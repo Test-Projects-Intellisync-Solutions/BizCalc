@@ -1,0 +1,28 @@
+# robots.txt for BusinessOne
+
+User-agent: *
+Allow: /
+Allow: /docs/
+Allow: /calculators/
+Allow: /tools/
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
+
+# Sitemaps
+Sitemap: https://home.intellisyncsolutions.io/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
+
+# Rate limits
+Request-rate: 1/10
+Crawl-rate: 1/10
+
+# Disallow sensitive areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /internal/
+Disallow: /user/
+Disallow: /account/
+Disallow: /dashboard/private/

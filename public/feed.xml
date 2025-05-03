@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>BusinessOne by IntelliSync Solutions</title>
+    <link>https://home.intellisyncsolutions.io</link>
+    <description>Professional financial planning, analysis and business intelligence tools for modern enterprises.</description>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 15 Mar 2024 12:00:00 GMT</lastBuildDate>
+    <atom:link href="https://home.intellisyncsolutions.io/feed.xml" rel="self" type="application/rss+xml"/>
+    
+    <item>
+      <title>Understanding Cash Flow Management</title>
+      <link>https://home.intellisyncsolutions.io/docs/what-is-cash-flow</link>
+      <description>Learn how to effectively manage your business cash flow with our comprehensive guide.</description>
+      <pubDate>Thu, 15 Mar 2024 10:00:00 GMT</pubDate>
+      <guid>https://home.intellisyncsolutions.io/docs/what-is-cash-flow</guid>
+      <category>Financial Concepts</category>
+    </item>
+
+    <item>
+      <title>Break-Even Analysis Guide</title>
+      <link>https://home.intellisyncsolutions.io/docs/break-even-analysis</link>
+      <description>Master the art of break-even analysis to make better business decisions.</description>
+      <pubDate>Thu, 15 Mar 2024 09:00:00 GMT</pubDate>
+      <guid>https://home.intellisyncsolutions.io/docs/break-even-analysis</guid>
+      <category>Financial Concepts</category>
+    </item>
+
+    <item>
+      <title>SaaS Metrics and Benchmarks</title>
+      <link>https://home.intellisyncsolutions.io/docs/saas-startups</link>
+      <description>Essential metrics and industry benchmarks for SaaS businesses in 2024.</description>
+      <pubDate>Thu, 15 Mar 2024 08:00:00 GMT</pubDate>
+      <guid>https://home.intellisyncsolutions.io/docs/saas-startups</guid>
+      <category>Industry Benchmarks</category>
+    </item>
+  </channel>
+</rss>
