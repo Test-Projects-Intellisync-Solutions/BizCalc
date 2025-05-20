@@ -64,7 +64,7 @@ export default function CTA() {
         Unlock Your Business Magic
       </motion.h2>
       <motion.p
-        className="mt-4 text-lg md:text-xl text-center text-white/90 max-w-2xl drop-shadow-md"
+        className="mt-6 text-lg md:text-xl text-center bg-gradient-to-r from-fuchsia-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent font-medium max-w-2xl drop-shadow-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.7 }}

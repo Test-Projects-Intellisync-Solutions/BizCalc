@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import { Home, Sparkles } from "lucide-react";
+import { Calculator, Sparkles } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Hero() {
@@ -55,7 +54,7 @@ export default function Hero() {
       </AnimatePresence>
       <span className="relative inline-block mb-6">
         <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl transform -rotate-6"></div>
-        <Home className="h-20 w-20 text-primary relative animate-bounce" />
+        <Calculator className="h-20 w-20 text-blue-400 relative animate-bounce drop-shadow-md" />
       </span>
       <motion.h1
         className="text-5xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-fuchsia-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg"
@@ -73,38 +72,7 @@ export default function Hero() {
       >
         Leverage powerful financial tools and insights to drive your business growth.
       </motion.p>
-      <motion.div
-        className="mt-8 flex gap-4 justify-center"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-      >
-        <Button
-          size="lg"
-          className="relative text-lg font-semibold px-8 py-4 rounded-full shadow-xl bg-gradient-to-br from-fuchsia-500 via-blue-500 to-cyan-400 text-white overflow-hidden hover:scale-105 hover:shadow-2xl transition-all duration-300 group"
-        >
-          <motion.span
-            className="absolute left-0 top-0 w-full h-full pointer-events-none"
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            {/* Glow effect */}
-            <span className="absolute inset-0 bg-white/30 blur-2xl rounded-full animate-pulse" />
-          </motion.span>
-          <span className="relative z-10 flex items-center gap-2">
-            <Sparkles className="h-6 w-6 animate-spin-slow text-yellow-200 drop-shadow" />
-            Get Started
-          </span>
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          className="relative text-lg font-semibold px-8 py-4 rounded-full shadow-lg group"
-        >
-          Learn More
-        </Button>
-      </motion.div>
+      
     </section>
   );
 }

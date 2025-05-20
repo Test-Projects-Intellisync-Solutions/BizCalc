@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { BarChart, Wrench, Brain } from "lucide-react";
 
 const services = [
@@ -95,7 +95,7 @@ export default function Services() {
         transition={{ duration: 0.8, type: "spring" }}
         viewport={{ once: true }}
       >
-        Our Services
+        Available Tools
       </motion.h2>
       <div className="relative py-8 overflow-hidden">
         {/* Infinite horizontal scroller */}

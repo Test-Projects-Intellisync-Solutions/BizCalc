@@ -20,9 +20,9 @@ import ProjectionsTab from '@/components/projections/ProjectionsTab';
 import ProfitabilityTab from '@/components/profitability/ProfitabilityTab';
 import RatiosTab from '@/components/ratios/RatiosTab';
 import Footer from '@/components/Footer';
-// import PricingPage from '@/components/pricing/PricingPage'; // (commented out for testing)
+// import PricingPage from '@/components/pricing/PricingPage'; // For Future Use
 import { motion } from 'framer-motion';
-import CTA from '@/components/CTA';
+// import CTA from '@/components/CTA'; // For Future Use
 import Hero from '@/components/Hero';
 import Services from '@/components/Services';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -51,7 +51,7 @@ function App() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Calculator className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold">BusinessOne</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">BusinessOne</h1>
               </div>
               {/* Desktop Navigation */}
               <nav className="hidden md:block">
@@ -73,7 +73,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Home className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Home</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     <NavigationMenuItem asChild>
@@ -91,7 +91,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Calculator className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Calculators</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     <NavigationMenuItem asChild>
@@ -109,7 +109,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Wrench className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Tools</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     <NavigationMenuItem asChild>
@@ -127,9 +127,12 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Book className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Docs</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
+
+                    
+                    {/*--- Pricing and Sign-In Buttons are commented out for future use ---*/}
                     {/*
                     <NavigationMenuItem asChild>
                       <button
@@ -144,6 +147,9 @@ function App() {
                     </NavigationMenuItem>
                     // Pricing link commented out for testing
                     */}
+
+                    
+                    {/* Sign In Button - For Future Use
                     <NavigationMenuItem>
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -155,10 +161,13 @@ function App() {
                           <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                             <LogIn className="h-5 w-5 transition-colors" />
                           </motion.span>
-                          <span className="transition-colors group-hover:underline group-hover:decoration-wavy">Sign In</span>
+                          <span className="transition-colors group-hover:underline">Sign In</span>
                         </Button>
                       </motion.div>
                     </NavigationMenuItem>
+                    */}
+
+
                   </NavigationMenuList>
                 </NavigationMenu>
               </nav>
@@ -236,6 +245,9 @@ function App() {
                         </motion.span>
                         Docs
                       </motion.button>
+
+                      
+                      // --- Pricing and Sign-In Buttons are commented out for future use ---
                       {/*
                       <button
                         onClick={() => {
@@ -281,12 +293,13 @@ function App() {
             >
               {/* Home Tab */}
               <TabsContent value="home" className="space-y-12">
-                {/* God Tier Hero Section */}
+                {/* Hero Section */}
                 <Hero />
                 {/* Animated Services Section */}
                 <Services />
-                {/* Magical CTA below hero */}
-                <CTA />
+                {/* Magical CTA - for future use*/}
+                {/* <CTA /> */} 
+
               </TabsContent>
 
               {/* Calculators Tab */}
