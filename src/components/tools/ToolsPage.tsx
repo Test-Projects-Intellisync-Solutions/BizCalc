@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import GuideCard from '@/components/ui/guide-card';
 import BurnRateCalculator from './calculators/BurnRateCalculator';
 import LoanCalculator from './calculators/LoanCalculator';
@@ -104,7 +105,8 @@ export default function ToolsPage() {
   const [selectedTool, setSelectedTool] = useState<any>(null);
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-6">
+    <TooltipProvider>
+      <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-6">
       <GuideCard
         title="Financial Tools Guide"
         steps={[
@@ -217,6 +219,7 @@ export default function ToolsPage() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

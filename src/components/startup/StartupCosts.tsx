@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useToast } from '@/lib/toast';
-import StartupCostEstimator from '@/components/tools/calculators/StartupCostEstimator';
+import StartupCostEstimator, { CostData } from '@/components/tools/calculators/StartupCostEstimator';
 import FileStatusIndicator from '@/components/common/FileStatusIndicator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,16 +8,21 @@ import { Save, FileText, FilePlus } from 'lucide-react';
 
 type FileHandleRef = FileSystemFileHandle | null;
 
-interface CostData {
-  businessType: string;
-  items: Array<{
-    id: string;
-    name: string;
-    amount: number;
-    category: string;
-    isOneTime: boolean;
-  }>;
-}
+const DEFAULT_COST_DATA: CostData = {
+  businessType: 'retail',
+  items: [
+    { id: '1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
+    { id: '2', name: 'Equipment', amount: 5000, category: 'Equipment', isOneTime: true },
+    { id: '3', name: 'Rent Deposit', amount: 3000, category: 'Facilities', isOneTime: true },
+    { id: '4', name: 'Initial Inventory', amount: 10000, category: 'Inventory', isOneTime: true },
+    { id: '5', name: 'Website', amount: 2000, category: 'Marketing', isOneTime: true },
+    { id: '6', name: 'Rent', amount: 1500, category: 'Facilities', isOneTime: false },
+    { id: '7', name: 'Utilities', amount: 500, category: 'Facilities', isOneTime: false },
+    { id: '8', name: 'Insurance', amount: 300, category: 'Insurance', isOneTime: false },
+    { id: '9', name: 'Marketing', amount: 1000, category: 'Marketing', isOneTime: false },
+    { id: '10', name: 'Employee Salaries', amount: 5000, category: 'Staffing', isOneTime: false },
+  ]
+};
 
 export default function StartupCosts() {
   const toast = useToast();
@@ -25,8 +30,15 @@ export default function StartupCosts() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [costData, setCostData] = useState<CostData>(DEFAULT_COST_DATA);
+  const costDataRef = useRef<CostData>(costData);
   const fileHandleRef = useRef<FileHandleRef>(null);
   const { success, error: showError } = toast;
+
+  // Keep the ref in sync with state
+  useEffect(() => {
+    costDataRef.current = costData;
+  }, [costData]);
 
   // Check if the File System Access API is supported
   const isFileSystemAccessSupported = 
@@ -39,9 +51,25 @@ export default function StartupCosts() {
     setFileName('Untitled.json');
     setLastSaved(null);
     fileHandleRef.current = null;
+    setCostData(DEFAULT_COST_DATA);
     // Reset the file input if it exists
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
+    success('New file created');
+  }, [success]);
+
+  // Update cost data when it changes
+  const handleDataChange = useCallback((newData: CostData) => {
+    setCostData(prevData => {
+      // Preserve the business type if it's not being updated
+      const updatedData = {
+        ...newData,
+        businessType: newData.businessType || prevData.businessType
+      };
+      return updatedData;
+    });
+    // Update last saved time when data changes
+    setLastSaved(new Date());
   }, []);
 
   // Save file using File System Access API
@@ -55,14 +83,9 @@ export default function StartupCosts() {
     setError(null);
 
     try {
-      // Get the current data from the StartupCostEstimator
-      // In a real implementation, you would get this from your state or ref
-      const data: CostData = {
-        businessType: 'retail', // Default or get from state
-        items: [], // Get actual items from your component state
-      };
-
-      const jsonString = JSON.stringify(data, null, 2);
+      // Use the ref to ensure we have the latest data
+      const currentData = costDataRef.current;
+      const jsonString = JSON.stringify(currentData, null, 2);
       let fileHandle = fileHandleRef.current;
 
       // If we don't have a file handle, show the file picker
@@ -131,20 +154,33 @@ export default function StartupCosts() {
       const file = await fileHandle.getFile();
       const contents = await file.text();
       
-      // Validate the file contents
+      // Parse and validate the file contents
       const data = JSON.parse(contents) as CostData;
       
-      // In a real implementation, you would validate the data structure here
-      // and update your component state with the loaded data
+      // Validate the loaded data
+      if (!data || typeof data !== 'object' || !Array.isArray(data.items)) {
+        throw new Error('Invalid file format: missing or invalid items array');
+      }
       
-      // Update UI state
+      // Ensure all required fields are present
+      const validatedData: CostData = {
+        businessType: data.businessType || 'retail',
+        items: data.items.map(item => ({
+          id: item.id || Date.now().toString(),
+          name: item.name || 'Unnamed Item',
+          amount: typeof item.amount === 'number' ? item.amount : 0,
+          category: item.category || 'Other',
+          isOneTime: !!item.isOneTime
+        }))
+      };
+      
+      // Update state with the loaded data
+      setCostData(validatedData);
       fileHandleRef.current = fileHandle;
       setFileName(file.name);
       setLastSaved(new Date());
-      
-      toast.success('Success', 'File loaded successfully');
-      
-      return data;
+      success('File loaded successfully');
+      return validatedData;
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
         console.error('Error opening file:', err);
@@ -165,16 +201,29 @@ export default function StartupCosts() {
       const contents = await file.text();
       const data = JSON.parse(contents) as CostData;
       
-      // In a real implementation, you would validate the data structure here
-      // and update your component state with the loaded data
+      // Validate the loaded data
+      if (!data || typeof data !== 'object' || !Array.isArray(data.items)) {
+        throw new Error('Invalid file format: missing or invalid items array');
+      }
       
-      // Update UI state
+      // Ensure all required fields are present
+      const validatedData: CostData = {
+        businessType: data.businessType || 'retail',
+        items: data.items.map(item => ({
+          id: item.id || Date.now().toString(),
+          name: item.name || 'Unnamed Item',
+          amount: typeof item.amount === 'number' ? item.amount : 0,
+          category: item.category || 'Other',
+          isOneTime: !!item.isOneTime
+        }))
+      };
+      
+      // Update state with the loaded data
+      setCostData(validatedData);
       setFileName(file.name);
       setLastSaved(new Date());
-      
-      toast.success('Success', 'File loaded successfully');
-      
-      return data;
+      success('File loaded successfully');
+      return validatedData;
     } catch (err) {
       console.error('Error reading file:', err);
       const error = new Error('Failed to read file');
@@ -260,7 +309,7 @@ export default function StartupCosts() {
           )}
         </CardHeader>
         <CardContent>
-          <StartupCostEstimator />
+          <StartupCostEstimator initialData={costData} onDataChange={handleDataChange} />
         </CardContent>
       </Card>
     </div>

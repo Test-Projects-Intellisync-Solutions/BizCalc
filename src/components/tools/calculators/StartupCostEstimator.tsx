@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +16,7 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 
-interface CostItem {
+export interface CostItem {
   id: string;
   name: string;
   amount: number;
@@ -24,9 +24,19 @@ interface CostItem {
   isOneTime: boolean;
 }
 
-export default function StartupCostEstimator() {
-  const [businessType, setBusinessType] = useState<string>('retail');
-  const [items, setItems] = useState<CostItem[]>([
+export interface CostData {
+  businessType: string;
+  items: CostItem[];
+}
+
+interface StartupCostEstimatorProps {
+  initialData?: CostData | null;
+  onDataChange?: (data: CostData) => void;
+}
+
+export default function StartupCostEstimator({ initialData, onDataChange }: StartupCostEstimatorProps) {
+  const [businessType, setBusinessType] = useState<string>(initialData?.businessType || 'retail');
+  const [items, setItems] = useState<CostItem[]>(initialData?.items || [
     { id: '1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
     { id: '2', name: 'Equipment', amount: 5000, category: 'Equipment', isOneTime: true },
     { id: '3', name: 'Rent Deposit', amount: 3000, category: 'Facilities', isOneTime: true },
@@ -39,33 +49,67 @@ export default function StartupCostEstimator() {
     { id: '10', name: 'Employee Salaries', amount: 5000, category: 'Staffing', isOneTime: false },
   ]);
 
+  // Update local state when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setBusinessType(initialData.businessType || 'retail');
+      setItems(initialData.items || []);
+    }
+  }, [initialData]);
+
   const handleItemChange = (id: string, field: keyof CostItem, value: any) => {
-    setItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, [field]: field === 'amount' ? parseFloat(value) || 0 : value } : item
-      )
+    const updatedItems = items.map(item => 
+      item.id === id ? { ...item, [field]: field === 'amount' ? parseFloat(value) || 0 : value } : item
     );
+    setItems(updatedItems);
+    
+    // Notify parent of data change
+    if (onDataChange) {
+      onDataChange({
+        businessType,
+        items: updatedItems
+      });
+    }
   };
 
   const addItem = () => {
-    setItems([
-      ...items,
-      {
-        id: Date.now().toString(),
-        name: 'New Item',
-        amount: 0,
-        category: 'Other',
-        isOneTime: true
-      }
-    ]);
+    const newItem = {
+      id: Date.now().toString(),
+      name: 'New Item',
+      amount: 0,
+      category: 'Other',
+      isOneTime: true
+    };
+    const updatedItems = [...items, newItem];
+    setItems(updatedItems);
+    
+    // Notify parent of data change
+    if (onDataChange) {
+      onDataChange({
+        businessType,
+        items: updatedItems
+      });
+    }
   };
 
   const removeItem = (id: string) => {
-    setItems(items => items.filter(item => item.id !== id));
+    const updatedItems = items.filter(item => item.id !== id);
+    setItems(updatedItems);
+    
+    // Notify parent of data change
+    if (onDataChange) {
+      onDataChange({
+        businessType,
+        items: updatedItems
+      });
+    }
   };
 
   const applyTemplate = (type: string) => {
     let templateItems: CostItem[] = [];
+    
+    // Update the business type in local state
+    setBusinessType(type);
     
     switch(type) {
       case 'retail':
@@ -138,7 +182,14 @@ export default function StartupCostEstimator() {
     }
     
     setItems(templateItems);
-    setBusinessType(type);
+    
+    // Notify parent of data change
+    if (onDataChange) {
+      onDataChange({
+        businessType: type,
+        items: templateItems
+      });
+    }
   };
 
   // Calculate totals
