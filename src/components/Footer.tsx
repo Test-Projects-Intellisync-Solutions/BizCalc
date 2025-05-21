@@ -1,4 +1,5 @@
 import { Calculator } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -97,9 +98,9 @@ export default function Footer() {
             © {new Date().getFullYear()} IntelliSync Solutions. All rights reserved.
           </div>
           <div className="flex space-x-4 text-sm text-muted-foreground">
-            <a href="/privacy" className="hover:text-primary">Privacy Policy</a>
-            <a href="/terms" className="hover:text-primary">Terms of Service</a>
-            <a href="/cookies" className="hover:text-primary">Cookie Policy</a>
+            <Link to="/privacy" className="hover:text-primary">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-primary">Terms of Service</Link>
+            <Link to="/cookies" className="hover:text-primary">Cookie Policy</Link>
           </div>
         </div>
       </div>

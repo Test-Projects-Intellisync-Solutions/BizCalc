@@ -21,6 +21,10 @@ import ProjectionsTab from '@/components/revenueExpensesTab/ProjectionsTab';
 import ProfitabilityTab from '@/components/profitabilityTab/ProfitabilityTab';
 import RatiosTab from '@/components/ratiosTab/RatiosTab';
 import Footer from '@/components/Footer';
+import { Routes, Route } from 'react-router-dom';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import CookiesPolicy from './pages/CookiesPolicy';
 // import PricingPage from '@/components/pricing/PricingPage'; // For Future Use
 import { motion } from 'framer-motion';
 // import CTA from '@/components/CTA'; // For Future Use
@@ -45,93 +49,101 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <TooltipProvider>
-        <div className="min-h-screen bg-background">
-          <div className="flex flex-col min-h-screen">
-          {/* Header */}
-          <header className="sticky top-0 z-50 bg-background/95 border-b backdrop-blur-lg px-4 py-3 sm:px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Calculator className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">BusinessOne</h1>
-              </div>
-              {/* Desktop Navigation */}
-              <nav className="hidden md:block">
-                <NavigationMenu>
-                  <NavigationMenuList>
-                    {/* Animated Desktop Navigation Links */}
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'home';
-                          setActiveTab('home');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.05, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Home className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'calculators';
-                          setActiveTab('calculators');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.10, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Calculator className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'tools';
-                          setActiveTab('tools');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Wrench className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'docs';
-                          setActiveTab('docs');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.20, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Book className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
+        <TooltipProvider>
+          <Routes>
+            <Route path="privacy" element={<><PrivacyPolicy /><Footer /></>} />
+            <Route path="terms" element={<><TermsOfService /><Footer /></>} />
+            <Route path="cookies" element={<><CookiesPolicy /><Footer /></>} />
+            <Route
+              path="*"
+              element={
+                <>
+                  <div className="min-h-screen bg-background">
+                    <div className="flex flex-col min-h-screen">
+                    {/* Header */}
+                    <header className="sticky top-0 z-50 bg-background/95 border-b backdrop-blur-lg px-4 py-3 sm:px-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <Calculator className="h-8 w-8 text-primary" />
+                          <h1 className="text-2xl font-bold bg-gradient-to-r from-fuchsia-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">BusinessOne</h1>
+                        </div>
+                        {/* Desktop Navigation */}
+                        <nav className="hidden md:block">
+                          <NavigationMenu>
+                            <NavigationMenuList>
+                              {/* Animated Desktop Navigation Links */}
+                              <NavigationMenuItem asChild>
+                                <motion.button
+                                  className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
+                                  onClick={() => {
+                                    window.location.hash = 'home';
+                                    setActiveTab('home');
+                                  }}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.05, type: 'spring', stiffness: 260, damping: 20 }}
+                                  whileHover={{ scale: 1.07 }}
+                                >
+                                  <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
+                                    <Home className="h-5 w-5 transition-colors" />
+                                  </motion.span>
+                                  <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
+                                </motion.button>
+                              </NavigationMenuItem>
+                              <NavigationMenuItem asChild>
+                                <motion.button
+                                  className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
+                                  onClick={() => {
+                                    window.location.hash = 'calculators';
+                                    setActiveTab('calculators');
+                                  }}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.10, type: 'spring', stiffness: 260, damping: 20 }}
+                                  whileHover={{ scale: 1.07 }}
+                                >
+                                  <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
+                                    <Calculator className="h-5 w-5 transition-colors" />
+                                  </motion.span>
+                                  <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
+                                </motion.button>
+                              </NavigationMenuItem>
+                              <NavigationMenuItem asChild>
+                                <motion.button
+                                  className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
+                                  onClick={() => {
+                                    window.location.hash = 'tools';
+                                    setActiveTab('tools');
+                                  }}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 20 }}
+                                  whileHover={{ scale: 1.07 }}
+                                >
+                                  <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
+                                    <Wrench className="h-5 w-5 transition-colors" />
+                                  </motion.span>
+                                  <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
+                                </motion.button>
+                              </NavigationMenuItem>
+                              <NavigationMenuItem asChild>
+                                <motion.button
+                                  className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
+                                  onClick={() => {
+                                    window.location.hash = 'docs';
+                                    setActiveTab('docs');
+                                  }}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.20, type: 'spring', stiffness: 260, damping: 20 }}
+                                  whileHover={{ scale: 1.07 }}
+                                >
+                                  <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
+                                    <Book className="h-5 w-5 transition-colors" />
+                                  </motion.span>
+                                  <NavigationMenuLink className="transition-colors group-hover:underline"></NavigationMenuLink>
+                                </motion.button>
+                              </NavigationMenuItem>
 
                     
                     {/*--- Pricing and Sign-In Buttons are commented out for future use ---*/}
@@ -356,10 +368,14 @@ function App() {
 
           {/* Footer */}
           <Footer />
-        </div>
-      </div>
-      <Toaster />
-      </TooltipProvider>
+                    </div>
+                  </div>
+                  <Toaster />
+                </>
+              }
+            />
+          </Routes>
+        </TooltipProvider>
     </ThemeProvider>
   );
 }
