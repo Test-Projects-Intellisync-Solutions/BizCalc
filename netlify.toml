@@ -8,7 +8,43 @@
   NPM_VERSION = "9"
   NODE_OPTIONS = "--max_old_space_size=4096"
 
-# Redirect all routes to index.html for SPA routing
+# Force HTTPS
+[[redirects]]
+  from = "http://*"
+  to = "https://:splat"
+  status = 301
+  force = true
+
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.*"
+  to = "https://:splat"
+  status = 301
+  force = true
+
+# Handle 404 errors
+[[redirects]]
+  from = "/404"
+  to = "/index.html"
+  status = 404
+
+# Redirect specific routes to their respective pages
+[[redirects]]
+  from = "/privacy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/cookies"
+  to = "/index.html"
+  status = 200
+
+# Redirect all routes to index.html for SPA routing (catch-all)
 [[redirects]]
   from = "/*"
   to = "/index.html"

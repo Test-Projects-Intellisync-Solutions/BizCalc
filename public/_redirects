@@ -1,0 +1,16 @@
+# Force HTTPS
+http://*  https://:splat  301!
+
+# Redirect www to non-www
+https://www.*  https://:splat  301!
+
+# Handle 404 errors
+/404  /index.html  404
+
+# Redirect specific routes to their respective pages
+/privacy  /index.html  200
+/terms  /index.html  200
+/cookies  /index.html  200
+
+# Redirect all routes to index.html for SPA routing (catch-all)
+/*  /index.html  200
