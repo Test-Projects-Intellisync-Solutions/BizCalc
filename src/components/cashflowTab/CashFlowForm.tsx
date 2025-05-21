@@ -98,7 +98,7 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
           <CardContent className="space-y-6">
             {items
               .filter((item) => item.category === 'inflow')
-              .map((item, index) => (
+              .map((item) => (
                 <div key={item.id} className="space-y-4 p-4 border rounded-lg">
                   <div className="flex items-center justify-between">
                     <Label>Income Source</Label>
@@ -178,7 +178,7 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
           <CardContent className="space-y-6">
             {items
               .filter((item) => item.category === 'outflow')
-              .map((item, index) => (
+              .map((item) => (
                 <div key={item.id} className="space-y-4 p-4 border rounded-lg">
                   <div className="flex items-center justify-between">
                     <Label>Expense</Label>

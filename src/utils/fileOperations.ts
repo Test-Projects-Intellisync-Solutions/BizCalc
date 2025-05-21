@@ -29,40 +29,7 @@ export type FileHandler = {
   name: string;
 };
 
-// Extend the Window interface for File System Access API
-declare global {
-  interface Window {
-    showSaveFilePicker?: (options?: {
-      suggestedName?: string;
-      types?: Array<{
-        description: string;
-        accept: Record<string, string[]>;
-      }>;
-    }) => Promise<{
-      name: string;
-      getFile: () => Promise<File>;
-      createWritable?: () => Promise<{
-        write: (data: any) => Promise<void>;
-        close: () => Promise<void>;
-      }>;
-    }>;
-    
-    showOpenFilePicker?: (options?: {
-      multiple?: boolean;
-      types?: Array<{
-        description: string;
-        accept: Record<string, string[]>;
-      }>;
-    }) => Promise<Array<{
-      name: string;
-      getFile: () => Promise<File>;
-      createWritable?: () => Promise<{
-        write: (data: any) => Promise<void>;
-        close: () => Promise<void>;
-      }>;
-    }>>;
-  }
-}
+
 
 // Supported file extensions
 export const CALCULATOR_FILE_EXTENSION = '.bizcalc';

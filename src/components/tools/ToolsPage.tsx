@@ -102,7 +102,8 @@ const documents = businessPlanningDocs.map(doc => ({
 
 export default function ToolsPage() {
   const [activeTab, setActiveTab] = useState('calculators');
-  const [selectedTool, setSelectedTool] = useState<any>(null);
+  // We're using setSelectedTool but don't need to track the value directly
+  const [, setSelectedTool] = useState<any>(null);
 
   return (
     <TooltipProvider>

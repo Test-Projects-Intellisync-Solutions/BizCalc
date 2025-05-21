@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-interface PageWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
+import type { HTMLMotionProps } from 'framer-motion';
+
+interface PageWrapperProps extends Omit<HTMLMotionProps<'div'>, 'ref'> {
   children: React.ReactNode;
 }
 

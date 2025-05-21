@@ -2,7 +2,6 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Toaster } from '@/components/ui/sonner';
 import { Calculator, Menu, Home, Wrench, Book, LogIn } from 'lucide-react';
-import DocsPage from '@/components/docs/DocsPage';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
   NavigationMenu,
@@ -11,26 +10,30 @@ import {
   NavigationMenuLink,
 } from '@/components/ui/navigation-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import StartupCosts from '@/components/startupCostsTab/StartupCosts';
-import ToolsPage from '@/components/tools/ToolsPage';
-import BurnRate from '@/components/startupCostsTab/BurnRate';
-import CashFlowTab from '@/components/cashflowTab/CashFlowTab';
-import ProjectionsTab from '@/components/revenueExpensesTab/ProjectionsTab';
-import ProfitabilityTab from '@/components/profitabilityTab/ProfitabilityTab';
-import RatiosTab from '@/components/ratiosTab/RatiosTab';
 import Footer from '@/components/Footer';
 import { Routes, Route } from 'react-router-dom';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfService from './pages/TermsOfService';
-import CookiesPolicy from './pages/CookiesPolicy';
-// import PricingPage from '@/components/pricing/PricingPage'; // For Future Use
+
+// Lazy-loaded components
+const DocsPage = lazy(() => import('@/components/docs/DocsPage'));
+const ToolsPage = lazy(() => import('@/components/tools/ToolsPage'));
+const StartupCosts = lazy(() => import('@/components/startupCostsTab/StartupCosts'));
+const BurnRate = lazy(() => import('@/components/startupCostsTab/BurnRate'));
+const CashFlowTab = lazy(() => import('@/components/cashflowTab/CashFlowTab'));
+const ProjectionsTab = lazy(() => import('@/components/revenueExpensesTab/ProjectionsTab'));
+const ProfitabilityTab = lazy(() => import('@/components/profitabilityTab/ProfitabilityTab'));
+const RatiosTab = lazy(() => import('@/components/ratiosTab/RatiosTab'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/TermsOfService'));
+const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy'));
+// const PricingPage = lazy(() => import('@/components/pricing/PricingPage')); // For Future Use
 import { motion } from 'framer-motion';
 // import CTA from '@/components/CTA'; // For Future Use
 import Hero from '@/components/Hero';
 import Services from '@/components/Services';
 import ScrollToTop from '@/components/ScrollToTop';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -51,9 +54,9 @@ function App() {
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <TooltipProvider>
           <Routes>
-            <Route path="privacy" element={<><PrivacyPolicy /><Footer /></>} />
-            <Route path="terms" element={<><TermsOfService /><Footer /></>} />
-            <Route path="cookies" element={<><CookiesPolicy /><Footer /></>} />
+            <Route path="privacy" element={<><Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}><PrivacyPolicy /></Suspense><Footer /></>} />
+            <Route path="terms" element={<><Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}><TermsOfService /></Suspense><Footer /></>} />
+            <Route path="cookies" element={<><Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}><CookiesPolicy /></Suspense><Footer /></>} />
             <Route
               path="*"
               element={
@@ -328,33 +331,49 @@ function App() {
                   </TabsList>
                   <TabsContent value="startup" className="space-y-6">
                     <div className="grid gap-4 md:grid-cols-2">
-                      <StartupCosts />
-                      <BurnRate />
+                      <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                        <StartupCosts />
+                      </Suspense>
+                      <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                        <BurnRate />
+                      </Suspense>
                     </div>
                   </TabsContent>
                   <TabsContent value="projections" className="space-y-6">
-                    <ProjectionsTab />
+                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                      <ProjectionsTab />
+                    </Suspense>
                   </TabsContent>
                   <TabsContent value="cashflow" className="space-y-6">
-                    <CashFlowTab />
+                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                      <CashFlowTab />
+                    </Suspense>
                   </TabsContent>
                   <TabsContent value="profitability" className="space-y-6">
-                    <ProfitabilityTab />
+                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                      <ProfitabilityTab />
+                    </Suspense>
                   </TabsContent>
                   <TabsContent value="ratios" className="space-y-6">
-                    <RatiosTab />
+                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                      <RatiosTab />
+                    </Suspense>
                   </TabsContent>
                 </Tabs>
               </TabsContent>
 
               {/* Tools Tab */}
               <TabsContent value="tools" className="mt-6">
-                <ToolsPage />
+                <Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}>
+                  <ToolsPage />
+                </Suspense>
               </TabsContent>
 
               {/* Docs Tab */}
               <TabsContent value="docs" className="mt-6">
-                <DocsPage />
+                <Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}>
+                  <DocsPage />
+                </Suspense>
               </TabsContent>
               
               {/*

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, X, Zap, Building, Sparkles, Cpu, Database, Lock, Users, BarChart, BrainCircuit } from 'lucide-react';
+import { Check, X, Zap, Building, Sparkles, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 
 export default function PricingPage() {
@@ -224,7 +224,7 @@ export default function PricingPage() {
         initial="hidden"
         animate="visible"
       >
-        {plans.map((plan, index) => {
+        {plans.map((plan) => {
           const PlanIcon = plan.icon;
           return (
             <motion.div key={plan.name} variants={itemVariants}>
