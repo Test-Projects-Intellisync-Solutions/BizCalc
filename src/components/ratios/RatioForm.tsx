@@ -1,3 +1,4 @@
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,13 +20,13 @@ interface FinancialData {
   ebit: number;
   interestExpense: number;
   accountsReceivable: number;
-  previousRevenue?: number;
-  previousNetIncome?: number;
+  previousRevenue: number;
+  previousNetIncome: number;
 }
 
 interface RatioFormProps {
   data: FinancialData;
-  onUpdate: (data: FinancialData) => void;
+  onUpdate: React.Dispatch<React.SetStateAction<FinancialData>>;
 }
 
 export default function RatioForm({ data, onUpdate }: RatioFormProps) {

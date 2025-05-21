@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+
 
 export default function RoiCalculator() {
   const [initialInvestment, setInitialInvestment] = useState<number>(0);
@@ -10,7 +10,7 @@ export default function RoiCalculator() {
   const [timeframe, setTimeframe] = useState<number>(1);
 
   const calculateROI = () => {
-    if (initialInvestment === 0) return 0;
+    if (initialInvestment === 0) return { roi: 0, annualizedROI: 0 };
     const roi = ((returnAmount - initialInvestment) / initialInvestment) * 100;
     const annualizedROI = ((1 + roi / 100) ** (1 / timeframe) - 1) * 100;
     return {
@@ -88,9 +88,6 @@ export default function RoiCalculator() {
             </Card>
           )}
 
-          <Button className="w-full" onClick={() => console.log('Save ROI calculation')}>
-            Save Calculation
-          </Button>
         </CardContent>
       </Card>
     </div>

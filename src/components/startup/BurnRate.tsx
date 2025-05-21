@@ -2,18 +2,11 @@ import { useState, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, FileText, FilePlus, Save } from 'lucide-react';
-import { toast } from 'sonner';
-import FileStatusIndicator from '@/components/common/FileStatusIndicator';
+import { AlertCircle } from 'lucide-react';
+import { useToast } from '@/lib/toast';
+import SaveLoadControls from '@/components/common/SaveLoadControls';
 import type { FileSystemFileHandle } from '@/types/file-system-access';
-
-// Check if the File System Access API is supported
-const isFileSystemAccessSupported = 
-  typeof window !== 'undefined' && 
-  'showSaveFilePicker' in window && 
-  'showOpenFilePicker' in window;
 
 // Define the data structure for the burn rate calculator
 export interface BurnRateData {
@@ -23,15 +16,18 @@ export interface BurnRateData {
 }
 
 export default function BurnRate() {
+  const toast = useToast();
   const [data, setData] = useState<BurnRateData>({
     availableCapital: 0,
     monthlyExpenses: 0
   });
-  const [fileName, setFileName] = useState<string>('Untitled.json');
+  const [fileName, setFileName] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
   const fileHandleRef = useRef<FileSystemFileHandle | null>(null);
+  const { success, error: showError } = toast;
   
   const { availableCapital, monthlyExpenses } = data;
 
@@ -53,129 +49,119 @@ export default function BurnRate() {
     return months.toFixed(1);
   };
 
+  // Create a new file
+  const handleNewFile = useCallback(() => {
+    setFileName('Untitled.json');
+    setLastSaved(null);
+    fileHandleRef.current = null;
+    setData({
+      availableCapital: 0,
+      monthlyExpenses: 0
+    });
+    success('New file created');
+  }, [success]);
+
   // Save file using File System Access API
   const handleSave = useCallback(async () => {
-    if (typeof window === 'undefined' || !window.showSaveFilePicker) {
-      toast.error('File System Access API is not supported in your browser.');
+    if (!window?.showSaveFilePicker) {
+      showError('Error', 'File System Access API is not supported in your browser.');
       return;
     }
 
     setIsSaving(true);
+    setError(null);
 
     try {
-      const fileData = {
-        ...data,
-        lastSaved: new Date().toISOString()
-      };
+      const jsonString = JSON.stringify(data, null, 2);
+      let fileHandle = fileHandleRef.current;
 
-      const blob = new Blob([JSON.stringify(fileData, null, 2)], { type: 'application/json' });
-      const fileHandle = await window.showSaveFilePicker({
-        suggestedName: fileName,
-        types: [{
-          description: 'JSON Files',
-          accept: { 'application/json': ['.json'] },
-        }],
-      });
+      if (!fileHandle) {
+        try {
+          fileHandle = await window.showSaveFilePicker({
+            suggestedName: 'burn-rate.json',
+            types: [{
+              description: 'JSON Files',
+              accept: { 'application/json': ['.json'] },
+            }],
+          }) as FileSystemFileHandle;
+          fileHandleRef.current = fileHandle;
+        } catch (err) {
+          if (err instanceof Error && err.name === 'AbortError') return;
+          throw err;
+        }
+      }
 
       const writable = await fileHandle.createWritable();
-      await writable.write(blob);
+      await writable.write(jsonString);
       await writable.close();
 
-      fileHandleRef.current = fileHandle;
       setFileName(fileHandle.name);
       setLastSaved(new Date());
-      toast.success('File saved successfully');
+      success('File saved successfully');
     } catch (err) {
-      if (err instanceof Error && err.name !== 'AbortError') {
-        console.error('Error saving file:', err);
-        toast.error('Failed to save file. Please try again.');
-      }
+      console.error('Error saving file:', err);
+      const error = err instanceof Error ? err : new Error('Failed to save file');
+      setError(error);
+      showError('Error', error.message);
     } finally {
       setIsSaving(false);
     }
-  }, [data, fileName]);
+  }, [data, showError, success]);
 
   // Load file using File System Access API
-  const handleLoad = useCallback(async (): Promise<BurnRateData | undefined> => {
-    if (typeof window === 'undefined' || !window.showOpenFilePicker) {
-      toast.error('File System Access API is not supported in your browser.');
+  const handleLoad = useCallback(async () => {
+    if (!window?.showOpenFilePicker) {
+      showError('Error', 'File System Access API is not supported in your browser.');
       return;
     }
 
     setIsLoading(true);
+    setError(null);
 
     try {
-      const fileHandles = await window.showOpenFilePicker({
-        multiple: false,
+      const [fileHandle] = await window.showOpenFilePicker({
         types: [{
           description: 'JSON Files',
           accept: { 'application/json': ['.json'] },
         }],
-      });
+        multiple: false,
+      }) as unknown as FileSystemFileHandle[];
       
-      const fileHandle = fileHandles[0];
       const file = await fileHandle.getFile();
       const contents = await file.text();
       
-      const loadedData = JSON.parse(contents);
+      // Parse and validate the file contents
+      const loadedData = JSON.parse(contents) as BurnRateData;
       
       // Validate the loaded data
       if (!loadedData || typeof loadedData !== 'object') {
         throw new Error('Invalid file format');
       }
-
-      const validatedData: BurnRateData = {
-        availableCapital: Number(loadedData.availableCapital) || 0,
-        monthlyExpenses: Number(loadedData.monthlyExpenses) || 0,
-      };
-
+      
+      if (typeof loadedData.availableCapital !== 'number' || 
+          typeof loadedData.monthlyExpenses !== 'number') {
+        throw new Error('Invalid data format: missing or invalid numeric fields');
+      }
+      
+      // Update state with the loaded data
+      setData(loadedData);
       fileHandleRef.current = fileHandle;
       setFileName(file.name);
-      setData(validatedData);
-      setLastSaved(loadedData.lastSaved ? new Date(loadedData.lastSaved) : new Date());
-      toast.success('File loaded successfully');
+      setLastSaved(new Date());
+      success('File loaded successfully');
+      return loadedData;
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
-        console.error('Error loading file:', err);
-        toast.error('Failed to load file. Please try again.');
+        console.error('Error opening file:', err);
+        const error = new Error('Failed to open file');
+        setError(error);
+        showError('Error', error.message);
       }
+      return undefined;
     } finally {
       setIsLoading(false);
     }
-  }, []);
-
-  // Handle file input change for browsers without File System Access API
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsLoading(true);
-
-    try {
-      const contents = await file.text();
-      const loadedData = JSON.parse(contents);
-      
-      // Validate the loaded data
-      if (!loadedData || typeof loadedData !== 'object') {
-        throw new Error('Invalid file format');
-      }
-
-      const validatedData: BurnRateData = {
-        availableCapital: Number(loadedData.availableCapital) || 0,
-        monthlyExpenses: Number(loadedData.monthlyExpenses) || 0,
-      };
-
-      setData(validatedData);
-      setFileName(file.name);
-      setLastSaved(loadedData.lastSaved ? new Date(loadedData.lastSaved) : new Date());
-      toast.success('File loaded successfully');
-    } catch (err) {
-      console.error('Error loading file:', err);
-      toast.error('Failed to load file. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [showError, success]);
 
   // Format currency
   const formatCurrency = (value: number) => {
@@ -195,85 +181,18 @@ export default function BurnRate() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setData({ availableCapital: 0, monthlyExpenses: 0 });
-              setFileName('Untitled.json');
-              setLastSaved(null);
-              fileHandleRef.current = null;
-            }}
-            className="gap-2"
-          >
-            <FilePlus className="h-4 w-4" />
-            New
-          </Button>
-          
-          {isFileSystemAccessSupported ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLoad}
-              className="gap-2"
-              disabled={isLoading}
-            >
-              <FileText className="h-4 w-4" />
-              Open
-            </Button>
-          ) : (
-            <>
-              <input
-                id="file-upload"
-                type="file"
-                accept=".json"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => document.getElementById('file-upload')?.click()}
-                className="gap-2"
-                disabled={isLoading}
-              >
-                <FileText className="h-4 w-4" />
-                Open
-              </Button>
-            </>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <FileStatusIndicator 
-            fileName={fileName}
-            lastSaved={lastSaved}
-            isSaving={isSaving}
-            error={null}
-          />
-          <Button 
-            variant="outline"
-            size="sm" 
-            onClick={handleSave}
-            disabled={isSaving}
-            className="gap-2"
-          >
-            <Save className={`h-4 w-4 ${isSaving ? 'animate-pulse' : ''}`} />
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
-        </div>
-      </div>
-
+      <SaveLoadControls
+        onNew={handleNewFile}
+        onSave={handleSave}
+        onLoad={handleLoad}
+        isSaving={isSaving}
+        isLoading={isLoading}
+        lastSaved={lastSaved}
+        fileName={fileName}
+      />
       <Card>
         <CardHeader>
           <CardTitle>Burn Rate Calculator</CardTitle>
-          {fileName && (
-            <p className="text-sm text-muted-foreground">
-              {fileName} • {lastSaved ? `Last saved: ${lastSaved.toLocaleString()}` : 'Not saved yet'}
-            </p>
-          )}
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -354,6 +273,9 @@ export default function BurnRate() {
           </div>
         </CardContent>
       </Card>
+      {error && (
+        <div className="text-red-500 text-sm mt-2">{error.message}</div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,45 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { useToast } from '@/lib/toast';
 import GuideCard from '@/components/ui/guide-card';
+import SaveLoadControls from '@/components/common/SaveLoadControls';
 import RatioForm from './RatioForm';
 import RatioCard from './RatioCard';
+import type { FileSystemFileHandle } from '@/types/file-system-access';
+
+interface FinancialData {
+  currentAssets: number;
+  inventory: number;
+  cash: number;
+  currentLiabilities: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  shareholderEquity: number;
+  revenue: number;
+  cogs: number;
+  operatingIncome: number;
+  netIncome: number;
+  ebit: number;
+  interestExpense: number;
+  accountsReceivable: number;
+  previousRevenue: number;
+  previousNetIncome: number;
+}
 
 export default function RatiosTab() {
-  const [financialData, setFinancialData] = useState({
+  const toast = useToast();
+  const { success, error: showError } = toast;
+  const fileHandleRef = useRef<FileSystemFileHandle | null>(null);
+
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const [financialData, setFinancialData] = useState<FinancialData>({
     currentAssets: 0,
     inventory: 0,
     cash: 0,
@@ -106,8 +138,151 @@ export default function RatiosTab() {
     }
   };
 
+  const handleNewFile = useCallback(() => {
+    setFileName('Untitled.json');
+    setLastSaved(null);
+    fileHandleRef.current = null;
+    setFinancialData({
+      currentAssets: 0,
+      inventory: 0,
+      cash: 0,
+      currentLiabilities: 0,
+      totalAssets: 0,
+      totalLiabilities: 0,
+      shareholderEquity: 0,
+      revenue: 0,
+      cogs: 0,
+      operatingIncome: 0,
+      netIncome: 0,
+      ebit: 0,
+      interestExpense: 0,
+      accountsReceivable: 0,
+      previousRevenue: 0,
+      previousNetIncome: 0,
+    });
+    success('New file created');
+  }, [success]);
+
+  const handleSave = useCallback(async () => {
+    if (!window?.showSaveFilePicker) {
+      showError('Error', 'File System Access API is not supported in your browser.');
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      const jsonString = JSON.stringify(financialData, null, 2);
+      let fileHandle = fileHandleRef.current;
+
+      if (!fileHandle) {
+        try {
+          fileHandle = await window.showSaveFilePicker({
+            suggestedName: 'financial-ratios.json',
+            types: [{
+              description: 'JSON Files',
+              accept: { 'application/json': ['.json'] },
+            }],
+          }) as FileSystemFileHandle;
+          fileHandleRef.current = fileHandle;
+        } catch (err) {
+          if (err instanceof Error && err.name === 'AbortError') return;
+          throw err;
+        }
+      }
+
+      const writable = await fileHandle.createWritable();
+      await writable.write(jsonString);
+      await writable.close();
+
+      setFileName(fileHandle.name);
+      setLastSaved(new Date());
+      success('File saved successfully');
+    } catch (err) {
+      console.error('Error saving file:', err);
+      const error = err instanceof Error ? err : new Error('Failed to save file');
+      setError(error);
+      showError('Error', error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [financialData, showError, success]);
+
+  const handleLoad = useCallback(async () => {
+    if (!window?.showOpenFilePicker) {
+      showError('Error', 'File System Access API is not supported in your browser.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [{
+          description: 'JSON Files',
+          accept: { 'application/json': ['.json'] },
+        }],
+        multiple: false,
+      }) as unknown as FileSystemFileHandle[];
+      
+      const file = await fileHandle.getFile();
+      const contents = await file.text();
+      
+      // Parse and validate the file contents
+      const loadedData = JSON.parse(contents) as FinancialData;
+      
+      // Validate the loaded data
+      const requiredFields: (keyof FinancialData)[] = [
+        'currentAssets', 'inventory', 'cash', 'currentLiabilities',
+        'totalAssets', 'totalLiabilities', 'shareholderEquity', 'revenue',
+        'cogs', 'operatingIncome', 'netIncome', 'ebit', 'interestExpense',
+        'accountsReceivable', 'previousRevenue', 'previousNetIncome'
+      ];
+
+      for (const field of requiredFields) {
+        if (typeof loadedData[field] !== 'number') {
+          throw new Error(`Invalid data format: missing or invalid field '${field}'`);
+        }
+      }
+      
+      // Update state with the loaded data
+      setFinancialData(loadedData);
+      fileHandleRef.current = fileHandle;
+      setFileName(file.name);
+      setLastSaved(new Date());
+      success('File loaded successfully');
+    } catch (err) {
+      if (err instanceof Error && err.name !== 'AbortError') {
+        console.error('Error opening file:', err);
+        const error = new Error('Failed to open file');
+        setError(error);
+        showError('Error', error.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [showError, success]);
+
   return (
     <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error.message}</AlertDescription>
+        </Alert>
+      )}
+      <SaveLoadControls
+        onNew={handleNewFile}
+        onSave={handleSave}
+        onLoad={handleLoad}
+        isSaving={isSaving}
+        isLoading={isLoading}
+        lastSaved={lastSaved}
+        fileName={fileName}
+      />
       <GuideCard
         title="Financial Ratios Analysis Guide"
         steps={[

@@ -1,10 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useToast } from '@/lib/toast';
 import StartupCostEstimator, { CostData } from '@/components/tools/calculators/StartupCostEstimator';
-import FileStatusIndicator from '@/components/common/FileStatusIndicator';
-import { Button } from '@/components/ui/button';
+import SaveLoadControls from '@/components/common/SaveLoadControls';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Save, FileText, FilePlus } from 'lucide-react';
 
 type FileHandleRef = FileSystemFileHandle | null;
 
@@ -29,11 +27,11 @@ export default function StartupCosts() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
   const [costData, setCostData] = useState<CostData>(DEFAULT_COST_DATA);
   const costDataRef = useRef<CostData>(costData);
   const fileHandleRef = useRef<FileHandleRef>(null);
   const { success, error: showError } = toast;
+  const [error, setError] = useState<Error | null>(null);
 
   // Keep the ref in sync with state
   useEffect(() => {
@@ -41,9 +39,9 @@ export default function StartupCosts() {
   }, [costData]);
 
   // Check if the File System Access API is supported
-  const isFileSystemAccessSupported = 
-    typeof window !== 'undefined' && 
-    'showSaveFilePicker' in window && 
+  const isFileSystemAccessSupported =
+    typeof window !== 'undefined' &&
+    'showSaveFilePicker' in window &&
     'showOpenFilePicker' in window;
 
   // Create a new file
@@ -52,9 +50,6 @@ export default function StartupCosts() {
     setLastSaved(null);
     fileHandleRef.current = null;
     setCostData(DEFAULT_COST_DATA);
-    // Reset the file input if it exists
-    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-    if (fileInput) fileInput.value = '';
     success('New file created');
   }, [success]);
 
@@ -129,7 +124,7 @@ export default function StartupCosts() {
     } finally {
       setIsSaving(false);
     }
-  }, [isFileSystemAccessSupported, toast]);
+  }, [isFileSystemAccessSupported, showError, success]);
 
   // Open an existing file
   const handleOpenFile = useCallback(async () => {
@@ -190,115 +185,19 @@ export default function StartupCosts() {
       }
       return null;
     }
-  }, [isFileSystemAccessSupported, toast]);
-
-  // Fallback for browsers that don't support the File System Access API
-  const handleFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const contents = await file.text();
-      const data = JSON.parse(contents) as CostData;
-      
-      // Validate the loaded data
-      if (!data || typeof data !== 'object' || !Array.isArray(data.items)) {
-        throw new Error('Invalid file format: missing or invalid items array');
-      }
-      
-      // Ensure all required fields are present
-      const validatedData: CostData = {
-        businessType: data.businessType || 'retail',
-        items: data.items.map(item => ({
-          id: item.id || Date.now().toString(),
-          name: item.name || 'Unnamed Item',
-          amount: typeof item.amount === 'number' ? item.amount : 0,
-          category: item.category || 'Other',
-          isOneTime: !!item.isOneTime
-        }))
-      };
-      
-      // Update state with the loaded data
-      setCostData(validatedData);
-      setFileName(file.name);
-      setLastSaved(new Date());
-      success('File loaded successfully');
-      return validatedData;
-    } catch (err) {
-      console.error('Error reading file:', err);
-      const error = new Error('Failed to read file');
-      setError(error);
-      showError('Error', error.message);
-      return null;
-    }
-  }, [success, showError]);
+  }, [isFileSystemAccessSupported, showError, success]);
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNewFile}
-            className="gap-2"
-          >
-            <FilePlus className="h-4 w-4" />
-            New
-          </Button>
-          
-          {isFileSystemAccessSupported ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleOpenFile}
-              className="gap-2"
-            >
-              <FileText className="h-4 w-4" />
-              Open
-            </Button>
-          ) : (
-            <>
-              <input
-                id="file-upload"
-                type="file"
-                accept=".json"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => document.getElementById('file-upload')?.click()}
-                className="gap-2"
-              >
-                <FileText className="h-4 w-4" />
-                Open
-              </Button>
-            </>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <FileStatusIndicator 
-            fileName={fileName}
-            lastSaved={lastSaved}
-            isSaving={isSaving}
-            error={error}
-          />
-          <Button 
-            variant="outline"
-            size="sm" 
-            onClick={handleSave}
-            disabled={isSaving}
-            className="gap-2"
-          >
-            <Save className={`h-4 w-4 ${isSaving ? 'animate-pulse' : ''}`} />
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
-        </div>
-      </div>
-
+      <SaveLoadControls
+        onNew={handleNewFile}
+        onSave={handleSave}
+        onLoad={handleOpenFile}
+        isSaving={isSaving}
+        isLoading={false}
+        lastSaved={lastSaved}
+        fileName={fileName}
+      />
       <Card>
         <CardHeader>
           <CardTitle>Startup Cost Estimator</CardTitle>
@@ -312,6 +211,9 @@ export default function StartupCosts() {
           <StartupCostEstimator initialData={costData} onDataChange={handleDataChange} />
         </CardContent>
       </Card>
+      {error && (
+        <div className="text-red-500 text-sm mt-2">{error.message}</div>
+      )}
     </div>
   );
 }

@@ -305,9 +305,7 @@ export default function CashFlowForecast() {
             </>
           )}
           
-          <Button className="w-full" onClick={() => console.log('Save forecast')}>
-            Save Forecast
-          </Button>
+
         </CardContent>
       </Card>
     </div>

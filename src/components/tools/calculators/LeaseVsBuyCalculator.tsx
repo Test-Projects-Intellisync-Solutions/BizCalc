@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+
 import {
   LineChart,
   Line,
@@ -33,7 +33,7 @@ export default function LeaseVsBuyCalculator() {
 
   const calculateAnalysis = () => {
     const years = assetLife;
-    const discountRate = interestRate / 100;
+
     const annualLeaseCost = leasePayment * 12;
     const leaseTaxBenefit = annualLeaseCost * (taxBracket / 100);
     
@@ -50,7 +50,13 @@ export default function LeaseVsBuyCalculator() {
     const depreciationTaxBenefit = annualDepreciation * (taxBracket / 100);
     const interestTaxBenefit = (annualLoanPayment - (loanAmount / years)) * (taxBracket / 100); // Rough approximation
     
-    const data = [];
+    const data: Array<{
+    year: string;
+    leaseCash: number;
+    buyCash: number;
+    leaseCumulative: number;
+    buyCumulative: number;
+  }> = [];
     
     for (let year = 0; year <= years; year++) {
       // Year 0 (initial)
@@ -222,13 +228,13 @@ export default function LeaseVsBuyCalculator() {
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground">Lease NPV</p>
                       <p className="text-2xl font-bold">
-                        ${analysis.leaseNPV.toFixed(2)}
+                        ${(analysis.leaseNPV as number).toFixed(2)}
                       </p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground">Buy NPV</p>
                       <p className="text-2xl font-bold">
-                        ${analysis.buyNPV.toFixed(2)}
+                        ${(analysis.buyNPV as number).toFixed(2)}
                       </p>
                     </div>
                     <div className="text-center">
@@ -247,7 +253,7 @@ export default function LeaseVsBuyCalculator() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" />
                     <YAxis />
-                    <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                    <Tooltip formatter={(value) => `$${(value as number).toFixed(2)}`} />
                     <Legend />
                     <Line type="monotone" dataKey="leaseCumulative" stroke="hsl(var(--chart-1))" name="Lease (Cumulative Cost)" />
                     <Line type="monotone" dataKey="buyCumulative" stroke="hsl(var(--chart-2))" name="Buy (Cumulative Cost)" />
@@ -257,9 +263,7 @@ export default function LeaseVsBuyCalculator() {
             </>
           )}
 
-          <Button className="w-full" onClick={() => console.log('Save analysis')}>
-            Save Analysis
-          </Button>
+
         </CardContent>
       </Card>
     </div>

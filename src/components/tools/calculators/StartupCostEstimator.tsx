@@ -422,9 +422,7 @@ export default function StartupCostEstimator({ initialData, onDataChange }: Star
             </Card>
           </div>
 
-          <Button className="w-full" onClick={() => console.log('Save estimate')}>
-            Save Estimate
-          </Button>
+
         </CardContent>
       </Card>
     </div>

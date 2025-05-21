@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+
 import {
   LineChart,
   Line,
@@ -43,14 +43,14 @@ export default function BreakEvenCalculator() {
     return data;
   };
 
-  const calculateBreakEven = () => {
+  const calculateBreakEven = (): number | string => {
     if (pricePerUnit <= variableCostPerUnit) return 'N/A';
     const breakEvenUnits = fixedCosts / (pricePerUnit - variableCostPerUnit);
     return Math.ceil(breakEvenUnits);
   };
 
   const breakEvenUnits = calculateBreakEven();
-  const breakEvenRevenue = breakEvenUnits === 'N/A' ? 'N/A' : (pricePerUnit * parseInt(breakEvenUnits)).toLocaleString();
+  const breakEvenRevenue = breakEvenUnits === 'N/A' ? 'N/A' : (pricePerUnit * (breakEvenUnits as number)).toLocaleString();
   const chartData = generateChartData();
 
   return (
@@ -67,7 +67,7 @@ export default function BreakEvenCalculator() {
                 id="fixedCosts"
                 type="number"
                 min="0"
-                value={fixedCosts || ''}
+                value={fixedCosts.toString()}
                 onChange={(e) => setFixedCosts(parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
               />
@@ -144,9 +144,7 @@ export default function BreakEvenCalculator() {
             </>
           )}
 
-          <Button className="w-full" onClick={() => console.log('Save calculation')}>
-            Save Calculation
-          </Button>
+
         </CardContent>
       </Card>
     </div>

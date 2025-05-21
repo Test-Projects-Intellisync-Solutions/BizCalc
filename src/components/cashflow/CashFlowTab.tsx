@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -7,15 +7,50 @@ import { AlertCircle, TrendingDown, TrendingUp } from 'lucide-react';
 import GuideCard from '@/components/ui/guide-card';
 import CashFlowForm, { type CashFlowItem } from './CashFlowForm';
 import CashFlowChart from './CashFlowChart';
+import SaveLoadControls from '@/components/common/SaveLoadControls';
+import { useCalculatorSaveLoad } from '@/hooks/useCalculatorSaveLoad';
+
+interface CashFlowTabState {
+  items: CashFlowItem[];
+  openingBalance: number;
+  projectionMonths: number;
+};
 
 export default function CashFlowTab() {
   const [items, setItems] = useState<CashFlowItem[]>([]);
   const [openingBalance, setOpeningBalance] = useState(0);
   const [projectionMonths, setProjectionMonths] = useState(12);
 
-  const handleItemsUpdate = (newItems: CashFlowItem[]) => {
-    setItems(newItems);
+  const {
+    isSaving,
+    isLoading,
+    error,
+    lastSaved,
+    fileName,
+    handleSave,
+    handleLoad,
+    clearError
+  } = useCalculatorSaveLoad<CashFlowTabState>({
+    calculatorType: 'cashflow',
+    onLoad: (data) => {
+      setItems(data.items || []);
+      setOpeningBalance(data.openingBalance || 0);
+      setProjectionMonths(data.projectionMonths || 12);
+    },
+  });
+
+  // Handler for 'New' button
+  const handleNew = () => {
+    setItems([]);
+    setOpeningBalance(0);
+    setProjectionMonths(12);
+    // If useCalculatorSaveLoad exposes a way to clear fileName/lastSaved, call it here
+    // Otherwise, these will reset on next save/load
   };
+
+  const handleItemsUpdate = useCallback((newItems: CashFlowItem[]) => {
+    setItems(newItems);
+  }, []);
 
   const calculateMetrics = () => {
     const inflows = items
@@ -34,8 +69,51 @@ export default function CashFlowTab() {
 
   const { inflows, outflows, monthlyNetCashFlow, runway } = calculateMetrics();
 
+  const saveState = useCallback(() => {
+    const state: CashFlowTabState = {
+      items,
+      openingBalance,
+      projectionMonths
+    };
+    return handleSave(state);
+  }, [items, openingBalance, projectionMonths, handleSave]);
+
   return (
+    
     <div className="space-y-6">
+      <div className="flex flex-row items-center gap-x-4 mb-4">
+        <SaveLoadControls
+          onNew={handleNew}
+          onSave={saveState}
+          onLoad={handleLoad}
+          isSaving={isSaving}
+          isLoading={isLoading}
+          lastSaved={lastSaved}
+          fileName={fileName}
+        />
+        <>
+          {error && (
+            <Alert variant="destructive" className="mb-4 flex items-center gap-4">
+              <div className="flex-1 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                <div>
+                  <AlertTitle>File Operation Error</AlertTitle>
+                  <AlertDescription>{error.message}</AlertDescription>
+                </div>
+              </div>
+              <button
+                onClick={clearError}
+                className="ml-2 px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200 border border-red-300"
+                aria-label="Clear error"
+                type="button"
+              >
+                Clear
+              </button>
+            </Alert>
+          )}
+          <h2 className="text-2xl font-bold">Cash Flow Management</h2>
+        </>
+      </div>
       <GuideCard
         title="Cash Flow Management Guide"
         steps={[
@@ -161,5 +239,6 @@ export default function CashFlowTab() {
         </Card>
       </div>
     </div>
+  
   );
 }

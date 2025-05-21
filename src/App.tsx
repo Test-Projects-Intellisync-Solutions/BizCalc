@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/components/theme-provider';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Toaster } from '@/components/ui/sonner';
 import { Calculator, Menu, Home, Wrench, Book, LogIn } from 'lucide-react';
 import DocsPage from '@/components/docs/DocsPage';
@@ -44,8 +45,9 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <div className="min-h-screen bg-background">
-        <div className="flex flex-col min-h-screen">
+      <TooltipProvider>
+        <div className="min-h-screen bg-background">
+          <div className="flex flex-col min-h-screen">
           {/* Header */}
           <header className="sticky top-0 z-50 bg-background/95 border-b backdrop-blur-lg px-4 py-3 sm:px-6">
             <div className="flex items-center justify-between">
@@ -357,6 +359,7 @@ function App() {
         </div>
       </div>
       <Toaster />
+      </TooltipProvider>
     </ThemeProvider>
   );
 }
