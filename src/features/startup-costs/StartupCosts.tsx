@@ -1,8 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useToast } from '@/lib/toast';
-import StartupCostEstimator, { CostData } from '@/components/tools/calculators/StartupCostEstimator';
-import SaveLoadControls from '@/components/common/SaveLoadControls';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import SaveLoadControls from '@/components/common/SaveLoadControls';
+import type { CostData, CostItem } from '@/features/tools/startup-cost-estimator/StartupCostEstimator';
+import { StartupCostsForm } from './components/StartupCostsForm';
+import { StartupCostsChart } from './components/StartupCostsChart';
+import { StartupCostsSummary } from './components/StartupCostsSummary';
 
 type FileHandleRef = FileSystemFileHandle | null;
 
@@ -55,13 +59,13 @@ export default function StartupCosts() {
 
   // Update cost data when it changes
   const handleDataChange = useCallback((newData: CostData) => {
-    setCostData(prevData => {
+    setCostData((prevData: CostData) => {
       // Preserve the business type if it's not being updated
       const updatedData = {
         ...newData,
-        businessType: newData.businessType || prevData.businessType
+        businessType: newData.businessType || (prevData?.businessType || 'retail')
       };
-      return updatedData;
+      return updatedData as CostData;
     });
     // Update last saved time when data changes
     setLastSaved(new Date());
@@ -158,6 +162,16 @@ export default function StartupCosts() {
       }
       
       // Ensure all required fields are present
+      const oneTimeTotal = data.items
+        .filter((item: { isOneTime: boolean; amount: number }) => item.isOneTime)
+        .reduce((sum: number, item: { amount: number }) => sum + item.amount, 0);
+
+      const monthlyTotal = data.items
+        .filter((item: { isOneTime: boolean }) => !item.isOneTime)
+        .reduce((sum: number, item: { amount: number }) => sum + item.amount, 0);
+
+      const annualTotal = monthlyTotal * 12;
+
       const validatedData: CostData = {
         businessType: data.businessType || 'retail',
         items: data.items.map(item => ({
@@ -187,6 +201,66 @@ export default function StartupCosts() {
     }
   }, [isFileSystemAccessSupported, showError, success]);
 
+  // Calculate totals for the summary and chart
+  const oneTimeCosts = costData.items
+    .filter(item => item.isOneTime)
+    .reduce((total, item) => total + item.amount, 0);
+    
+  const monthlyCosts = costData.items
+    .filter(item => !item.isOneTime)
+    .reduce((total, item) => total + item.amount, 0);
+    
+  const sixMonthOperating = monthlyCosts * 6;
+  const totalStartupCosts = oneTimeCosts + sixMonthOperating;
+  
+  // Prepare category data for the chart
+  const categories = [...new Set(costData.items.map(item => item.category))];
+  const categoryData = categories.map(category => ({
+    name: category,
+    value: costData.items
+      .filter(item => item.category === category)
+      .reduce((total, item) => item.isOneTime 
+        ? total + item.amount 
+        : total + (item.amount * 6), 0)
+  })).sort((a, b) => b.value - a.value);
+
+  // Handle adding a new item
+  const handleAddItem = useCallback(() => {
+    const newItem = {
+      id: Date.now().toString(),
+      name: 'New Item',
+      amount: 0,
+      category: 'Other',
+      isOneTime: true
+    };
+    
+    const updatedItems = [...costData.items, newItem];
+    handleDataChange({ ...costData, items: updatedItems });
+  }, [costData, handleDataChange]);
+
+  // Handle removing an item
+  const handleRemoveItem = useCallback((id: string) => {
+    const updatedItems = costData.items.filter(item => item.id !== id);
+    handleDataChange({ ...costData, items: updatedItems });
+  }, [costData, handleDataChange]);
+
+  // Handle item field changes
+  const handleItemChange = useCallback((id: string, field: keyof CostItem, value: any) => {
+    const updatedItems = costData.items.map(item => 
+      item.id === id 
+        ? { ...item, [field]: field === 'amount' ? parseFloat(value) || 0 : value }
+        : item
+    );
+    handleDataChange({ ...costData, items: updatedItems });
+  }, [costData, handleDataChange]);
+
+  // Apply a business template
+  const handleTemplateApply = useCallback((type: string) => {
+    // The actual template logic is now in the StartupCostEstimator component
+    // This just forwards the event to update the business type
+    handleDataChange({ ...costData, businessType: type });
+  }, [costData, handleDataChange]);
+
   return (
     <div className="space-y-4">
       <SaveLoadControls
@@ -198,6 +272,7 @@ export default function StartupCosts() {
         lastSaved={lastSaved}
         fileName={fileName}
       />
+      
       <Card>
         <CardHeader>
           <CardTitle>Startup Cost Estimator</CardTitle>
@@ -207,12 +282,36 @@ export default function StartupCosts() {
             </p>
           )}
         </CardHeader>
-        <CardContent>
-          <StartupCostEstimator initialData={costData} onDataChange={handleDataChange} />
+        <CardContent className="space-y-6">
+          <StartupCostsForm
+            businessType={costData.businessType}
+            items={costData.items}
+            onBusinessTypeChange={(type) => handleDataChange({ ...costData, businessType: type })}
+            onItemChange={handleItemChange}
+            onAddItem={handleAddItem}
+            onRemoveItem={handleRemoveItem}
+            onTemplateApply={handleTemplateApply}
+          />
+          
+          <StartupCostsSummary 
+            oneTimeCosts={oneTimeCosts}
+            sixMonthOperating={sixMonthOperating}
+            totalStartupCosts={totalStartupCosts}
+          />
+          
+          <StartupCostsChart 
+            oneTimeCosts={oneTimeCosts}
+            sixMonthOperating={sixMonthOperating}
+            categoryData={categoryData}
+          />
         </CardContent>
       </Card>
+      
       {error && (
-        <div className="text-red-500 text-sm mt-2">{error.message}</div>
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error.message}</AlertDescription>
+        </Alert>
       )}
     </div>
   );
