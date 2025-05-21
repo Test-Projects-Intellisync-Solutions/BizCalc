@@ -1,5 +1,5 @@
-import type { RevenueStream } from '@/components/projections/RevenueForm';
-import type { Expense } from '@/components/projections/ExpenseForm';
+import type { RevenueStream } from '@/components/revenueExpensesTab/RevenueForm';
+import type { Expense } from '@/components/revenueExpensesTab/ExpenseForm';
 
 export interface ProjectionData {
   revenues: RevenueStream[];

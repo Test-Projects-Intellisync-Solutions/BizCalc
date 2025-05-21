@@ -13,13 +13,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import StartupCosts from '@/components/startup/StartupCosts';
+import StartupCosts from '@/components/startupCostsTab/StartupCosts';
 import ToolsPage from '@/components/tools/ToolsPage';
-import BurnRate from '@/components/startup/BurnRate';
-import CashFlowTab from '@/components/cashflow/CashFlowTab';
-import ProjectionsTab from '@/components/projections/ProjectionsTab';
-import ProfitabilityTab from '@/components/profitability/ProfitabilityTab';
-import RatiosTab from '@/components/ratios/RatiosTab';
+import BurnRate from '@/components/startupCostsTab/BurnRate';
+import CashFlowTab from '@/components/cashflowTab/CashFlowTab';
+import ProjectionsTab from '@/components/revenueExpensesTab/ProjectionsTab';
+import ProfitabilityTab from '@/components/profitabilityTab/ProfitabilityTab';
+import RatiosTab from '@/components/ratiosTab/RatiosTab';
 import Footer from '@/components/Footer';
 // import PricingPage from '@/components/pricing/PricingPage'; // For Future Use
 import { motion } from 'framer-motion';
