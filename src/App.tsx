@@ -14,6 +14,7 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/Footer';
 import { Routes, Route } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy-loaded components
 const DocsPage = lazy(() => import('@/components/docs/DocsPage'));
@@ -33,7 +34,19 @@ import { motion } from 'framer-motion';
 import Hero from '@/components/Hero';
 import Services from '@/components/Services';
 import ScrollToTop from '@/components/ScrollToTop';
-import { Skeleton } from '@/components/ui/skeleton';
+
+const LoadingFallback = () => (
+  <div className="p-4 space-y-4">
+    <Skeleton className="h-12 w-1/2 mx-auto" />
+    <div className="space-y-2">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-5/6" />
+      <Skeleton className="h-10 w-4/5" />
+      <Skeleton className="h-10 w-5/6" />
+      <Skeleton className="h-10 w-4/5" />
+    </div>
+  </div>
+);
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -54,9 +67,9 @@ function App() {
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <TooltipProvider>
           <Routes>
-            <Route path="privacy" element={<><Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}><PrivacyPolicy /></Suspense><Footer /></>} />
-            <Route path="terms" element={<><Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}><TermsOfService /></Suspense><Footer /></>} />
-            <Route path="cookies" element={<><Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}><CookiesPolicy /></Suspense><Footer /></>} />
+            <Route path="privacy" element={<><Suspense fallback={<LoadingFallback />}><PrivacyPolicy /></Suspense><Footer /></>} />
+            <Route path="terms" element={<><Suspense fallback={<LoadingFallback />}><TermsOfService /></Suspense><Footer /></>} />
+            <Route path="cookies" element={<><Suspense fallback={<LoadingFallback />}><CookiesPolicy /></Suspense><Footer /></>} />
             <Route
               path="*"
               element={
@@ -331,31 +344,31 @@ function App() {
                   </TabsList>
                   <TabsContent value="startup" className="space-y-6">
                     <div className="grid gap-4 md:grid-cols-2">
-                      <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                      <Suspense fallback={<LoadingFallback />}>
                         <StartupCosts />
                       </Suspense>
-                      <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}>
+                      <Suspense fallback={<LoadingFallback />}>
                         <BurnRate />
                       </Suspense>
                     </div>
                   </TabsContent>
                   <TabsContent value="projections" className="space-y-6">
-                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                    <Suspense fallback={<LoadingFallback />}>
                       <ProjectionsTab />
                     </Suspense>
                   </TabsContent>
                   <TabsContent value="cashflow" className="space-y-6">
-                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                    <Suspense fallback={<LoadingFallback />}>
                       <CashFlowTab />
                     </Suspense>
                   </TabsContent>
                   <TabsContent value="profitability" className="space-y-6">
-                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                    <Suspense fallback={<LoadingFallback />}>
                       <ProfitabilityTab />
                     </Suspense>
                   </TabsContent>
                   <TabsContent value="ratios" className="space-y-6">
-                    <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-lg" />}>
+                    <Suspense fallback={<LoadingFallback />}>
                       <RatiosTab />
                     </Suspense>
                   </TabsContent>
@@ -364,14 +377,14 @@ function App() {
 
               {/* Tools Tab */}
               <TabsContent value="tools" className="mt-6">
-                <Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}>
+                <Suspense fallback={<LoadingFallback />}>
                   <ToolsPage />
                 </Suspense>
               </TabsContent>
 
               {/* Docs Tab */}
               <TabsContent value="docs" className="mt-6">
-                <Suspense fallback={<div className="p-8"><Skeleton className="h-[600px] w-full rounded-lg" /></div>}>
+                <Suspense fallback={<LoadingFallback />}>
                   <DocsPage />
                 </Suspense>
               </TabsContent>
