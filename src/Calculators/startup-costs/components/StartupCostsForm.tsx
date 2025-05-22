@@ -3,13 +3,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, PlusCircle } from 'lucide-react';
-import { CostItem } from '@/features/tools/startup-cost-estimator/StartupCostEstimator';
+import { CostItem } from '@/Calculators/tools/startup-cost-estimator/types';
 
 interface StartupCostsFormProps {
   businessType: string;
   items: CostItem[];
   onBusinessTypeChange: (type: string) => void;
-  onItemChange: (id: string, field: keyof CostItem, value: any) => void;
+  onItemChange: (id: string, field: string, value: any) => void;
   onAddItem: () => void;
   onRemoveItem: (id: string) => void;
   onTemplateApply: (type: string) => void;

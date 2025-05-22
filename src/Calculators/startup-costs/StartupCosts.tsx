@@ -3,7 +3,7 @@ import { useToast } from '@/lib/toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import SaveLoadControls from '@/components/common/SaveLoadControls';
-import type { CostData, CostItem } from '@/features/tools/startup-cost-estimator/StartupCostEstimator';
+import type { CostData } from '../tools/startup-cost-estimator/types';
 import { StartupCostsForm } from './components/StartupCostsForm';
 import { StartupCostsChart } from './components/StartupCostsChart';
 import { StartupCostsSummary } from './components/StartupCostsSummary';
@@ -161,16 +161,7 @@ export default function StartupCosts() {
         throw new Error('Invalid file format: missing or invalid items array');
       }
       
-      // Ensure all required fields are present
-      const oneTimeTotal = data.items
-        .filter((item: { isOneTime: boolean; amount: number }) => item.isOneTime)
-        .reduce((sum: number, item: { amount: number }) => sum + item.amount, 0);
-
-      const monthlyTotal = data.items
-        .filter((item: { isOneTime: boolean }) => !item.isOneTime)
-        .reduce((sum: number, item: { amount: number }) => sum + item.amount, 0);
-
-      const annualTotal = monthlyTotal * 12;
+      // Data validation is performed in the mapping below
 
       const validatedData: CostData = {
         businessType: data.businessType || 'retail',
@@ -245,7 +236,7 @@ export default function StartupCosts() {
   }, [costData, handleDataChange]);
 
   // Handle item field changes
-  const handleItemChange = useCallback((id: string, field: keyof CostItem, value: any) => {
+  const handleItemChange = useCallback((id: string, field: string, value: any) => {
     const updatedItems = costData.items.map(item => 
       item.id === id 
         ? { ...item, [field]: field === 'amount' ? parseFloat(value) || 0 : value }

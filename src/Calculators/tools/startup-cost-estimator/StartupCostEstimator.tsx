@@ -15,24 +15,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
-
-export interface CostItem {
-  id: string;
-  name: string;
-  amount: number;
-  category: string;
-  isOneTime: boolean;
-}
-
-export interface CostData {
-  businessType: string;
-  items: CostItem[];
-}
-
-interface StartupCostEstimatorProps {
-  initialData?: CostData | null;
-  onDataChange?: (data: CostData) => void;
-}
+import { CostItem, StartupCostEstimatorProps } from './types';
 
 export default function StartupCostEstimator({ initialData, onDataChange }: StartupCostEstimatorProps) {
   const [businessType, setBusinessType] = useState<string>(initialData?.businessType || 'retail');
