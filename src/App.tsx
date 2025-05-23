@@ -73,7 +73,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Home className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Home</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline">Home</NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     <NavigationMenuItem asChild>
@@ -91,7 +91,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Calculator className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Calculators</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline">Calculators</NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     <NavigationMenuItem asChild>
@@ -109,7 +109,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Wrench className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Tools</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline">Tools</NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     <NavigationMenuItem asChild>
@@ -127,7 +127,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Book className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline group-hover:decoration-wavy">Docs</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline">Docs</NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     {/*
@@ -144,6 +144,7 @@ function App() {
                     </NavigationMenuItem>
                     // Pricing link commented out for testing
                     */}
+                    {/* Sign In Button - Temporarily disabled for future authentication implementation
                     <NavigationMenuItem>
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -159,6 +160,7 @@ function App() {
                         </Button>
                       </motion.div>
                     </NavigationMenuItem>
+                    */}
                   </NavigationMenuList>
                 </NavigationMenu>
               </nav>
