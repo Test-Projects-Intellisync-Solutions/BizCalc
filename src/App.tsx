@@ -1,6 +1,6 @@
 import { ThemeProvider } from '@/components/ui/UIComponents/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
-import { Calculator, Menu, Home, Wrench, Book, LogIn } from 'lucide-react';
+import { Calculator, Menu, Home, Wrench, Book } from 'lucide-react';
 import DocsPage from '@/pages/DocsPage/DocsPage';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -22,7 +22,7 @@ import RatiosTab from '@/calculators/suite/ratios/RatiosTab';
 import Footer from '@/components/ui/UIComponents/Footer';
 // import PricingPage from '@/components/pricing/PricingPage'; // (commented out for testing)
 import { motion } from 'framer-motion';
-import CTA from '@/components/ui/UIComponents/CTA';
+// import CTA from '@/components/ui/UIComponents/CTA'; For Future Use
 import Hero from '@/components/ui/UIComponents/Hero';
 import Services from '@/components/ui/UIComponents/Services';
 import ScrollToTop from '@/components/ui/UIComponents/ScrollToTop';
@@ -248,8 +248,9 @@ function App() {
                       >
                         Pricing
                       </button>
-                      // Pricing link commented out for testing
+                      // Pricing link commented out for futre use.
                       */}
+                      {/* CTA Button - Temporarily disabled for future implementation
                       <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -260,9 +261,10 @@ function App() {
                           <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                             <LogIn className="h-5 w-5 transition-colors" />
                           </motion.span>
-                          <span className="transition-colors group-hover:underline group-hover:decoration-wavy">Sign In</span>
+                          <span className="transition-colors group-hover:underline">Sign In</span>
                         </Button>
                       </motion.div>
+                      */}
                     </nav>
                   </SheetContent>
                 </Sheet>
@@ -287,8 +289,8 @@ function App() {
                 <Hero />
                 {/* Animated Services Section */}
                 <Services />
-                {/* Magical CTA below hero */}
-                <CTA />
+                {/* CTA - Commented out for future use. */}
+                {/* <CTA /> */}
               </TabsContent>
 
               {/* Calculators Tab */}
