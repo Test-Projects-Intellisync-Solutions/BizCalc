@@ -24,7 +24,7 @@ interface CostItem {
   isOneTime: boolean;
 }
 
-export default function StartupCostEstimator() {
+function StartupCostEstimator() {
   const [businessType, setBusinessType] = useState<string>('retail');
   const [items, setItems] = useState<CostItem[]>([
     { id: '1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
@@ -379,3 +379,5 @@ export default function StartupCostEstimator() {
     </div>
   );
 }
+
+export default StartupCostEstimator;

@@ -12,20 +12,20 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import StartupCosts from '@/calculators/suite/startup/StartupCosts';
+import StartupCostEstimator from '@/calculators/suite/startup/StartupCostEstimator/StartupCostEstimator';
 import ToolsPage from '@/pages/ToolsPage/ToolsPage';
-import BurnRate from '@/calculators/suite/startup/BurnRate';
+import BurnRate from '@/calculators/suite/startup/BurnRate/BurnRate';
 import CashFlowTab from '@/calculators/suite/cashflow/CashFlowTab';
 import ProjectionsTab from '@/calculators/suite/projections/ProjectionsTab';
 import ProfitabilityTab from '@/calculators/suite/profitability/ProfitabilityTab';
 import RatiosTab from '@/calculators/suite/ratios/RatiosTab';
 import Footer from '@/components/ui/UIComponents/Footer';
-// import PricingPage from '@/components/pricing/PricingPage'; // (commented out for testing)
-import { motion } from 'framer-motion';
-// import CTA from '@/components/ui/UIComponents/CTA'; For Future Use
 import Hero from '@/components/ui/UIComponents/Hero';
 import Services from '@/components/ui/UIComponents/Services';
 import ScrollToTop from '@/components/ui/UIComponents/ScrollToTop';
+import { motion } from 'framer-motion';
+// import CTA from '@/components/ui/UIComponents/CTA'; For Future Use
+// import PricingPage from '@/components/pricing/PricingPage'; For Future Use
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -305,7 +305,7 @@ function App() {
                   </TabsList>
                   <TabsContent value="startup" className="space-y-6">
                     <div className="grid gap-4 md:grid-cols-2">
-                      <StartupCosts />
+                      <StartupCostEstimator />
                       <BurnRate />
                     </div>
                   </TabsContent>

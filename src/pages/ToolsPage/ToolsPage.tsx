@@ -14,7 +14,7 @@ import BreakEvenCalculator from '@/calculators/tools/financial/BreakEven/BreakEv
 import CashFlowForecast from '@/calculators/tools/operations/CashFlowForecast/CashFlowForecast';
 import LeaseVsBuyCalculator from '@/calculators/tools/business/LeaseVsBuy/LeaseVsBuyCalculator';
 import ProfitMarginCalculator from '@/calculators/tools/financial/ProfitMargin/ProfitMarginCalculator';
-import StartupCostEstimator from '@/calculators/tools/operations/StartupCost/StartupCostEstimator';
+import StartupCostEstimator from '@/calculators/suite/startup/StartupCostEstimator/StartupCostEstimator';
 import { businessPlanningDocs } from '@/components/docs/content/business-planning';
 import { MarkdownViewer } from '../DocsPage/MarkdownViewer';
 
