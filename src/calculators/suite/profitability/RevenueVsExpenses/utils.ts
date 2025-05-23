@@ -1,4 +1,4 @@
-import { FinancialItem, FinancialSummary, CategorySummary, frequencyMultipliers } from './types';
+import { FinancialItem, FinancialSummary, frequencyMultipliers } from './types'; // Removed unused CategorySummary
 
 export const calculateItemMonthlyAmount = (item: FinancialItem): number => {
   return (item.amount || 0) * frequencyMultipliers[item.frequency];

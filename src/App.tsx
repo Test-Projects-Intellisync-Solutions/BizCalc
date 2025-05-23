@@ -29,7 +29,7 @@ import { motion } from 'framer-motion';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
-
+1
   // Listen to URL hash changes to update the active tab
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
