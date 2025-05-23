@@ -1,7 +1,7 @@
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/components/ui/UIComponents/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { Calculator, Menu, Home, Wrench, Book, LogIn } from 'lucide-react';
-import DocsPage from '@/components/docs/DocsPage';
+import DocsPage from '@/pages/DocsPage/DocsPage';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
   NavigationMenu,
@@ -12,20 +12,20 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import StartupCosts from '@/components/startup/StartupCosts';
-import ToolsPage from '@/components/tools/ToolsPage';
-import BurnRate from '@/components/startup/BurnRate';
-import CashFlowTab from '@/components/cashflow/CashFlowTab';
-import ProjectionsTab from '@/components/projections/ProjectionsTab';
-import ProfitabilityTab from '@/components/profitability/ProfitabilityTab';
-import RatiosTab from '@/components/ratios/RatiosTab';
-import Footer from '@/components/Footer';
+import StartupCosts from '@/calculators/suite/startup/StartupCosts';
+import ToolsPage from '@/pages/ToolsPage/ToolsPage';
+import BurnRate from '@/calculators/suite/startup/BurnRate';
+import CashFlowTab from '@/calculators/suite/cashflow/CashFlowTab';
+import ProjectionsTab from '@/calculators/suite/projections/ProjectionsTab';
+import ProfitabilityTab from '@/calculators/suite/profitability/ProfitabilityTab';
+import RatiosTab from '@/calculators/suite/ratios/RatiosTab';
+import Footer from '@/components/ui/UIComponents/Footer';
 // import PricingPage from '@/components/pricing/PricingPage'; // (commented out for testing)
 import { motion } from 'framer-motion';
-import CTA from '@/components/CTA';
-import Hero from '@/components/Hero';
-import Services from '@/components/Services';
-import ScrollToTop from '@/components/ScrollToTop';
+import CTA from '@/components/ui/UIComponents/CTA';
+import Hero from '@/components/ui/UIComponents/Hero';
+import Services from '@/components/ui/UIComponents/Services';
+import ScrollToTop from '@/components/ui/UIComponents/ScrollToTop';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');

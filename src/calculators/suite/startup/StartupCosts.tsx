@@ -1,4 +1,4 @@
-import StartupCostEstimator from '@/components/tools/calculators/StartupCostEstimator';
+import StartupCostEstimator from '@/calculators/tools/operations/StartupCost/StartupCostEstimator';
 
 interface CostCategory {
   name: string;

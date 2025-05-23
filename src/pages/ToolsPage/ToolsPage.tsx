@@ -5,18 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GuideCard from '@/components/ui/guide-card';
-import BurnRateCalculator from './calculators/BurnRateCalculator';
-import LoanCalculator from './calculators/LoanCalculator';
-import ValuationCalculator from './calculators/ValuationCalculator';
-import RoiCalculator from './calculators/RoiCalculator';
-import SalaryCalculator from './calculators/SalaryCalculator';
-import BreakEvenCalculator from './calculators/BreakEvenCalculator';
-import CashFlowForecast from './calculators/CashFlowForecast';
-import LeaseVsBuyCalculator from './calculators/LeaseVsBuyCalculator';
-import ProfitMarginCalculator from './calculators/ProfitMarginCalculator';
-import StartupCostEstimator from '@/components/startup/SimpleStartupCosts';
+import BurnRateCalculator from '@/calculators/tools/financial/BurnRate/BurnRateCalculator';
+import LoanCalculator from '@/calculators/tools/operations/Loan/LoanCalculator';
+import ValuationCalculator from '@/calculators/tools/business/Valuation/ValuationCalculator';
+import RoiCalculator from '@/calculators/tools/business/Roi/RoiCalculator';
+import SalaryCalculator from '@/calculators/tools/operations/Salary/SalaryCalculator';
+import BreakEvenCalculator from '@/calculators/tools/financial/BreakEven/BreakEvenCalculator';
+import CashFlowForecast from '@/calculators/tools/operations/CashFlowForecast/CashFlowForecast';
+import LeaseVsBuyCalculator from '@/calculators/tools/business/LeaseVsBuy/LeaseVsBuyCalculator';
+import ProfitMarginCalculator from '@/calculators/tools/financial/ProfitMargin/ProfitMarginCalculator';
+import StartupCostEstimator from '@/calculators/tools/operations/StartupCost/StartupCostEstimator';
 import { businessPlanningDocs } from '@/components/docs/content/business-planning';
-import { MarkdownViewer } from '@/components/docs/MarkdownViewer';
+import { MarkdownViewer } from '../DocsPage/MarkdownViewer';
 
 const calculators = [
   {
