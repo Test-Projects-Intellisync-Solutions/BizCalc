@@ -46,9 +46,9 @@
   }
   .prose pre {
     @apply bg-muted p-4 rounded-lg overflow-x-auto;
-    code {
-      @apply bg-transparent p-0;
-    }
+  }
+  .prose pre code {
+    @apply bg-transparent p-0;
   }
   .prose ul {
     @apply list-disc pl-6 my-4 space-y-2;
