@@ -15,45 +15,59 @@ import {
   Legend,
 } from 'recharts';
 
+// Utility functions exported for testing
+export const calculateBreakEven = (fixedCosts: number, pricePerUnit: number, variableCostPerUnit: number): number | 'N/A' => {
+  if (pricePerUnit <= variableCostPerUnit) return 'N/A';
+  const breakEvenUnits = fixedCosts / (pricePerUnit - variableCostPerUnit);
+  return Math.ceil(breakEvenUnits);
+};
+
+export const generateChartData = (fixedCosts: number, pricePerUnit: number, variableCostPerUnit: number) => {
+  const data = [];
+  if (pricePerUnit <= 0 || pricePerUnit <= variableCostPerUnit) return [];
+
+  const breakEvenUnits = Math.ceil(fixedCosts / (pricePerUnit - variableCostPerUnit));
+  const maxUnits = Math.max(breakEvenUnits * 2, 10);
+
+  for (let units = 0; units <= maxUnits; units += Math.max(1, Math.floor(maxUnits / 10))) {
+    const revenue = units * pricePerUnit;
+    const totalCosts = fixedCosts + (units * variableCostPerUnit);
+    const profit = revenue - totalCosts;
+
+    data.push({
+      units,
+      revenue,
+      totalCosts,
+      profit
+    });
+  }
+
+  return data;
+};
+
 export default function BreakEvenCalculator() {
   const [fixedCosts, setFixedCosts] = useState<number>(0);
   const [pricePerUnit, setPricePerUnit] = useState<number>(0);
   const [variableCostPerUnit, setVariableCostPerUnit] = useState<number>(0);
 
-  const generateChartData = () => {
-    const data = [];
-    if (pricePerUnit <= 0 || pricePerUnit <= variableCostPerUnit) return [];
-
-    const breakEvenUnits = Math.ceil(fixedCosts / (pricePerUnit - variableCostPerUnit));
-    const maxUnits = Math.max(breakEvenUnits * 2, 10);
-
-    for (let units = 0; units <= maxUnits; units += Math.max(1, Math.floor(maxUnits / 10))) {
-      const revenue = units * pricePerUnit;
-      const totalCosts = fixedCosts + (units * variableCostPerUnit);
-      const profit = revenue - totalCosts;
-
-      data.push({
-        units,
-        revenue,
-        totalCosts,
-        profit
-      });
-    }
-
-    return data;
+  const breakEvenUnits = calculateBreakEven(fixedCosts, pricePerUnit, variableCostPerUnit);
+  const chartData = generateChartData(fixedCosts, pricePerUnit, variableCostPerUnit);
+  
+  const handleFixedCostsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFixedCosts(parseFloat(e.target.value) || 0);
   };
-
-  const calculateBreakEven = (): number | 'N/A' => {
-    if (pricePerUnit <= variableCostPerUnit) return 'N/A';
-    const breakEvenUnits = fixedCosts / (pricePerUnit - variableCostPerUnit);
-    return Math.ceil(breakEvenUnits);
+  
+  const handlePricePerUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPricePerUnit(parseFloat(e.target.value) || 0);
   };
-
-  const breakEvenUnits = calculateBreakEven();
+  
+  const handleVariableCostPerUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVariableCostPerUnit(parseFloat(e.target.value) || 0);
+  };
+  
   const breakEvenRevenue = breakEvenUnits === 'N/A' 
     ? 'N/A' 
     : (pricePerUnit * breakEvenUnits).toLocaleString();
-  const chartData = generateChartData();
 
   return (
     <div className="space-y-6">
@@ -70,7 +84,7 @@ export default function BreakEvenCalculator() {
                 type="number"
                 min="0"
                 value={fixedCosts || ''}
-                onChange={(e) => setFixedCosts(parseFloat(e.target.value) || 0)}
+                onChange={handleFixedCostsChange}
                 placeholder="0.00"
               />
             </div>
@@ -82,7 +96,7 @@ export default function BreakEvenCalculator() {
                 type="number"
                 min="0"
                 value={pricePerUnit || ''}
-                onChange={(e) => setPricePerUnit(parseFloat(e.target.value) || 0)}
+                onChange={handlePricePerUnitChange}
                 placeholder="0.00"
               />
             </div>
@@ -94,7 +108,7 @@ export default function BreakEvenCalculator() {
                 type="number"
                 min="0"
                 value={variableCostPerUnit || ''}
-                onChange={(e) => setVariableCostPerUnit(parseFloat(e.target.value) || 0)}
+                onChange={handleVariableCostPerUnitChange}
                 placeholder="0.00"
               />
             </div>
