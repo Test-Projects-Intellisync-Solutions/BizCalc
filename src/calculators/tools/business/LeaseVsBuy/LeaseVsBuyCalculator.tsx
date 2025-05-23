@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   LineChart,
   Line,
@@ -31,9 +30,9 @@ export default function LeaseVsBuyCalculator() {
     }, 0);
   };
 
+  // Lease vs Buy Analysis
   const calculateAnalysis = () => {
     const years = assetLife;
-    const discountRate = interestRate / 100;
     const annualLeaseCost = leasePayment * 12;
     const leaseTaxBenefit = annualLeaseCost * (taxBracket / 100);
     
@@ -50,7 +49,15 @@ export default function LeaseVsBuyCalculator() {
     const depreciationTaxBenefit = annualDepreciation * (taxBracket / 100);
     const interestTaxBenefit = (annualLoanPayment - (loanAmount / years)) * (taxBracket / 100); // Rough approximation
     
-    const data = [];
+    interface YearData {
+      year: string;
+      leaseCash: number;
+      buyCash: number;
+      leaseCumulative: number;
+      buyCumulative: number;
+    }
+    
+    const data: YearData[] = [];
     
     for (let year = 0; year <= years; year++) {
       // Year 0 (initial)
@@ -247,7 +254,11 @@ export default function LeaseVsBuyCalculator() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" />
                     <YAxis />
-                    <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                    <Tooltip 
+                      formatter={(value: number | string) => 
+                        `$${typeof value === 'number' ? value.toFixed(2) : value}`
+                      } 
+                    />
                     <Legend />
                     <Line type="monotone" dataKey="leaseCumulative" stroke="hsl(var(--chart-1))" name="Lease (Cumulative Cost)" />
                     <Line type="monotone" dataKey="buyCumulative" stroke="hsl(var(--chart-2))" name="Buy (Cumulative Cost)" />

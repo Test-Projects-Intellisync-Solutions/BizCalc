@@ -9,8 +9,13 @@ export default function RoiCalculator() {
   const [returnAmount, setReturnAmount] = useState<number>(0);
   const [timeframe, setTimeframe] = useState<number>(1);
 
-  const calculateROI = () => {
-    if (initialInvestment === 0) return 0;
+  interface RoiResult {
+    roi: number;
+    annualizedROI: number;
+  }
+
+  const calculateROI = (): RoiResult | null => {
+    if (initialInvestment === 0) return null;
     const roi = ((returnAmount - initialInvestment) / initialInvestment) * 100;
     const annualizedROI = ((1 + roi / 100) ** (1 / timeframe) - 1) * 100;
     return {
@@ -68,22 +73,28 @@ export default function RoiCalculator() {
           {initialInvestment > 0 && (
             <Card className="bg-muted">
               <CardContent className="pt-6">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Total ROI</p>
-                    <p className="text-2xl font-bold">
-                      {results.roi.toFixed(2)}%
-                    </p>
-                  </div>
-                  {timeframe > 1 && (
+                {results ? (
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Annualized ROI</p>
+                      <p className="text-sm text-muted-foreground">Total ROI</p>
                       <p className="text-2xl font-bold">
-                        {results.annualizedROI.toFixed(2)}%
+                        {results.roi.toFixed(2)}%
                       </p>
                     </div>
-                  )}
-                </div>
+                    {timeframe > 1 && (
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">Annualized ROI</p>
+                        <p className="text-2xl font-bold">
+                          {results.annualizedROI.toFixed(2)}%
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground">
+                    Enter valid values to calculate ROI
+                  </p>
+                )}
               </CardContent>
             </Card>
           )}

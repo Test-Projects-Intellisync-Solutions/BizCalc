@@ -43,14 +43,16 @@ export default function BreakEvenCalculator() {
     return data;
   };
 
-  const calculateBreakEven = () => {
+  const calculateBreakEven = (): number | 'N/A' => {
     if (pricePerUnit <= variableCostPerUnit) return 'N/A';
     const breakEvenUnits = fixedCosts / (pricePerUnit - variableCostPerUnit);
     return Math.ceil(breakEvenUnits);
   };
 
   const breakEvenUnits = calculateBreakEven();
-  const breakEvenRevenue = breakEvenUnits === 'N/A' ? 'N/A' : (pricePerUnit * parseInt(breakEvenUnits)).toLocaleString();
+  const breakEvenRevenue = breakEvenUnits === 'N/A' 
+    ? 'N/A' 
+    : (pricePerUnit * breakEvenUnits).toLocaleString();
   const chartData = generateChartData();
 
   return (

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { FinancialItem, FrequencyType } from '../types';
-import { formatCurrency } from '../utils';
+
 
 interface FinancialItemFormProps {
   type: 'revenue' | 'expense';
@@ -23,14 +23,15 @@ export function FinancialItemForm({
   initialData,
   onCancel,
 }: FinancialItemFormProps) {
-  const [formData, setFormData] = useState<Omit<FinancialItem, 'id' | 'createdAt' | 'updatedAt'>>({
+  const [formData, setFormData] = useState<Omit<FinancialItem, 'id' | 'createdAt' | 'updatedAt'>>(() => ({
     name: '',
     amount: 0,
     category: categories[0] || '',
     frequency: 'monthly',
     notes: '',
+    type, // Ensure type is always set
     ...initialData,
-  });
+  }));
   const [customCategory, setCustomCategory] = useState('');
   const [showCustomCategory, setShowCustomCategory] = useState(false);
 
@@ -60,6 +61,7 @@ export function FinancialItemForm({
       category: categories[0] || '',
       frequency: 'monthly',
       notes: '',
+      type, // Ensure type is preserved on reset
     });
     setCustomCategory('');
     setShowCustomCategory(false);

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
-import { FinancialItem, FinancialSummary } from '../types';
-import { formatCurrency, formatPercentage } from '../utils';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import { FinancialSummary } from '../types';
+import { formatCurrency, formatPercentage } from '../utils'; // formatCurrency is used in the JSX
 
 interface FinancialSummaryCardProps {
   type: 'revenue' | 'expense';
