@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, TrendingDown, TrendingUp, DollarSign, Target } from 'lucide-react';
 import GuideCard from '@/components/ui/guide-card';
+import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import ProfitabilityForm from './ProfitabilityForm';
 import ProfitabilityChart from './ProfitabilityChart';
 
@@ -15,6 +16,15 @@ export default function ProfitabilityTab() {
     variableCostPerUnit: 0,
     fixedCosts: 0,
   });
+
+  const handleImportData = (data: Record<string, unknown>) => {
+    if (data.metrics && typeof data.metrics === 'object') {
+      setMetrics(prevMetrics => ({
+        ...prevMetrics,
+        ...(data.metrics as object)
+      }));
+    }
+  };
 
   const calculateMetrics = () => {
     const grossProfit = metrics.revenue - metrics.cogs;
@@ -54,6 +64,13 @@ export default function ProfitabilityTab() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <ImportExport 
+          calculatorType="profitability"
+          currentData={{ metrics }}
+          onImport={handleImportData}
+        />
+      </div>
       <GuideCard
         title="Profitability & Break-Even Analysis Guide"
         steps={[

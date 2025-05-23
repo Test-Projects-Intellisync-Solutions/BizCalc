@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, TrendingDown, TrendingUp } from 'lucide-react';
 import GuideCard from '@/components/ui/guide-card';
+import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import CashFlowForm, { type CashFlowItem } from './CashFlowForm';
 import CashFlowChart from './CashFlowChart';
 
@@ -12,6 +13,18 @@ export default function CashFlowTab() {
   const [items, setItems] = useState<CashFlowItem[]>([]);
   const [openingBalance, setOpeningBalance] = useState(0);
   const [projectionMonths, setProjectionMonths] = useState(12);
+
+  const handleImportData = (data: Record<string, unknown>) => {
+    if (data.items && Array.isArray(data.items)) {
+      setItems(data.items as CashFlowItem[]);
+    }
+    if (data.openingBalance && typeof data.openingBalance === 'number') {
+      setOpeningBalance(data.openingBalance);
+    }
+    if (data.projectionMonths && typeof data.projectionMonths === 'number') {
+      setProjectionMonths(data.projectionMonths);
+    }
+  };
 
   const handleItemsUpdate = (newItems: CashFlowItem[]) => {
     setItems(newItems);
@@ -36,6 +49,13 @@ export default function CashFlowTab() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <ImportExport 
+          calculatorType="cashflow"
+          currentData={{ items, openingBalance, projectionMonths }}
+          onImport={handleImportData}
+        />
+      </div>
       <GuideCard
         title="Cash Flow Management Guide"
         steps={[

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import GuideCard from '@/components/ui/guide-card';
+import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import RevenueForm, { type RevenueStream } from './RevenueForm';
 import ExpenseForm, { type Expense } from './ExpenseForm';
 import ProjectionChart from './ProjectionChart';
@@ -11,6 +12,18 @@ export default function ProjectionsTab() {
   const [revenueStreams, setRevenueStreams] = useState<RevenueStream[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [projectionMonths, setProjectionMonths] = useState(12);
+
+  const handleImportData = (data: Record<string, unknown>) => {
+    if (data.revenueStreams && Array.isArray(data.revenueStreams)) {
+      setRevenueStreams(data.revenueStreams as RevenueStream[]);
+    }
+    if (data.expenses && Array.isArray(data.expenses)) {
+      setExpenses(data.expenses as Expense[]);
+    }
+    if (data.projectionMonths && typeof data.projectionMonths === 'number') {
+      setProjectionMonths(data.projectionMonths);
+    }
+  };
 
   const handleRevenueUpdate = (streams: RevenueStream[]) => {
     setRevenueStreams(streams);
@@ -32,6 +45,13 @@ export default function ProjectionsTab() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <ImportExport 
+          calculatorType="projections"
+          currentData={{ revenueStreams, expenses, projectionMonths }}
+          onImport={handleImportData}
+        />
+      </div>
       <GuideCard
         title="Revenue & Expense Projections Guide"
         steps={[
