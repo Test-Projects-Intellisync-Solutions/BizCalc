@@ -1,30 +1,69 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import GuideCard from '@/components/ui/guide-card';
+import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import RatioForm from './RatioForm';
 import RatioCard from './RatioCard';
+import { FinancialData } from './types';
+
+const initialFinancialData: FinancialData = {
+  currentAssets: 0,
+  inventory: 0,
+  cash: 0,
+  currentLiabilities: 0,
+  totalAssets: 0,
+  totalLiabilities: 0,
+  shareholderEquity: 0,
+  revenue: 0,
+  cogs: 0,
+  operatingIncome: 0,
+  netIncome: 0,
+  ebit: 0,
+  interestExpense: 0,
+  accountsReceivable: 0,
+  previousRevenue: 0,
+  previousNetIncome: 0,
+};
 
 export default function RatiosTab() {
-  const [financialData, setFinancialData] = useState({
-    currentAssets: 0,
-    inventory: 0,
-    cash: 0,
-    currentLiabilities: 0,
-    totalAssets: 0,
-    totalLiabilities: 0,
-    shareholderEquity: 0,
-    revenue: 0,
-    cogs: 0,
-    operatingIncome: 0,
-    netIncome: 0,
-    ebit: 0,
-    interestExpense: 0,
-    accountsReceivable: 0,
-    previousRevenue: 0,
-    previousNetIncome: 0,
-  });
+  const [financialData, setFinancialData] = useState<FinancialData>(initialFinancialData);
+
+  // Handle data import from the ImportExport component
+  const handleImportData = useCallback((data: unknown) => {
+    try {
+      const parsedData = data as Partial<FinancialData>;
+      const updatedData = { ...financialData };
+      
+      // Only update fields that exist in the imported data and are numbers
+      (Object.keys(parsedData) as Array<keyof FinancialData>).forEach(key => {
+        const value = parsedData[key];
+        if (typeof value === 'number') {
+          updatedData[key] = value;
+        }
+      });
+      
+      setFinancialData(updatedData);
+      return true;
+    } catch (error) {
+      console.error('Error importing data:', error);
+      return false;
+    }
+  }, [financialData]);
+  
+  // Handle import from the ImportExport component
+  const handleImportWrapper = useCallback((data: Record<string, unknown>) => {
+    return handleImportData(data);
+  }, [handleImportData]);
+
+  // Prepare data for export - ensure it matches the ExportData type expected by ImportExport
+  const exportData = useMemo(() => ({
+    type: 'ratios' as const,
+    data: { ...financialData },
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  }), [financialData]);
 
   const calculateRatios = () => {
     // Liquidity Ratios
@@ -108,6 +147,13 @@ export default function RatiosTab() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <ImportExport 
+          calculatorType="ratios"
+          currentData={exportData}
+          onImport={handleImportWrapper}
+        />
+      </div>
       <GuideCard
         title="Financial Ratios Analysis Guide"
         steps={[

@@ -3,25 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpCircle } from 'lucide-react';
-
-interface FinancialData {
-  currentAssets: number;
-  inventory: number;
-  cash: number;
-  currentLiabilities: number;
-  totalAssets: number;
-  totalLiabilities: number;
-  shareholderEquity: number;
-  revenue: number;
-  cogs: number;
-  operatingIncome: number;
-  netIncome: number;
-  ebit: number;
-  interestExpense: number;
-  accountsReceivable: number;
-  previousRevenue?: number;
-  previousNetIncome?: number;
-}
+import { FinancialData } from './types';
 
 interface RatioFormProps {
   data: FinancialData;
