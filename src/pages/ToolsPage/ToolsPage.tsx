@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Calculator, DollarSign, TrendingDown, LineChart, PiggyBank, BarChart, ArrowDownUp, Scale, Building, PercentCircle, FileText, ClipboardList } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GuideCard from '@/components/ui/guide-card';
 import BurnRateCalculator from '@/calculators/tools/financial/BurnRate/BurnRateCalculator';
@@ -99,9 +99,13 @@ const documents = businessPlanningDocs.map(doc => ({
   content: doc.content
 }));
 
+type Tool = typeof calculators[number];
+type Document = typeof documents[number];
+
 export default function ToolsPage() {
   const [activeTab, setActiveTab] = useState('calculators');
-  const [selectedTool, setSelectedTool] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<Tool | Document | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   return (
     <div className="container mx-auto p-4 sm:p-6 md:p-8 space-y-6">
@@ -161,21 +165,15 @@ export default function ToolsPage() {
                   <CardDescription>{tool.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button className="w-full" onClick={() => setSelectedTool(tool)}>
-                        Launch Calculator
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent side="right" className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl flex flex-col h-full">
-                      <SheetHeader className="flex-shrink-0">
-                        <SheetTitle>{tool.name}</SheetTitle>
-                      </SheetHeader>
-                      <div className="flex-1 overflow-y-auto mt-6 pr-6">
-                        <tool.component />
-                      </div>
-                    </SheetContent>
-                  </Sheet>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => {
+                      setSelectedItem(tool);
+                      setIsSheetOpen(true);
+                    }}
+                  >
+                    Launch Calculator
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -196,27 +194,41 @@ export default function ToolsPage() {
                   <CardDescription>{doc.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button className="w-full" onClick={() => setSelectedTool(doc)}>
-                        View Document
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent side="right" className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl flex flex-col h-full">
-                      <SheetHeader className="flex-shrink-0">
-                        <SheetTitle>{doc.name}</SheetTitle>
-                      </SheetHeader>
-                      <div className="flex-1 overflow-y-auto mt-6 pr-6">
-                        <MarkdownViewer content={doc.content} />
-                      </div>
-                    </SheetContent>
-                  </Sheet>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => {
+                      setSelectedItem(doc);
+                      setIsSheetOpen(true);
+                    }}
+                  >
+                    View Document
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Single Sheet for all tools and documents */}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl flex flex-col h-full">
+          {selectedItem && (
+            <>
+              <SheetHeader className="flex-shrink-0">
+                <SheetTitle>{selectedItem.name}</SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto mt-6 pr-6">
+                {'component' in selectedItem ? (
+                  <selectedItem.component />
+                ) : 'content' in selectedItem ? (
+                  <MarkdownViewer content={selectedItem.content} />
+                ) : null}
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
