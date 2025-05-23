@@ -15,6 +15,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from 'recharts';
+import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 
 interface CostItem {
   id: string;
@@ -27,16 +28,16 @@ interface CostItem {
 function StartupCostEstimator() {
   const [businessType, setBusinessType] = useState<string>('retail');
   const [items, setItems] = useState<CostItem[]>([
-    { id: '1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
-    { id: '2', name: 'Equipment', amount: 5000, category: 'Equipment', isOneTime: true },
-    { id: '3', name: 'Rent Deposit', amount: 3000, category: 'Facilities', isOneTime: true },
-    { id: '4', name: 'Initial Inventory', amount: 10000, category: 'Inventory', isOneTime: true },
-    { id: '5', name: 'Website', amount: 2000, category: 'Marketing', isOneTime: true },
-    { id: '6', name: 'Rent', amount: 1500, category: 'Facilities', isOneTime: false },
-    { id: '7', name: 'Utilities', amount: 500, category: 'Facilities', isOneTime: false },
-    { id: '8', name: 'Insurance', amount: 300, category: 'Insurance', isOneTime: false },
-    { id: '9', name: 'Marketing', amount: 1000, category: 'Marketing', isOneTime: false },
-    { id: '10', name: 'Employee Salaries', amount: 5000, category: 'Staffing', isOneTime: false },
+    { id: 'startup1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
+    { id: 'startup2', name: 'Equipment', amount: 5000, category: 'Equipment', isOneTime: true },
+    { id: 'startup3', name: 'Rent Deposit', amount: 3000, category: 'Facilities', isOneTime: true },
+    { id: 'startup4', name: 'Initial Inventory', amount: 10000, category: 'Inventory', isOneTime: true },
+    { id: 'startup5', name: 'Website', amount: 2000, category: 'Marketing', isOneTime: true },
+    { id: 'startup6', name: 'Rent', amount: 1500, category: 'Facilities', isOneTime: false },
+    { id: 'startup7', name: 'Utilities', amount: 500, category: 'Facilities', isOneTime: false },
+    { id: 'startup8', name: 'Insurance', amount: 300, category: 'Insurance', isOneTime: false },
+    { id: 'startup9', name: 'Marketing', amount: 1000, category: 'Marketing', isOneTime: false },
+    { id: 'startup10', name: 'Employee Salaries', amount: 5000, category: 'Staffing', isOneTime: false },
   ]);
 
   const handleItemChange = (id: string, field: keyof CostItem, value: any) => {
@@ -70,67 +71,67 @@ function StartupCostEstimator() {
     switch(type) {
       case 'retail':
         templateItems = [
-          { id: '1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
-          { id: '2', name: 'Store Equipment', amount: 15000, category: 'Equipment', isOneTime: true },
-          { id: '3', name: 'Rent Deposit', amount: 5000, category: 'Facilities', isOneTime: true },
-          { id: '4', name: 'Initial Inventory', amount: 25000, category: 'Inventory', isOneTime: true },
-          { id: '5', name: 'Store Fixtures', amount: 8000, category: 'Equipment', isOneTime: true },
-          { id: '6', name: 'Point of Sale System', amount: 3000, category: 'Equipment', isOneTime: true },
-          { id: '7', name: 'Signage', amount: 2500, category: 'Marketing', isOneTime: true },
-          { id: '8', name: 'Website', amount: 2000, category: 'Marketing', isOneTime: true },
-          { id: '9', name: 'Monthly Rent', amount: 2500, category: 'Facilities', isOneTime: false },
-          { id: '10', name: 'Utilities', amount: 500, category: 'Facilities', isOneTime: false },
-          { id: '11', name: 'Insurance', amount: 400, category: 'Insurance', isOneTime: false },
-          { id: '12', name: 'Marketing', amount: 1500, category: 'Marketing', isOneTime: false },
-          { id: '13', name: 'Employee Salaries', amount: 8000, category: 'Staffing', isOneTime: false },
+          { id: 'retail1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
+          { id: 'retail2', name: 'Store Equipment', amount: 15000, category: 'Equipment', isOneTime: true },
+          { id: 'retail3', name: 'Rent Deposit', amount: 5000, category: 'Facilities', isOneTime: true },
+          { id: 'retail4', name: 'Initial Inventory', amount: 25000, category: 'Inventory', isOneTime: true },
+          { id: 'retail5', name: 'Store Fixtures', amount: 8000, category: 'Equipment', isOneTime: true },
+          { id: 'retail6', name: 'Point of Sale System', amount: 3000, category: 'Equipment', isOneTime: true },
+          { id: 'retail7', name: 'Signage', amount: 2500, category: 'Marketing', isOneTime: true },
+          { id: 'retail8', name: 'Website', amount: 2000, category: 'Marketing', isOneTime: true },
+          { id: 'retail9', name: 'Monthly Rent', amount: 2500, category: 'Facilities', isOneTime: false },
+          { id: 'retail10', name: 'Utilities', amount: 500, category: 'Facilities', isOneTime: false },
+          { id: 'retail11', name: 'Insurance', amount: 400, category: 'Insurance', isOneTime: false },
+          { id: 'retail12', name: 'Marketing', amount: 1500, category: 'Marketing', isOneTime: false },
+          { id: 'retail13', name: 'Employee Salaries', amount: 8000, category: 'Staffing', isOneTime: false },
         ];
         break;
       case 'service':
         templateItems = [
-          { id: '1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
-          { id: '2', name: 'Office Equipment', amount: 5000, category: 'Equipment', isOneTime: true },
-          { id: '3', name: 'Security Deposit', amount: 2000, category: 'Facilities', isOneTime: true },
-          { id: '4', name: 'Software & Licenses', amount: 3000, category: 'Equipment', isOneTime: true },
-          { id: '5', name: 'Website', amount: 3000, category: 'Marketing', isOneTime: true },
-          { id: '6', name: 'Professional Certifications', amount: 1500, category: 'Legal', isOneTime: true },
-          { id: '7', name: 'Monthly Rent', amount: 1500, category: 'Facilities', isOneTime: false },
-          { id: '8', name: 'Utilities', amount: 300, category: 'Facilities', isOneTime: false },
-          { id: '9', name: 'Insurance', amount: 350, category: 'Insurance', isOneTime: false },
-          { id: '10', name: 'Marketing', amount: 1000, category: 'Marketing', isOneTime: false },
-          { id: '11', name: 'Employee Salaries', amount: 6000, category: 'Staffing', isOneTime: false },
+          { id: 'service1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
+          { id: 'service2', name: 'Office Equipment', amount: 5000, category: 'Equipment', isOneTime: true },
+          { id: 'service3', name: 'Security Deposit', amount: 2000, category: 'Facilities', isOneTime: true },
+          { id: 'service4', name: 'Software & Licenses', amount: 3000, category: 'Equipment', isOneTime: true },
+          { id: 'service5', name: 'Website', amount: 3000, category: 'Marketing', isOneTime: true },
+          { id: 'service6', name: 'Professional Certifications', amount: 1500, category: 'Legal', isOneTime: true },
+          { id: 'service7', name: 'Monthly Rent', amount: 1500, category: 'Facilities', isOneTime: false },
+          { id: 'service8', name: 'Utilities', amount: 300, category: 'Facilities', isOneTime: false },
+          { id: 'service9', name: 'Insurance', amount: 350, category: 'Insurance', isOneTime: false },
+          { id: 'service10', name: 'Marketing', amount: 1000, category: 'Marketing', isOneTime: false },
+          { id: 'service11', name: 'Employee Salaries', amount: 6000, category: 'Staffing', isOneTime: false },
         ];
         break;
       case 'online':
         templateItems = [
-          { id: '1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
-          { id: '2', name: 'Website Development', amount: 5000, category: 'Marketing', isOneTime: true },
-          { id: '3', name: 'Logo & Branding', amount: 1500, category: 'Marketing', isOneTime: true },
-          { id: '4', name: 'Computer Equipment', amount: 3000, category: 'Equipment', isOneTime: true },
-          { id: '5', name: 'Initial Inventory', amount: 10000, category: 'Inventory', isOneTime: true },
-          { id: '6', name: 'E-commerce Platform', amount: 2000, category: 'Equipment', isOneTime: true },
-          { id: '7', name: 'Website Hosting', amount: 30, category: 'Equipment', isOneTime: false },
-          { id: '8', name: 'Online Marketing', amount: 1500, category: 'Marketing', isOneTime: false },
-          { id: '9', name: 'Software Subscriptions', amount: 200, category: 'Equipment', isOneTime: false },
-          { id: '10', name: 'Shipping Supplies', amount: 300, category: 'Inventory', isOneTime: false },
-          { id: '11', name: 'Insurance', amount: 200, category: 'Insurance', isOneTime: false },
+          { id: 'online1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
+          { id: 'online2', name: 'Website Development', amount: 5000, category: 'Marketing', isOneTime: true },
+          { id: 'online3', name: 'Logo & Branding', amount: 1500, category: 'Marketing', isOneTime: true },
+          { id: 'online4', name: 'Computer Equipment', amount: 3000, category: 'Equipment', isOneTime: true },
+          { id: 'online5', name: 'Initial Inventory', amount: 10000, category: 'Inventory', isOneTime: true },
+          { id: 'online6', name: 'E-commerce Platform', amount: 2000, category: 'Equipment', isOneTime: true },
+          { id: 'online7', name: 'Website Hosting', amount: 30, category: 'Equipment', isOneTime: false },
+          { id: 'online8', name: 'Online Marketing', amount: 1500, category: 'Marketing', isOneTime: false },
+          { id: 'online9', name: 'Software Subscriptions', amount: 200, category: 'Equipment', isOneTime: false },
+          { id: 'online10', name: 'Shipping Supplies', amount: 300, category: 'Inventory', isOneTime: false },
+          { id: 'online11', name: 'Insurance', amount: 200, category: 'Insurance', isOneTime: false },
         ];
         break;
       case 'restaurant':
         templateItems = [
-          { id: '1', name: 'Business Registration', amount: 1000, category: 'Legal', isOneTime: true },
-          { id: '2', name: 'Kitchen Equipment', amount: 50000, category: 'Equipment', isOneTime: true },
-          { id: '3', name: 'Furniture & Fixtures', amount: 30000, category: 'Equipment', isOneTime: true },
-          { id: '4', name: 'Rent Deposit', amount: 10000, category: 'Facilities', isOneTime: true },
-          { id: '5', name: 'Renovations', amount: 40000, category: 'Facilities', isOneTime: true },
-          { id: '6', name: 'Initial Inventory', amount: 15000, category: 'Inventory', isOneTime: true },
-          { id: '7', name: 'Liquor License', amount: 5000, category: 'Legal', isOneTime: true },
-          { id: '8', name: 'POS System', amount: 5000, category: 'Equipment', isOneTime: true },
-          { id: '9', name: 'Monthly Rent', amount: 5000, category: 'Facilities', isOneTime: false },
-          { id: '10', name: 'Utilities', amount: 1500, category: 'Facilities', isOneTime: false },
-          { id: '11', name: 'Insurance', amount: 1000, category: 'Insurance', isOneTime: false },
-          { id: '12', name: 'Marketing', amount: 3000, category: 'Marketing', isOneTime: false },
-          { id: '13', name: 'Staff Salaries', amount: 20000, category: 'Staffing', isOneTime: false },
-          { id: '14', name: 'Food & Beverage', amount: 10000, category: 'Inventory', isOneTime: false },
+          { id: 'restaurant1', name: 'Business Registration', amount: 1000, category: 'Legal', isOneTime: true },
+          { id: 'restaurant2', name: 'Kitchen Equipment', amount: 50000, category: 'Equipment', isOneTime: true },
+          { id: 'restaurant3', name: 'Furniture & Fixtures', amount: 30000, category: 'Equipment', isOneTime: true },
+          { id: 'restaurant4', name: 'Rent Deposit', amount: 10000, category: 'Facilities', isOneTime: true },
+          { id: 'restaurant5', name: 'Renovations', amount: 40000, category: 'Facilities', isOneTime: true },
+          { id: 'restaurant6', name: 'Initial Inventory', amount: 15000, category: 'Inventory', isOneTime: true },
+          { id: 'restaurant7', name: 'Liquor License', amount: 5000, category: 'Legal', isOneTime: true },
+          { id: 'restaurant8', name: 'POS System', amount: 5000, category: 'Equipment', isOneTime: true },
+          { id: 'restaurant9', name: 'Monthly Rent', amount: 5000, category: 'Facilities', isOneTime: false },
+          { id: 'restaurant10', name: 'Utilities', amount: 1500, category: 'Facilities', isOneTime: false },
+          { id: 'restaurant11', name: 'Insurance', amount: 1000, category: 'Insurance', isOneTime: false },
+          { id: 'restaurant12', name: 'Marketing', amount: 3000, category: 'Marketing', isOneTime: false },
+          { id: 'restaurant13', name: 'Staff Salaries', amount: 20000, category: 'Staffing', isOneTime: false },
+          { id: 'restaurant14', name: 'Food & Beverage', amount: 10000, category: 'Inventory', isOneTime: false },
         ];
         break;
       default:
@@ -172,8 +173,24 @@ function StartupCostEstimator() {
     };
   }).sort((a, b) => b.value - a.value);
 
+  const handleImportData = (data: Record<string, unknown>) => {
+    if (data.items && Array.isArray(data.items)) {
+      setItems(data.items as CostItem[]);
+    }
+    if (data.businessType && typeof data.businessType === 'string') {
+      setBusinessType(data.businessType);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <ImportExport 
+          calculatorType="startupCostEstimator"
+          currentData={{ items, businessType }}
+          onImport={handleImportData}
+        />
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Startup Cost Estimator</CardTitle>
@@ -370,10 +387,6 @@ function StartupCostEstimator() {
               </div>
             </Card>
           </div>
-
-          <Button className="w-full" onClick={() => console.log('Save estimate')}>
-            Save Estimate
-          </Button>
         </CardContent>
       </Card>
     </div>

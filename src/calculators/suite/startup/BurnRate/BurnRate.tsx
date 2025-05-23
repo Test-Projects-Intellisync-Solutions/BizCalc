@@ -2,13 +2,35 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import GuideCard from '@/components/ui/guide-card';
+import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 
 export default function BurnRate() {
   const [availableCapital, setAvailableCapital] = useState<number>(0);
   const [monthlyExpenses, setMonthlyExpenses] = useState<number>(0);
+
+  // Prepare calculator data for import/export
+  const calculatorData = {
+    availableCapital,
+    monthlyExpenses,
+  };
+
+  // Handle data import
+  const handleImport = (data: Record<string, unknown>) => {
+    try {
+      if (typeof data.availableCapital === 'number') {
+        setAvailableCapital(data.availableCapital);
+      }
+      if (typeof data.monthlyExpenses === 'number') {
+        setMonthlyExpenses(data.monthlyExpenses);
+      }
+      toast.success('Data imported successfully!');
+    } catch (error) {
+      console.error('Error importing data:', error);
+      toast.error('Failed to import data');
+    }
+  };
 
   const handleCapitalChange = (value: string) => {
     const numValue = value === '' ? 0 : parseFloat(value);
@@ -28,10 +50,6 @@ export default function BurnRate() {
     return months.toFixed(1);
   };
 
-  const handleSave = () => {
-    toast.success('Burn rate calculations saved!');
-    // TODO: Implement save to Supabase
-  };
 
   return (
     <Card>
@@ -110,9 +128,14 @@ export default function BurnRate() {
             </p>
           </div>
 
-          <Button onClick={handleSave} className="w-full">
-            Save Calculations
-          </Button>
+          <div className="mt-4">
+            <ImportExport
+              calculatorType="burnRate"
+              currentData={calculatorData}
+              onImport={handleImport}
+              className="w-full"
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
