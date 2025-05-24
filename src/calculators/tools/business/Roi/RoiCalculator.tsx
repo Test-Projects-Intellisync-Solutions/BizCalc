@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 
 export default function RoiCalculator() {
   const [initialInvestment, setInitialInvestment] = useState<number>(0);
@@ -34,7 +35,9 @@ export default function RoiCalculator() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="investment">Initial Investment</Label>
+            <TooltipWrapper content="The initial amount of money invested in the project or business">
+              <Label htmlFor="investment">Initial Investment</Label>
+            </TooltipWrapper>
             <Input
               id="investment"
               type="number"
@@ -46,7 +49,9 @@ export default function RoiCalculator() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="return">Total Return</Label>
+            <TooltipWrapper content="The total amount of money returned from the investment">
+              <Label htmlFor="return">Total Return</Label>
+            </TooltipWrapper>
             <Input
               id="return"
               type="number"
@@ -58,16 +63,19 @@ export default function RoiCalculator() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="timeframe">Investment Period (Years)</Label>
-            <Input
-              id="timeframe"
-              type="number"
-              min="0.1"
-              step="0.1"
-              value={timeframe || ''}
-              onChange={(e) => setTimeframe(parseFloat(e.target.value) || 1)}
-              placeholder="1"
-            />
+            <TooltipWrapper content="The number of years over which the return is calculated">
+              <Label htmlFor="timeframe">Timeframe (Years)</Label>
+            </TooltipWrapper>
+            <TooltipWrapper content="Enter the timeframe in years">
+              <Input
+                id="timeframe"
+                type="number"
+                min="1"
+                value={timeframe}
+                onChange={(e) => setTimeframe(parseInt(e.target.value) || 1)}
+                placeholder="1"
+              />
+            </TooltipWrapper>
           </div>
 
           {initialInvestment > 0 && (
@@ -76,17 +84,21 @@ export default function RoiCalculator() {
                 {results ? (
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Total ROI</p>
-                      <p className="text-2xl font-bold">
-                        {results.roi.toFixed(2)}%
-                      </p>
+                      <TooltipWrapper content="Return on Investment: (Gain from Investment - Cost of Investment) / Cost of Investment">
+                        <div>
+                          <p className="text-sm text-muted-foreground">ROI</p>
+                          <p className="text-2xl font-bold">{results.roi.toFixed(2)}%</p>
+                        </div>
+                      </TooltipWrapper>
                     </div>
                     {timeframe > 1 && (
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Annualized ROI</p>
-                        <p className="text-2xl font-bold">
-                          {results.annualizedROI.toFixed(2)}%
-                        </p>
+                        <TooltipWrapper content="Annualized ROI accounts for the time period of the investment, showing the average annual return">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Annualized ROI</p>
+                            <p className="text-2xl font-bold">{results.annualizedROI.toFixed(2)}%</p>
+                          </div>
+                        </TooltipWrapper>
                       </div>
                     )}
                   </div>

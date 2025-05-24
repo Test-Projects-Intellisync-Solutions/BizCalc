@@ -4,32 +4,84 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 
 interface RevenueItem {
   id: string;
   name: string;
   amount: number;
+  description?: string;
 }
 
 interface ExpenseItem extends RevenueItem {}
 
 export default function RevenueVsExpensesCalculator() {
-  // Predefined revenue categories
+  // Predefined revenue categories with descriptions
   const initialRevenues: RevenueItem[] = [
-    { id: 'rev-1', name: 'Product Sales', amount: 0 },
-    { id: 'rev-2', name: 'Service Revenue', amount: 0 },
-    { id: 'rev-3', name: 'Subscription Income', amount: 0 },
-    { id: 'rev-4', name: 'Other Income', amount: 0 },
+    { 
+      id: 'rev-1', 
+      name: 'Product Sales', 
+      amount: 0,
+      description: 'Revenue from selling physical or digital products'
+    },
+    { 
+      id: 'rev-2', 
+      name: 'Service Revenue', 
+      amount: 0,
+      description: 'Income from providing services to customers'
+    },
+    { 
+      id: 'rev-3', 
+      name: 'Subscription Income', 
+      amount: 0,
+      description: 'Recurring revenue from subscription-based services'
+    },
+    { 
+      id: 'rev-4', 
+      name: 'Other Income', 
+      amount: 0,
+      description: 'Any other sources of revenue not listed above'
+    },
   ];
 
-  // Predefined expense categories
+  // Predefined expense categories with descriptions
   const initialExpenses: ExpenseItem[] = [
-    { id: 'exp-1', name: 'Salaries & Wages', amount: 0 },
-    { id: 'exp-2', name: 'Rent & Utilities', amount: 0 },
-    { id: 'exp-3', name: 'Marketing', amount: 0 },
-    { id: 'exp-4', name: 'Supplies', amount: 0 },
-    { id: 'exp-5', name: 'Insurance', amount: 0 },
-    { id: 'exp-6', name: 'Other Expenses', amount: 0 },
+    { 
+      id: 'exp-1', 
+      name: 'Salaries & Wages', 
+      amount: 0,
+      description: 'Employee compensation including salaries, wages, and benefits'
+    },
+    { 
+      id: 'exp-2', 
+      name: 'Rent & Utilities', 
+      amount: 0,
+      description: 'Office space rent, electricity, water, internet, and other utilities'
+    },
+    { 
+      id: 'exp-3', 
+      name: 'Marketing', 
+      amount: 0,
+      description: 'Advertising, promotions, and other marketing expenses'
+    },
+    { 
+      id: 'exp-4', 
+      name: 'Supplies', 
+      amount: 0,
+      description: 'Office supplies, materials, and other consumables'
+    },
+    { 
+      id: 'exp-5', 
+      name: 'Insurance', 
+      amount: 0,
+      description: 'Business insurance policies and coverage'
+    },
+    { 
+      id: 'exp-6', 
+      name: 'Other Expenses', 
+      amount: 0,
+      description: 'Any other business expenses not listed above'
+    },
   ];
 
   const [revenues, setRevenues] = useState<RevenueItem[]>(initialRevenues);
@@ -93,22 +145,27 @@ export default function RevenueVsExpensesCalculator() {
               <div className="space-y-3">
                 {revenues.map((item) => (
                   <div key={item.id} className="space-y-1">
-                    <Label htmlFor={item.id} className="text-sm">
-                      {item.name}
-                    </Label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500 sm:text-sm">$</span>
+                    <div className="flex items-center gap-2">
+                      <TooltipWrapper content={item.description || 'No description available'}>
+                        <Label htmlFor={item.id} className="min-w-[120px] flex items-center gap-1">
+                          {item.name}
+                        </Label>
+                      </TooltipWrapper>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span className="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <Input
+                          id={item.id}
+                          type="number"
+                          min="0"
+                          value={item.amount || ''}
+                          onChange={(e) => handleRevenueChange(item.id, e.target.value)}
+                          placeholder="0.00"
+                          className="pl-7"
+                          step="0.01"
+                        />
                       </div>
-                      <Input
-                        id={item.id}
-                        type="number"
-                        value={item.amount || ''}
-                        onChange={(e) => handleRevenueChange(item.id, e.target.value)}
-                        className="pl-7"
-                        min="0"
-                        step="0.01"
-                      />
                     </div>
                   </div>
                 ))}
@@ -128,22 +185,27 @@ export default function RevenueVsExpensesCalculator() {
               <div className="space-y-3">
                 {expenses.map((item) => (
                   <div key={item.id} className="space-y-1">
-                    <Label htmlFor={item.id} className="text-sm">
-                      {item.name}
-                    </Label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500 sm:text-sm">$</span>
+                    <div className="flex items-center gap-2">
+                      <TooltipWrapper content={item.description || 'No description available'}>
+                        <Label htmlFor={item.id} className="min-w-[120px] flex items-center gap-1">
+                          {item.name}
+                        </Label>
+                      </TooltipWrapper>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span className="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <Input
+                          id={item.id}
+                          type="number"
+                          min="0"
+                          value={item.amount || ''}
+                          onChange={(e) => handleExpenseChange(item.id, e.target.value)}
+                          placeholder="0.00"
+                          className="pl-7"
+                          step="0.01"
+                        />
                       </div>
-                      <Input
-                        id={item.id}
-                        type="number"
-                        value={item.amount || ''}
-                        onChange={(e) => handleExpenseChange(item.id, e.target.value)}
-                        className="pl-7"
-                        min="0"
-                        step="0.01"
-                      />
                     </div>
                   </div>
                 ))}

@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 
 export default function BurnRateCalculator() {
   const [monthlyExpenses, setMonthlyExpenses] = useState<number>(0);
@@ -26,7 +27,9 @@ export default function BurnRateCalculator() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="expenses">Monthly Expenses</Label>
+            <TooltipWrapper content="Total monthly operating expenses including salaries, rent, and other fixed costs">
+              <Label htmlFor="expenses">Monthly Expenses</Label>
+            </TooltipWrapper>
             <Input
               id="expenses"
               type="number"
@@ -38,7 +41,9 @@ export default function BurnRateCalculator() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cash">Cash on Hand</Label>
+            <TooltipWrapper content="Total cash reserves available to cover expenses">
+              <Label htmlFor="cash">Cash on Hand</Label>
+            </TooltipWrapper>
             <Input
               id="cash"
               type="number"

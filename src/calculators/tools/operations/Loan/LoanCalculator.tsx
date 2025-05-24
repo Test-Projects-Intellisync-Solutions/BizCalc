@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -64,7 +65,9 @@ export default function LoanCalculator() {
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="amount">Loan Amount</Label>
+              <TooltipWrapper content="The total amount of money you want to borrow">
+                <Label htmlFor="loanAmount">Loan Amount</Label>
+              </TooltipWrapper>
               <Input
                 id="amount"
                 type="number"
@@ -76,7 +79,9 @@ export default function LoanCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rate">Annual Interest Rate (%)</Label>
+              <TooltipWrapper content="The annual interest rate for the loan">
+                <Label htmlFor="interestRate">Interest Rate (%)</Label>
+              </TooltipWrapper>
               <Input
                 id="rate"
                 type="number"
@@ -90,7 +95,9 @@ export default function LoanCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="term">Term (Years)</Label>
+              <TooltipWrapper content="The length of time over which you'll repay the loan">
+                <Label htmlFor="term">Loan Term (years)</Label>
+              </TooltipWrapper>
               <Input
                 id="term"
                 type="number"
@@ -102,8 +109,10 @@ export default function LoanCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label>Payment Frequency</Label>
-              <Select value={frequency} onValueChange={(value: 'monthly' | 'quarterly' | 'annually') => setFrequency(value)}>
+              <TooltipWrapper content="How often you'll make payments on the loan">
+                <Label>Payment Frequency</Label>
+              </TooltipWrapper>
+              <Select value={frequency} onValueChange={(value) => setFrequency(value as 'monthly' | 'quarterly' | 'annually')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -139,11 +148,31 @@ export default function LoanCalculator() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Payment #</TableHead>
-                      <TableHead>Payment</TableHead>
-                      <TableHead>Principal</TableHead>
-                      <TableHead>Interest</TableHead>
-                      <TableHead>Balance</TableHead>
+                      <TableHead>
+                        <TooltipWrapper content="Payment number in the schedule">
+                          <span>Payment #</span>
+                        </TooltipWrapper>
+                      </TableHead>
+                      <TableHead>
+                        <TooltipWrapper content="Total payment amount (principal + interest)">
+                          <span>Payment</span>
+                        </TooltipWrapper>
+                      </TableHead>
+                      <TableHead>
+                        <TooltipWrapper content="Portion of payment that reduces the loan balance">
+                          <span>Principal</span>
+                        </TooltipWrapper>
+                      </TableHead>
+                      <TableHead>
+                        <TooltipWrapper content="Interest portion of the payment">
+                          <span>Interest</span>
+                        </TooltipWrapper>
+                      </TableHead>
+                      <TableHead>
+                        <TooltipWrapper content="Remaining loan balance after the payment">
+                          <span>Balance</span>
+                        </TooltipWrapper>
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

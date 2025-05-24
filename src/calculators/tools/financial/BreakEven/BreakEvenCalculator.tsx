@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
+import { Tooltip} from '@/components/ui/tooltip';
+
 import {
   LineChart,
   Line,
@@ -71,78 +72,62 @@ export default function BreakEvenCalculator() {
     : (pricePerUnit * breakEvenUnits).toLocaleString();
 
   return (
-    <TooltipProvider>
-      <div className="space-y-6">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Break-Even Calculator</CardTitle>
+          <CardTitle>Break-Even Analysis</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Calculate the number of units you need to sell to cover your costs
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
+              <TooltipWrapper content="Costs that don't change with production volume (e.g., rent, salaries, insurance)">
                 <Label htmlFor="fixedCosts">Fixed Costs</Label>
-                <Tooltip>
-                  <TooltipTrigger type="button">
-                    <Info className="h-4 w-4 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Expenses that don't change with production volume, like rent, salaries, and insurance.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <Input
-                id="fixedCosts"
-                type="number"
-                min="0"
-                value={fixedCosts || ''}
-                onChange={handleFixedCostsChange}
-                placeholder="0.00"
-              />
+              </TooltipWrapper>
+              <TooltipWrapper content="Enter the total fixed costs, e.g., $1000">
+                <Input
+                  id="fixedCosts"
+                  type="number"
+                  min="0"
+                  value={fixedCosts || ''}
+                  onChange={handleFixedCostsChange}
+                  placeholder="0.00"
+                />
+              </TooltipWrapper>
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="price">Price Per Unit</Label>
-                <Tooltip>
-                  <TooltipTrigger type="button">
-                    <Info className="h-4 w-4 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>The selling price for each unit of your product or service.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <Input
-                id="price"
-                type="number"
-                min="0"
-                value={pricePerUnit || ''}
-                onChange={handlePricePerUnitChange}
-                placeholder="0.00"
-              />
+              <TooltipWrapper content="Selling price for each unit of your product/service">
+                <Label htmlFor="pricePerUnit">Price Per Unit</Label>
+              </TooltipWrapper>
+              <TooltipWrapper content="Enter the selling price per unit, e.g., $10.99">
+                <Input
+                  id="pricePerUnit"
+                  type="number"
+                  min="0"
+                  value={pricePerUnit || ''}
+                  onChange={handlePricePerUnitChange}
+                  placeholder="0.00"
+                />
+              </TooltipWrapper>
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
+              <TooltipWrapper content="Costs that vary with production volume (e.g., materials, labor per unit, shipping)">
                 <Label htmlFor="variableCost">Variable Cost Per Unit</Label>
-                <Tooltip>
-                  <TooltipTrigger type="button">
-                    <Info className="h-4 w-4 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Costs that vary with production volume, like materials and direct labor.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <Input
-                id="variableCost"
-                type="number"
-                min="0"
-                value={variableCostPerUnit || ''}
-                onChange={handleVariableCostPerUnitChange}
-                placeholder="0.00"
-              />
+              </TooltipWrapper>
+              <TooltipWrapper content="Enter the variable cost per unit, e.g., $5.00">
+                <Input
+                  id="variableCost"
+                  type="number"
+                  min="0"
+                  value={variableCostPerUnit || ''}
+                  onChange={handleVariableCostPerUnitChange}
+                  placeholder="0.00"
+                />
+              </TooltipWrapper>
             </div>
           </div>
 
@@ -198,6 +183,5 @@ export default function BreakEvenCalculator() {
         </CardContent>
       </Card>
       </div>
-    </TooltipProvider>
   );
 }

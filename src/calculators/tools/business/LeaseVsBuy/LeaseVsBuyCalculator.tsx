@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 import {
   LineChart,
   Line,
@@ -123,7 +124,9 @@ export default function LeaseVsBuyCalculator() {
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="assetValue">Asset Value</Label>
+              <TooltipWrapper content="The total purchase price of the asset you're considering">
+                <Label htmlFor="assetValue">Asset Value</Label>
+              </TooltipWrapper>
               <Input
                 id="assetValue"
                 type="number"
@@ -135,7 +138,9 @@ export default function LeaseVsBuyCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assetLife">Asset Life (Years)</Label>
+              <TooltipWrapper content="Expected useful life of the asset in years">
+                <Label htmlFor="assetLife">Asset Life (years)</Label>
+              </TooltipWrapper>
               <Input
                 id="assetLife"
                 type="number"
@@ -147,7 +152,9 @@ export default function LeaseVsBuyCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="salvageValue">Estimated Salvage Value</Label>
+              <TooltipWrapper content="Estimated value of the asset at the end of its useful life">
+                <Label htmlFor="salvageValue">Salvage Value</Label>
+              </TooltipWrapper>
               <Input
                 id="salvageValue"
                 type="number"
@@ -159,7 +166,9 @@ export default function LeaseVsBuyCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="interestRate">Interest Rate (%)</Label>
+              <TooltipWrapper content="Annual interest rate for financing the purchase">
+                <Label htmlFor="interestRate">Interest Rate (%)</Label>
+              </TooltipWrapper>
               <Input
                 id="interestRate"
                 type="number"
@@ -172,7 +181,9 @@ export default function LeaseVsBuyCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="leasePayment">Monthly Lease Payment</Label>
+              <TooltipWrapper content="Monthly payment amount if leasing the asset">
+                <Label htmlFor="leasePayment">Monthly Lease Payment</Label>
+              </TooltipWrapper>
               <Input
                 id="leasePayment"
                 type="number"
@@ -184,7 +195,9 @@ export default function LeaseVsBuyCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="downPayment">Down Payment (if buying)</Label>
+              <TooltipWrapper content="Initial payment if purchasing the asset">
+                <Label htmlFor="downPayment">Down Payment</Label>
+              </TooltipWrapper>
               <Input
                 id="downPayment"
                 type="number"
@@ -196,7 +209,9 @@ export default function LeaseVsBuyCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="maintenanceCost">Annual Maintenance Cost (if buying)</Label>
+              <TooltipWrapper content="Estimated annual maintenance cost if you own the asset">
+                <Label htmlFor="maintenanceCost">Annual Maintenance Cost</Label>
+              </TooltipWrapper>
               <Input
                 id="maintenanceCost"
                 type="number"
@@ -208,7 +223,9 @@ export default function LeaseVsBuyCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="taxBracket">Income Tax Bracket (%)</Label>
+              <TooltipWrapper content="Your business tax bracket for calculating tax benefits">
+                <Label htmlFor="taxBracket">Tax Bracket (%)</Label>
+              </TooltipWrapper>
               <Input
                 id="taxBracket"
                 type="number"

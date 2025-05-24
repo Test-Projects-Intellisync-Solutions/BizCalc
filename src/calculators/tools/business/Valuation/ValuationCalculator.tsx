@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-// Alert components are not currently used
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 
 export default function ValuationCalculator() {
   const [ebitda, setEbitda] = useState<number>(0);
@@ -29,7 +29,9 @@ export default function ValuationCalculator() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="ebitda">Annual EBITDA</Label>
+            <TooltipWrapper content="Earnings Before Interest, Taxes, Depreciation, and Amortization - A measure of a company's operating performance">
+              <Label htmlFor="ebitda">Annual EBITDA</Label>
+            </TooltipWrapper>
             <Input
               id="ebitda"
               type="number"
@@ -41,7 +43,9 @@ export default function ValuationCalculator() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="multiple">Industry Multiple</Label>
+            <TooltipWrapper content="Valuation multiple based on industry standards (typically 3x-10x EBITDA)">
+              <Label htmlFor="multiple">Industry Multiple</Label>
+            </TooltipWrapper>
             <Input
               id="multiple"
               type="number"
@@ -54,16 +58,20 @@ export default function ValuationCalculator() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="growth">Annual Growth Rate (%)</Label>
-            <Input
-              id="growth"
-              type="number"
-              min="0"
-              max="100"
-              value={growthRate || ''}
-              onChange={(e) => setGrowthRate(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
-            />
+            <TooltipWrapper content="Expected annual growth rate percentage to adjust the valuation">
+              <Label htmlFor="growth">Expected Growth Rate (%)</Label>
+            </TooltipWrapper>
+            <TooltipWrapper content="Enter the expected annual growth rate percentage">
+              <Input
+                id="growth"
+                type="number"
+                min="-100"
+                max="100"
+                value={growthRate || ''}
+                onChange={(e) => setGrowthRate(parseFloat(e.target.value) || 0)}
+                placeholder="0"
+              />
+            </TooltipWrapper>
           </div>
 
           {ebitda > 0 && (
@@ -71,16 +79,24 @@ export default function ValuationCalculator() {
               <CardContent className="pt-6">
                 <div className="grid gap-4">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Base Valuation</p>
-                    <p className="text-2xl font-bold">
-                      ${valuation.base.toLocaleString()}
-                    </p>
+                    <TooltipWrapper content="Base valuation calculated as EBITDA × Industry Multiple">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Base Valuation</p>
+                        <p className="text-2xl font-bold">
+                          ${valuation.base.toLocaleString()}
+                        </p>
+                      </div>
+                    </TooltipWrapper>
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Growth-Adjusted Valuation</p>
-                    <p className="text-2xl font-bold">
-                      ${valuation.adjusted.toLocaleString()}
-                    </p>
+                    <TooltipWrapper content="Growth-adjusted valuation calculated as Base Valuation + (Base Valuation × Growth Rate)">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Growth-Adjusted Valuation</p>
+                        <p className="text-2xl font-bold">
+                          ${valuation.adjusted.toLocaleString()}
+                        </p>
+                      </div>
+                    </TooltipWrapper>
                   </div>
                 </div>
               </CardContent>

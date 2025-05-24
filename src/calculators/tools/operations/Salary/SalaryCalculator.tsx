@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { TooltipWrapper } from '@/components/ui/tooltip-wrapper';
 
 //
 // Canadian Federal Tax Brackets (2023) for Salary Income
@@ -119,7 +120,9 @@ export default function SalaryCalculator() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="income">Target Annual Income</Label>
+            <TooltipWrapper content="Your desired total annual income from both salary and dividends">
+              <Label htmlFor="income">Target Annual Income</Label>
+            </TooltipWrapper>
             <Input
               id="income"
               type="number"
@@ -132,7 +135,9 @@ export default function SalaryCalculator() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="corpTax">Corporate Tax Rate (%)</Label>
+              <TooltipWrapper content="The corporate tax rate that applies to your business income">
+                <Label htmlFor="corpTax">Corporate Tax Rate (%)</Label>
+              </TooltipWrapper>
               <Input
                 id="corpTax"
                 type="number"
@@ -146,7 +151,9 @@ export default function SalaryCalculator() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dividendTax">Dividend Tax Rate (%)</Label>
+              <TooltipWrapper content="Your personal tax rate on dividend income (varies by province and income level)">
+                <Label htmlFor="dividendTax">Dividend Tax Rate (%)</Label>
+              </TooltipWrapper>
               <Input
                 id="dividendTax"
                 type="number"
@@ -166,36 +173,48 @@ export default function SalaryCalculator() {
               <CardContent className="pt-6">
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      Recommended Salary
-                    </p>
-                    <p className="text-2xl font-bold">
-                      ${optimalSalary.toLocaleString(undefined, {
-                        maximumFractionDigits: 0,
-                      })}
-                    </p>
+                    <TooltipWrapper content="Optimal salary amount to minimize total tax burden based on Canadian tax brackets">
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Recommended Salary
+                        </p>
+                        <p className="text-2xl font-bold">
+                          ${optimalSalary.toLocaleString(undefined, {
+                            maximumFractionDigits: 0,
+                          })}
+                        </p>
+                      </div>
+                    </TooltipWrapper>
                   </div>
                   {targetIncome >= 250000 && (
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground">
-                        Recommended Dividend
-                      </p>
-                      <p className="text-2xl font-bold">
-                        ${optimalDividend.toLocaleString(undefined, {
-                          maximumFractionDigits: 0,
-                        })}
-                      </p>
+                      <TooltipWrapper content="Recommended dividend amount to complement the salary for optimal tax efficiency">
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Recommended Dividend
+                          </p>
+                          <p className="text-2xl font-bold">
+                            ${optimalDividend.toLocaleString(undefined, {
+                              maximumFractionDigits: 0,
+                            })}
+                          </p>
+                        </div>
+                      </TooltipWrapper>
                     </div>
                   )}
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      Estimated Total Tax
-                    </p>
-                    <p className="text-2xl font-bold">
-                      ${totalTax.toLocaleString(undefined, {
-                        maximumFractionDigits: 0,
-                      })}
-                    </p>
+                    <TooltipWrapper content="Total estimated tax (corporate + personal) on your target income">
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Estimated Total Tax
+                        </p>
+                        <p className="text-2xl font-bold">
+                          ${totalTax.toLocaleString(undefined, {
+                            maximumFractionDigits: 0,
+                          })}
+                        </p>
+                      </div>
+                    </TooltipWrapper>
                   </div>
                 </div>
                 <div className="mt-4 text-center">
