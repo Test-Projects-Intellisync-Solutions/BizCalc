@@ -19,12 +19,18 @@ export default function LoanCalculator() {
   const [loanAmount, setLoanAmount] = useState<number>(0);
   const [interestRate, setInterestRate] = useState<number>(0);
   const [term, setTerm] = useState<number>(0);
-  const [frequency, setFrequency] = useState<'monthly' | 'quarterly' | 'annually'>('monthly');
+  const [frequency, setFrequency] = useState<'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'annually'>('monthly');
 
   const calculatePayments = useMemo(() => {
     if (!loanAmount || !interestRate || !term) return [];
 
-    const periodsPerYear = frequency === 'monthly' ? 12 : frequency === 'quarterly' ? 4 : 1;
+    const periodsPerYear = {
+      'weekly': 52,
+      'biweekly': 26,
+      'monthly': 12,
+      'quarterly': 4,
+      'annually': 1
+    }[frequency];
     const totalPeriods = term * periodsPerYear;
     const periodicRate = (interestRate / 100) / periodsPerYear;
     
@@ -117,6 +123,8 @@ export default function LoanCalculator() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="biweekly">Bi-Weekly</SelectItem>
                   <SelectItem value="monthly">Monthly</SelectItem>
                   <SelectItem value="quarterly">Quarterly</SelectItem>
                   <SelectItem value="annually">Annually</SelectItem>
