@@ -19,6 +19,11 @@ interface RevenueFormProps {
 }
 
 export default function RevenueForm({ onUpdate }: RevenueFormProps) {
+  const exampleValues = {
+    baseAmount: '5,000',
+    growthRate: '5.00'
+  };
+
   const [streams, setStreams] = useState<RevenueStream[]>([
     {
       id: '1',
@@ -33,7 +38,9 @@ export default function RevenueForm({ onUpdate }: RevenueFormProps) {
     const newStreams = [...streams];
     newStreams[index] = {
       ...newStreams[index],
-      [field]: value,
+      [field]: typeof value === 'string' && (field === 'baseAmount' || field === 'growthRate') 
+        ? (value === '' ? 0 : parseFloat(value) || 0)
+        : value,
     };
     setStreams(newStreams);
     onUpdate(newStreams);
@@ -91,9 +98,9 @@ export default function RevenueForm({ onUpdate }: RevenueFormProps) {
                 <Input
                   type="number"
                   min="0"
-                  value={stream.baseAmount}
-                  onChange={(e) => handleStreamChange(index, 'baseAmount', parseFloat(e.target.value) || 0)}
-                  placeholder="0.00"
+                  value={stream.baseAmount === 0 ? '' : stream.baseAmount}
+                  onChange={(e) => handleStreamChange(index, 'baseAmount', e.target.value)}
+                  placeholder={exampleValues.baseAmount}
                 />
               </div>
 
@@ -120,9 +127,9 @@ export default function RevenueForm({ onUpdate }: RevenueFormProps) {
                     type="number"
                     min="0"
                     max="100"
-                    value={stream.growthRate}
-                    onChange={(e) => handleStreamChange(index, 'growthRate', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
+                    value={stream.growthRate === 0 ? '' : stream.growthRate}
+                    onChange={(e) => handleStreamChange(index, 'growthRate', e.target.value)}
+                    placeholder={exampleValues.growthRate}
                   />
                 </div>
               )}

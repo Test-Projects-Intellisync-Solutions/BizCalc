@@ -23,6 +23,10 @@ interface CashFlowFormProps {
 }
 
 export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanceChange }: CashFlowFormProps) {
+  const exampleValues = {
+    openingBalance: '10,000',
+    amount: '2,500'
+  };
   const [items, setItems] = useState<CashFlowItem[]>([
     {
       id: '1',
@@ -44,10 +48,16 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
     const newItems = [...items];
     newItems[index] = {
       ...newItems[index],
-      [field]: value,
+      [field]: typeof value === 'string' && field === 'amount'
+        ? (value === '' ? 0 : parseFloat(value) || 0)
+        : value,
     };
     setItems(newItems);
     onUpdate(newItems);
+  };
+  
+  const handleOpeningBalanceChange = (value: string) => {
+    onOpeningBalanceChange(value === '' ? 0 : parseFloat(value) || 0);
   };
 
   const addItem = (category: 'inflow' | 'outflow') => {
@@ -81,9 +91,9 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
             <Input
               type="number"
               min="0"
-              value={openingBalance}
-              onChange={(e) => onOpeningBalanceChange(parseFloat(e.target.value) || 0)}
-              placeholder="0.00"
+              value={openingBalance === 0 ? '' : openingBalance}
+              onChange={(e) => handleOpeningBalanceChange(e.target.value)}
+              placeholder={exampleValues.openingBalance}
             />
           </div>
         </CardContent>
@@ -123,9 +133,9 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
                       <Input
                         type="number"
                         min="0"
-                        value={item.amount}
+                        value={item.amount === 0 ? '' : item.amount}
                         onChange={(e) => handleItemChange(items.indexOf(item), 'amount', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
+                        placeholder={exampleValues.amount}
                       />
                     </div>
 
@@ -203,9 +213,9 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
                       <Input
                         type="number"
                         min="0"
-                        value={item.amount}
+                        value={item.amount === 0 ? '' : item.amount}
                         onChange={(e) => handleItemChange(items.indexOf(item), 'amount', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
+                        placeholder={exampleValues.amount}
                       />
                     </div>
 

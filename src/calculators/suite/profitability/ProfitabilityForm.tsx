@@ -24,12 +24,24 @@ export default function ProfitabilityForm({ onUpdate }: ProfitabilityFormProps) 
     variableCostPerUnit: 0,
     fixedCosts: 0,
   });
+  
+  const exampleValues = {
+    revenue: '50,000',
+    cogs: '20,000',
+    operatingExpenses: '10,000',
+    pricePerUnit: '49.99',
+    variableCostPerUnit: '15.50',
+    fixedCosts: '5,000'
+  };
 
   const handleChange = (field: keyof typeof formData, value: string) => {
-    const numValue = value === '' ? 0 : parseFloat(value);
-    const newData = { ...formData, [field]: numValue };
-    setFormData(newData);
-    onUpdate(newData);
+    // Allow empty string or valid numbers
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      const numValue = value === '' ? 0 : parseFloat(value);
+      const newData = { ...formData, [field]: numValue };
+      setFormData(newData);
+      onUpdate(newData);
+    }
   };
 
   return (
@@ -44,9 +56,9 @@ export default function ProfitabilityForm({ onUpdate }: ProfitabilityFormProps) 
             <Input
               type="number"
               min="0"
-              value={formData.revenue || ''}
+              value={formData.revenue === 0 ? '' : formData.revenue}
               onChange={(e) => handleChange('revenue', e.target.value)}
-              placeholder="0.00"
+              placeholder={exampleValues.revenue}
             />
           </div>
 
@@ -55,9 +67,9 @@ export default function ProfitabilityForm({ onUpdate }: ProfitabilityFormProps) 
             <Input
               type="number"
               min="0"
-              value={formData.cogs || ''}
+              value={formData.cogs === 0 ? '' : formData.cogs}
               onChange={(e) => handleChange('cogs', e.target.value)}
-              placeholder="0.00"
+              placeholder={exampleValues.cogs}
             />
           </div>
 
@@ -68,9 +80,9 @@ export default function ProfitabilityForm({ onUpdate }: ProfitabilityFormProps) 
             <Input
               type="number"
               min="0"
-              value={formData.operatingExpenses || ''}
+              value={formData.operatingExpenses === 0 ? '' : formData.operatingExpenses}
               onChange={(e) => handleChange('operatingExpenses', e.target.value)}
-              placeholder="0.00"
+              placeholder={exampleValues.operatingExpenses}
             />
           </div>
         </CardContent>
@@ -86,9 +98,9 @@ export default function ProfitabilityForm({ onUpdate }: ProfitabilityFormProps) 
             <Input
               type="number"
               min="0"
-              value={formData.pricePerUnit || ''}
+              value={formData.pricePerUnit === 0 ? '' : formData.pricePerUnit}
               onChange={(e) => handleChange('pricePerUnit', e.target.value)}
-              placeholder="0.00"
+              placeholder={exampleValues.pricePerUnit}
             />
           </div>
 
@@ -97,9 +109,9 @@ export default function ProfitabilityForm({ onUpdate }: ProfitabilityFormProps) 
             <Input
               type="number"
               min="0"
-              value={formData.variableCostPerUnit || ''}
+              value={formData.variableCostPerUnit === 0 ? '' : formData.variableCostPerUnit}
               onChange={(e) => handleChange('variableCostPerUnit', e.target.value)}
-              placeholder="0.00"
+              placeholder={exampleValues.variableCostPerUnit}
             />
           </div>
 
@@ -108,9 +120,9 @@ export default function ProfitabilityForm({ onUpdate }: ProfitabilityFormProps) 
             <Input
               type="number"
               min="0"
-              value={formData.fixedCosts || ''}
+              value={formData.fixedCosts === 0 ? '' : formData.fixedCosts}
               onChange={(e) => handleChange('fixedCosts', e.target.value)}
-              placeholder="0.00"
+              placeholder={exampleValues.fixedCosts}
             />
           </div>
         </CardContent>

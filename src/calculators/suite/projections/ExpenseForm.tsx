@@ -20,6 +20,11 @@ interface ExpenseFormProps {
 }
 
 export default function ExpenseForm({ onUpdate }: ExpenseFormProps) {
+  const exampleValues = {
+    amount: '2,500',
+    variableRate: '10.00'
+  };
+
   const [expenses, setExpenses] = useState<Expense[]>([
     {
       id: '1',
@@ -34,7 +39,9 @@ export default function ExpenseForm({ onUpdate }: ExpenseFormProps) {
     const newExpenses = [...expenses];
     newExpenses[index] = {
       ...newExpenses[index],
-      [field]: value,
+      [field]: typeof value === 'string' && (field === 'amount' || field === 'variableRate')
+        ? (value === '' ? 0 : parseFloat(value) || 0)
+        : value,
     };
     setExpenses(newExpenses);
     onUpdate(newExpenses);
@@ -126,9 +133,9 @@ export default function ExpenseForm({ onUpdate }: ExpenseFormProps) {
                   <Input
                     type="number"
                     min="0"
-                    value={expense.amount}
-                    onChange={(e) => handleExpenseChange(index, 'amount', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
+                    value={expense.amount === 0 ? '' : expense.amount}
+                    onChange={(e) => handleExpenseChange(index, 'amount', e.target.value)}
+                    placeholder={exampleValues.amount}
                   />
                 </div>
               ) : (
@@ -138,9 +145,9 @@ export default function ExpenseForm({ onUpdate }: ExpenseFormProps) {
                     type="number"
                     min="0"
                     max="100"
-                    value={expense.variableRate || 0}
-                    onChange={(e) => handleExpenseChange(index, 'variableRate', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
+                    value={expense.variableRate === 0 ? '' : (expense.variableRate || 0)}
+                    onChange={(e) => handleExpenseChange(index, 'variableRate', e.target.value)}
+                    placeholder={exampleValues.variableRate}
                   />
                 </div>
               )}
