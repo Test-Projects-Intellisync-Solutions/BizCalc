@@ -13,7 +13,8 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  Cell
 } from 'recharts';
 import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 
@@ -347,43 +348,96 @@ function StartupCostEstimator() {
             </CardContent>
           </Card>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="p-4">
-              <CardTitle className="text-lg mb-4">Cost Breakdown</CardTitle>
-              <div className="h-[250px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                  <Legend />
-                  <Bar dataKey="value" name="Cost" fill="hsl(var(--chart-1))" />
-                </BarChart>
-              </ResponsiveContainer>
+          <div className="space-y-6">
+            {/* Cost Summary Cards */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="p-4 border-l-4 border-primary">
+                <div className="text-sm text-muted-foreground">One-Time Costs</div>
+                <div className="text-2xl font-bold">${oneTimeCosts.toLocaleString()}</div>
+              </Card>
+              <Card className="p-4 border-l-4 border-secondary">
+                <div className="text-sm text-muted-foreground">6-Month Operating</div>
+                <div className="text-2xl font-bold">${sixMonthOperating.toLocaleString()}</div>
+              </Card>
+              <Card className="p-4 border-l-4 border-destructive">
+                <div className="text-sm text-muted-foreground">Total Startup Costs</div>
+                <div className="text-2xl font-bold">${totalStartupCosts.toLocaleString()}</div>
+              </Card>
+            </div>
+
+            {/* Category Breakdown */}
+            <Card className="p-6">
+              <CardTitle className="text-lg mb-6">Costs by Category</CardTitle>
+              <div className="space-y-4">
+                {categoryData.map((item, index) => {
+                  const percentage = (item.value / totalStartupCosts) * 100;
+                  return (
+                    <div key={item.name} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="font-medium">{item.name}</span>
+                        <span>${item.value.toLocaleString()} ({percentage.toFixed(1)}%)</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full"
+                          style={{
+                            width: `${percentage}%`,
+                            backgroundColor: `hsl(var(--chart-${(index % 5) + 1}))`
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </Card>
 
-            <Card className="p-4">
-              <CardTitle className="text-lg mb-4">Costs by Category</CardTitle>
-              <div className="h-[250px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={categoryData}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 60, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis type="category" dataKey="name" />
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                  <Legend />
-                  <Bar dataKey="value" name="Cost by Category" fill="hsl(var(--chart-2))" />
-                </BarChart>
-              </ResponsiveContainer>
+            {/* Cost Distribution */}
+            <Card className="p-6">
+              <CardTitle className="text-lg mb-6">Cost Distribution</CardTitle>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    layout="vertical"
+                    data={categoryData}
+                    margin={{ top: 0, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid horizontal={true} vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis 
+                      type="number" 
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      axisLine={false}
+                    />
+                    <YAxis 
+                      type="category" 
+                      dataKey="name"
+                      tick={{ fill: 'hsl(var(--foreground))' }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={100}
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Amount']}
+                      contentStyle={{
+                        background: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: 'var(--radius)',
+                      }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      radius={[0, 4, 4, 0]}
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={`hsl(var(--chart-${(index % 5) + 1}))`} 
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </Card>
           </div>
