@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, MinusCircle } from 'lucide-react';
+import { PlusCircle, MinusCircle, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Textarea } from '@/components/ui/textarea';
 
 export interface CashFlowItem {
@@ -80,14 +81,25 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
+    <TooltipProvider>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
           <CardTitle>Opening Balance</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label>Starting Cash Position</Label>
+            <div className="flex items-center gap-2">
+              <Label>Starting Cash Position</Label>
+              <Tooltip>
+                <TooltipTrigger type="button">
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>The amount of cash available at the start of your projection period.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Input
               type="number"
               min="0"
@@ -111,7 +123,17 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
               .map((item, index) => (
                 <div key={item.id} className="space-y-4 p-4 border rounded-lg">
                   <div className="flex items-center justify-between">
-                    <Label>Income Source</Label>
+                    <div className="flex items-center gap-2">
+                      <Label>Income Source</Label>
+                      <Tooltip>
+                        <TooltipTrigger type="button">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>E.g., Product Sales, Service Revenue, Investments</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -191,7 +213,17 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
               .map((item, index) => (
                 <div key={item.id} className="space-y-4 p-4 border rounded-lg">
                   <div className="flex items-center justify-between">
-                    <Label>Expense</Label>
+                    <div className="flex items-center gap-2">
+                      <Label>Expense Name</Label>
+                      <Tooltip>
+                        <TooltipTrigger type="button">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>E.g., Rent, Salaries, Utilities, Supplies</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -204,7 +236,7 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
                   <Input
                     value={item.name}
                     onChange={(e) => handleItemChange(items.indexOf(item), 'name', e.target.value)}
-                    placeholder="e.g., Rent"
+                    placeholder="e.g., Office Rent"
                   />
 
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -260,6 +292,7 @@ export default function CashFlowForm({ onUpdate, openingBalance, onOpeningBalanc
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

@@ -4,18 +4,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button'; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, PlusCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Trash2, PlusCircle, Info } from 'lucide-react';
 import { 
   BarChart, 
-  Bar, 
+  Bar,
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip, 
-  Legend, 
   ResponsiveContainer,
-  Cell
+  Cell,
 } from 'recharts';
+
 import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 
 interface CostItem {
@@ -184,7 +184,8 @@ function StartupCostEstimator() {
   };
 
   return (
-    <div className="space-y-6">
+    <TooltipProvider>
+      <div className="space-y-6">
       <div className="flex justify-end">
         <ImportExport 
           calculatorType="startupCostEstimator"
@@ -203,29 +204,28 @@ function StartupCostEstimator() {
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-                <SelectContent>
-    <SelectItem value="boutique">Boutique</SelectItem>
-    <SelectItem value="coworking">Co-working Space</SelectItem>
-    <SelectItem value="consulting">Consulting Agency</SelectItem>
-    <SelectItem value="creative">Creative Studio</SelectItem>
-    <SelectItem value="digitalMarketing">Digital Marketing Agency</SelectItem>
-    <SelectItem value="ecommerce">E-commerce Store</SelectItem>
-    <SelectItem value="eventPlanning">Event Planning</SelectItem>
-    <SelectItem value="foodTruck">Food Truck</SelectItem>
-    <SelectItem value="health">Health &amp; Wellness</SelectItem>
-    <SelectItem value="homeBased">Home-based Business</SelectItem>
-    <SelectItem value="manufacturing">Manufacturing &amp; Production</SelectItem>
-    <SelectItem value="mobileApp">Mobile App Development</SelectItem>
-    <SelectItem value="online">Online Business</SelectItem>
-    <SelectItem value="realEstate">Real Estate Agency</SelectItem>
-    <SelectItem value="restaurant">Restaurant</SelectItem>
-    <SelectItem value="retail">Retail Store</SelectItem>
-    <SelectItem value="service">Service Business</SelectItem>
-    <SelectItem value="socialEnterprise">Social Enterprise</SelectItem>
-    <SelectItem value="subscription">Subscription Box Service</SelectItem>
-    <SelectItem value="tech">Tech Startup</SelectItem>
-  </SelectContent>
-              
+              <SelectContent>
+                <SelectItem value="boutique">Boutique</SelectItem>
+                <SelectItem value="coworking">Co-working Space</SelectItem>
+                <SelectItem value="consulting">Consulting Agency</SelectItem>
+                <SelectItem value="creative">Creative Studio</SelectItem>
+                <SelectItem value="digitalMarketing">Digital Marketing Agency</SelectItem>
+                <SelectItem value="ecommerce">E-commerce Store</SelectItem>
+                <SelectItem value="eventPlanning">Event Planning</SelectItem>
+                <SelectItem value="foodTruck">Food Truck</SelectItem>
+                <SelectItem value="health">Health &amp; Wellness</SelectItem>
+                <SelectItem value="homeBased">Home-based Business</SelectItem>
+                <SelectItem value="manufacturing">Manufacturing &amp; Production</SelectItem>
+                <SelectItem value="mobileApp">Mobile App Development</SelectItem>
+                <SelectItem value="online">Online Business</SelectItem>
+                <SelectItem value="realEstate">Real Estate Agency</SelectItem>
+                <SelectItem value="restaurant">Restaurant</SelectItem>
+                <SelectItem value="retail">Retail Store</SelectItem>
+                <SelectItem value="service">Service Business</SelectItem>
+                <SelectItem value="socialEnterprise">Social Enterprise</SelectItem>
+                <SelectItem value="subscription">Subscription Box Service</SelectItem>
+                <SelectItem value="tech">Tech Startup</SelectItem>
+              </SelectContent>
             </Select>
           </div>
 
@@ -283,7 +283,19 @@ function StartupCostEstimator() {
                   </div>
                   
                   <div>
-                    <Label className="mb-2 block">Type</Label>
+                    <div className="flex items-center space-x-1 mb-1">
+                      <Label className="block">Type</Label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[300px] p-4">
+                          <p className="mb-2 font-semibold">Expense Type:</p>
+                          <p className="mb-1"><span className="font-medium">One-Time:</span> Initial setup costs (e.g., equipment, licenses)</p>
+                          <p><span className="font-medium">Monthly:</span> Recurring operational expenses</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <Select
                       value={item.isOneTime ? 'one-time' : 'monthly'}
                       onValueChange={(value) => handleItemChange(item.id, 'isOneTime', value === 'one-time')}
@@ -299,7 +311,17 @@ function StartupCostEstimator() {
                   </div>
                   
                   <div>
-                    <Label className="mb-2 block">Amount ($)</Label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Label>Amount ($)</Label>
+                      <Tooltip>
+                        <TooltipTrigger type="button">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Enter the estimated amount for this expense</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <Input
                       type="number"
                       className="w-full"
@@ -333,7 +355,18 @@ function StartupCostEstimator() {
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">6-Month Operating</p>
+                  <div className="flex items-center justify-center space-x-1">
+                    <p className="text-sm text-muted-foreground">6-Month Operating</p>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px] p-4">
+                        <p>Estimated operating expenses for the first 6 months.</p>
+                        <p className="mt-1 text-sm text-muted-foreground">(Monthly recurring costs × 6 months)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <p className="text-2xl font-bold">
                     ${sixMonthOperating.toLocaleString()}
                   </p>
@@ -417,21 +450,15 @@ function StartupCostEstimator() {
                       tickLine={false}
                       width={100}
                     />
-                    <Tooltip 
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Amount']}
-                      contentStyle={{
-                        background: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                      }}
-                    />
+                   
                     <Bar 
                       dataKey="value" 
                       radius={[0, 4, 4, 0]}
+                      name="Amount"
                     >
                       {categoryData.map((entry, index) => (
                         <Cell 
-                          key={`cell-${index}`} 
+                          key={`cell-${index}`}
                           fill={`hsl(var(--chart-${(index % 5) + 1}))`} 
                         />
                       ))}
@@ -443,8 +470,9 @@ function StartupCostEstimator() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </TooltipProvider>
   );
-}
+};
 
 export default StartupCostEstimator;

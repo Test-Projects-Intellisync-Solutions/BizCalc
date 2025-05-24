@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, MinusCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PlusCircle, MinusCircle, Info } from 'lucide-react';
 
 export interface RevenueStream {
   id: string;
@@ -105,7 +106,21 @@ export default function RevenueForm({ onUpdate }: RevenueFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label>Growth Type</Label>
+<div className="flex items-center space-x-1">
+                  <Label>Growth Type</Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px] p-4">
+                        <p className="mb-2 font-semibold">Growth Type Options:</p>
+                        <p className="mb-1"><span className="font-medium">Fixed:</span> Revenue grows by a constant amount each period</p>
+                        <p><span className="font-medium">Percentage Growth:</span> Revenue grows by a percentage of the previous period's amount</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <Select
                   value={stream.growthType}
                   onValueChange={(value) => handleStreamChange(index, 'growthType', value)}

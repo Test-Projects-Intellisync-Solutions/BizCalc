@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   ResponsiveContainer,
   ReferenceLine,
   Legend,
@@ -70,7 +71,8 @@ export default function BreakEvenCalculator() {
     : (pricePerUnit * breakEvenUnits).toLocaleString();
 
   return (
-    <div className="space-y-6">
+    <TooltipProvider>
+      <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Break-Even Calculator</CardTitle>
@@ -78,7 +80,17 @@ export default function BreakEvenCalculator() {
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="fixedCosts">Fixed Costs</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="fixedCosts">Fixed Costs</Label>
+                <Tooltip>
+                  <TooltipTrigger type="button">
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Expenses that don't change with production volume, like rent, salaries, and insurance.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
                 id="fixedCosts"
                 type="number"
@@ -90,7 +102,17 @@ export default function BreakEvenCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price">Price Per Unit</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="price">Price Per Unit</Label>
+                <Tooltip>
+                  <TooltipTrigger type="button">
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>The selling price for each unit of your product or service.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
                 id="price"
                 type="number"
@@ -102,7 +124,17 @@ export default function BreakEvenCalculator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="variableCost">Variable Cost Per Unit</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="variableCost">Variable Cost Per Unit</Label>
+                <Tooltip>
+                  <TooltipTrigger type="button">
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Costs that vary with production volume, like materials and direct labor.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
                 id="variableCost"
                 type="number"
@@ -165,6 +197,7 @@ export default function BreakEvenCalculator() {
           </Button>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

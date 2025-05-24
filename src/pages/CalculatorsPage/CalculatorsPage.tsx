@@ -4,6 +4,7 @@ import BurnRate from '@/calculators/suite/startup/BurnRate/BurnRate';
 import ProjectionsTab from '@/calculators/suite/projections/ProjectionsTab';
 import CashFlowTab from '@/calculators/suite/cashflow/CashFlowTab';
 import ProfitabilityTab from '@/calculators/suite/profitability/ProfitabilityTab';
+import RatiosTab from '@/calculators/suite/ratios/RatiosTab';
 
 const CalculatorsPage = () => {
   return (
@@ -38,11 +39,7 @@ const CalculatorsPage = () => {
         </TabsContent>
         
         <TabsContent value="ratios" className="space-y-6">
-          {/* Add Financial Ratios component when ready */}
-          <div className="p-4 border rounded-lg">
-            <h3 className="text-lg font-medium mb-2">Financial Ratios</h3>
-            <p>Coming soon...</p>
-          </div>
+          <RatiosTab />
         </TabsContent>
       </Tabs>
     </div>
