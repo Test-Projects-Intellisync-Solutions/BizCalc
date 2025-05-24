@@ -1,35 +1,39 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Calculator, Menu, Home, Wrench, Book } from 'lucide-react';
+
+// UI Components
 import { ThemeProvider } from '@/components/ui/UIComponents/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
-import { Calculator, Menu, Home, Wrench, Book } from 'lucide-react';
-import DocsPage from '@/pages/DocsPage/DocsPage';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
 } from '@/components/ui/navigation-menu';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import StartupCostEstimator from '@/calculators/suite/startup/StartupCostEstimator/StartupCostEstimator';
+
+// Pages
+import DocsPage from '@/pages/DocsPage/DocsPage';
+import CalculatorsPage from '@/pages/CalculatorsPage/CalculatorsPage';
 import ToolsPage from '@/pages/ToolsPage/ToolsPage';
-import BurnRate from '@/calculators/suite/startup/BurnRate/BurnRate';
-import CashFlowTab from '@/calculators/suite/cashflow/CashFlowTab';
-import ProjectionsTab from '@/calculators/suite/projections/ProjectionsTab';
-import ProfitabilityTab from '@/calculators/suite/profitability/ProfitabilityTab';
-import RatiosTab from '@/calculators/suite/ratios/RatiosTab';
+
+// Utils
+import { cn } from '@/lib/utils';
+
+// Components
 import Footer from '@/components/ui/UIComponents/Footer';
 import Hero from '@/components/ui/UIComponents/Hero';
 import Services from '@/components/ui/UIComponents/Services';
 import ScrollToTop from '@/components/ui/UIComponents/ScrollToTop';
-import { motion } from 'framer-motion';
 // import CTA from '@/components/ui/UIComponents/CTA'; For Future Use
 // import PricingPage from '@/components/pricing/PricingPage'; For Future Use
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
-1
+
   // Listen to URL hash changes to update the active tab
   useEffect(() => {
     const hash = window.location.hash.replace('#', '');
@@ -295,33 +299,7 @@ function App() {
 
               {/* Calculators Tab */}
               <TabsContent value="calculators" className="mt-6">
-                <Tabs defaultValue="startup" className="space-y-4">
-                  <TabsList className="flex overflow-x-auto hide-scrollbar p-1 gap-2">
-                    <TabsTrigger value="startup">Start-Up &amp; Costs</TabsTrigger>
-                    <TabsTrigger value="projections">Revenue &amp; Expenses</TabsTrigger>
-                    <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
-                    <TabsTrigger value="profitability">Profitability</TabsTrigger>
-                    <TabsTrigger value="ratios">Financial Ratios</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="startup" className="space-y-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <StartupCostEstimator />
-                      <BurnRate />
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="projections" className="space-y-6">
-                    <ProjectionsTab />
-                  </TabsContent>
-                  <TabsContent value="cashflow" className="space-y-6">
-                    <CashFlowTab />
-                  </TabsContent>
-                  <TabsContent value="profitability" className="space-y-6">
-                    <ProfitabilityTab />
-                  </TabsContent>
-                  <TabsContent value="ratios" className="space-y-6">
-                    <RatiosTab />
-                  </TabsContent>
-                </Tabs>
+                <CalculatorsPage />
               </TabsContent>
 
               {/* Tools Tab */}
