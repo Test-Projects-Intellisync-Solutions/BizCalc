@@ -8,7 +8,7 @@ import { caseStudies } from './case-studies';
 import { businessPlanningDocs } from './business-planning';
 
 // Create a function to ensure we always get fresh content
-// This helps avoid module caching issues
+
 const getDocSections = () => [
   {
     label: "📘 Calculator Guides",

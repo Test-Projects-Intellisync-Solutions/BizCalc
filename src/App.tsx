@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/components/ui/UIComponents/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -21,7 +21,7 @@ import CalculatorsPage from '@/pages/CalculatorsPage/CalculatorsPage';
 import ToolsPage from '@/pages/ToolsPage/ToolsPage';
 
 // Utils
-import { cn } from '@/lib/utils';
+// import { cn } from '@/lib/utils'; For Future Use
 
 // Components
 import Footer from '@/components/ui/UIComponents/Footer';
@@ -131,7 +131,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Book className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline">Docs</NavigationMenuLink>
+                        <NavigationMenuLink className="transition-colors group-hover:underline">Resources</NavigationMenuLink>
                       </motion.button>
                     </NavigationMenuItem>
                     {/*
@@ -240,7 +240,7 @@ function App() {
                         <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
                           <Book className="h-5 w-5 transition-colors" />
                         </motion.span>
-                        Docs
+                        Resources
                       </motion.button>
                       {/*
                       <button
@@ -307,7 +307,7 @@ function App() {
                 <ToolsPage />
               </TabsContent>
 
-              {/* Docs Tab */}
+              {/* Resources Tab */}
               <TabsContent value="docs" className="mt-6">
                 <DocsPage />
               </TabsContent>
