@@ -101,6 +101,6 @@ A comprehensive guide to crafting a detailed business plan that not only meets p
 - [Market Research Guide](/guides/market-research) – Tailored for the Canadian market.
 - [Business Plan Templates](/templates/business-plan) – Customizable templates with Canadian examples.
 
-This enhanced outline offers a robust framework for your business plan, integrating Canadian context and best practices. By tailoring your plan with locally relevant examples and regional insights, you can better connect with your audience and demonstrate a strong understanding of your target market.
+>This enhanced outline offers a robust framework for your business plan, integrating Canadian context and best practices. By tailoring your plan with locally relevant examples and regional insights, you can better connect with your audience and demonstrate a strong understanding of your target market.
 `
 };

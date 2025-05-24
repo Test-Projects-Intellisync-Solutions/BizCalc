@@ -188,6 +188,6 @@ Establish an ongoing system for:
 2. Update your data dashboard with new findings.
 3. Hold periodic strategy reviews to adapt to market changes.
 
-Competitive analysis is not a one-time task—it’s an ongoing process. Staying alert to market shifts and continuously refining your strategy will ensure your business remains ahead of the curve in your target market.
+>Competitive analysis is not a one-time task—it’s an ongoing process. Staying alert to market shifts and continuously refining your strategy will ensure your business remains ahead of the curve in your target market.
 `
 };

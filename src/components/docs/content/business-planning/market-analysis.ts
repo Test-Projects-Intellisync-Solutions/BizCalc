@@ -147,6 +147,6 @@ Score your business against competitors based on:
 ❌ Focusing only on positive trends and overlooking risks  
 ❌ Failing to update your analysis regularly as the market evolves
 
-Remember: A robust market analysis is an ongoing process. As markets and customer preferences in your target market evolve, update your analysis to keep your strategies relevant and effective.
+>Remember: A robust market analysis is an ongoing process. As markets and customer preferences in your target market evolve, update your analysis to keep your strategies relevant and effective.
 `
 };

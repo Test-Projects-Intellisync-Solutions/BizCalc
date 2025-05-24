@@ -11,15 +11,15 @@ import { operationalPlan } from './operational-plan';
 import { fundingStrategy } from './funding-strategy';
 
 export const businessPlanningDocs = [
-  businessPlanOutline,
-  executiveSummaryTemplate,
-  marketAnalysisReport,
-  competitiveAnalysis,
-  financialProjections,
-  riskManagementPlan,
-  swotAnalysis,
-  strategicPlanning,
-  marketingPlan,
-  operationalPlan,
-  fundingStrategy
+  executiveSummaryTemplate,   // Start with the high-level summary
+  businessPlanOutline,         // Follow with the full plan structure
+  strategicPlanning,           // Then strategic direction
+  marketAnalysisReport,        // Market understanding
+  competitiveAnalysis,         // Competitive landscape
+  swotAnalysis,                // Strengths/weaknesses analysis
+  marketingPlan,               // Marketing strategy
+  operationalPlan,             // Operational details
+  financialProjections,         // Financial planning
+  fundingStrategy,             // Funding approach
+  riskManagementPlan           // Risk assessment and mitigation
 ];

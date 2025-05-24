@@ -233,6 +233,6 @@ Strategies to mitigate risks:
 ❌ Skimping on preparation and documentation  
 ❌ Poor planning leading to cash flow issues
 
-Remember: Funding is a tool—not an end in itself. Choose the right mix of funding options that align with your business goals, market conditions, and long-term vision. With careful planning and the right approach, you can secure the investment needed to bring your business dreams to life.
+>Remember: Funding is a tool—not an end in itself. Choose the right mix of funding options that align with your business goals, market conditions, and long-term vision. With careful planning and the right approach, you can secure the investment needed to bring your business dreams to life.
 `
 };

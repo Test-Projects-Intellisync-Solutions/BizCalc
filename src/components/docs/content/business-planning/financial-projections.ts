@@ -178,6 +178,6 @@ Financial projections should be dynamic:
 3. Conduct variance analysis to identify discrepancies.
 4. Update projections to reflect new data and trends.
 
-Financial projections are vital tools for guiding your business strategy. By staying realistic, planning for multiple outcomes, and continuously refining your assumptions based on local market trends, you can set your business on a path to success.
+>Financial projections are vital tools for guiding your business strategy. By staying realistic, planning for multiple outcomes, and continuously refining your assumptions based on local market trends, you can set your business on a path to success.
 `
 };

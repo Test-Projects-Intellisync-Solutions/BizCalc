@@ -1,6 +1,6 @@
 export const swotAnalysis = {
   id: "swot-analysis",
-  label: "SWOT Analysis Template",
+  label: "SWOT Analysis",
   content: `
 # SWOT Analysis Guide
 
@@ -183,6 +183,6 @@ Minimize weaknesses to avoid potential threats.
 ❌ Failing to update your analysis regularly  
 ❌ Neglecting to communicate findings to all stakeholders
 
-Remember: SWOT Analysis is a dynamic tool for strategic planning. Regularly revisit and update your analysis to reflect changing conditions and to guide your business decisions effectively.
+>Remember: SWOT Analysis is a dynamic tool for strategic planning. Regularly revisit and update your analysis to reflect changing conditions and to guide your business decisions effectively.
 `
 };

@@ -271,6 +271,6 @@ Prepare for unexpected disruptions.
 ❌ Ignoring customer and staff feedback  
 ❌ Delaying necessary maintenance
 
-Remember: An operational plan is a living document. Regular review and updates are essential to keep your business running efficiently and to adapt as your business grows and market conditions change.
+>Remember: An operational plan is a living document. Regular review and updates are essential to keep your business running efficiently and to adapt as your business grows and market conditions change.
 `
 };

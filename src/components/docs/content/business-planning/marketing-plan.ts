@@ -247,6 +247,6 @@ Conduct regular reviews to stay on track:
 4. Update your strategy regularly.
 5. Document lessons learned for future campaigns.
 
-Remember: Marketing is an ongoing process. Regular monitoring, feedback, and adjustments will ensure your marketing efforts remain effective and aligned with the evolving market in your target market.
+>Remember: Marketing is an ongoing process. Regular monitoring, feedback, and adjustments will ensure your marketing efforts remain effective and aligned with the evolving market in your target market.
 `
 };

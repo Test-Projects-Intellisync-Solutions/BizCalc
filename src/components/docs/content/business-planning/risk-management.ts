@@ -217,6 +217,6 @@ Watch for indicators that may signal emerging risks:
 4. Adjust risk response plans based on performance data.
 5. Continuously improve processes based on feedback and new challenges.
 
-Remember: Risk management is a continuous process. Regular reviews, effective communication, and a commitment to continuous improvement are essential to protect your business and ensure long-term success.
+>Remember: Risk management is a continuous process. Regular reviews, effective communication, and a commitment to continuous improvement are essential to protect your business and ensure long-term success.
 `
 };

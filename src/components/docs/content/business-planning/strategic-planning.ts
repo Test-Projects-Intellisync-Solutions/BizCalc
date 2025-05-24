@@ -221,6 +221,6 @@ Develop contingency plans:
 4. Communicate successes and areas for improvement.
 5. Iterate and refine your strategy for continuous growth.
 
-Remember: Strategic planning is an ongoing journey. Regular review and adjustment ensure that your plan remains relevant, agile, and effective in an ever-changing business environment.
+>Remember: Strategic planning is an ongoing journey. Regular review and adjustment ensure that your plan remains relevant, agile, and effective in an ever-changing business environment.
 `
 };
