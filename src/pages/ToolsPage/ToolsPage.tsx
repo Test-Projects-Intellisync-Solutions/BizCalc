@@ -19,6 +19,28 @@ import { businessPlanningDocs } from '@/components/docs/content/business-plannin
 import { MarkdownViewer } from '../DocsPage/MarkdownViewer';
 
 const calculators = [
+  // Financial Health
+  {
+    id: 'cash-flow',
+    name: 'Cash Flow Forecast',
+    description: 'Project your future cash position to identify potential shortfalls and ensure healthy liquidity.',
+    icon: ArrowDownUp,
+    component: CashFlowForecast,
+  },
+  {
+    id: 'break-even',
+    name: 'Break-Even Calculator',
+    description: 'Determine how many units you need to sell to cover your costs and start making a profit.',
+    icon: BarChart,
+    component: BreakEvenCalculator,
+  },
+  {
+    id: 'profit-margin',
+    name: 'Profit Margin Calculator',
+    description: 'Calculate gross, operating, and net profit margins to evaluate your business performance.',
+    icon: PercentCircle,
+    component: ProfitMarginCalculator,
+  },
   {
     id: 'burn-rate',
     name: 'Burn Rate Calculator',
@@ -26,12 +48,14 @@ const calculators = [
     icon: TrendingDown,
     component: BurnRateCalculator,
   },
+  
+  // Business Planning
   {
-    id: 'loan',
-    name: 'Loan Repayment Planner',
-    description: 'Plan loan payments and view complete amortization schedules.',
-    icon: DollarSign,
-    component: LoanCalculator,
+    id: 'startup-costs',
+    name: 'Startup Cost Estimator',
+    description: 'Estimate initial business expenses and plan your funding needs.',
+    icon: Building,
+    component: StartupCostEstimator,
   },
   {
     id: 'valuation',
@@ -47,26 +71,14 @@ const calculators = [
     icon: PiggyBank,
     component: RoiCalculator,
   },
+  
+  // Operations
   {
     id: 'salary',
     name: 'Salary vs. Dividend Planner',
     description: 'Optimize your income split between salary and dividends.',
     icon: Calculator,
     component: SalaryCalculator,
-  },
-  {
-    id: 'break-even',
-    name: 'Break-Even Calculator',
-    description: 'Determine how many units you need to sell to cover your costs and start making a profit.',
-    icon: BarChart,
-    component: BreakEvenCalculator,
-  },
-  {
-    id: 'cash-flow',
-    name: 'Cash Flow Forecast',
-    description: 'Project your future cash position to identify potential shortfalls and ensure healthy liquidity.',
-    icon: ArrowDownUp,
-    component: CashFlowForecast,
   },
   {
     id: 'lease-vs-buy',
@@ -76,18 +88,11 @@ const calculators = [
     component: LeaseVsBuyCalculator,
   },
   {
-    id: 'profit-margin',
-    name: 'Profit Margin Calculator',
-    description: 'Calculate gross, operating, and net profit margins to evaluate your business performance.',
-    icon: PercentCircle,
-    component: ProfitMarginCalculator,
-  },
-  {
-    id: 'startup-costs',
-    name: 'Startup Cost Estimator',
-    description: 'Simple calculator for estimating initial business expenses.',
-    icon: Building,
-    component: StartupCostEstimator,
+    id: 'loan',
+    name: 'Loan Repayment Planner',
+    description: 'Plan loan payments and view complete amortization schedules.',
+    icon: DollarSign,
+    component: LoanCalculator,
   },
 ];
 
