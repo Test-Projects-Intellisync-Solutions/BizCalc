@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Menu, Home, Wrench, Book } from 'lucide-react';
+import { Calculator, Menu, Wrench, Book, Home } from 'lucide-react';
 
 // UI Components
 import { ThemeProvider } from '@/components/ui/UIComponents/theme-provider';

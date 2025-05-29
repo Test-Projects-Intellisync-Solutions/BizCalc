@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import { Home, Sparkles } from "lucide-react";
+import { Calculator, Home, Sparkles } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Hero() {
@@ -49,13 +49,13 @@ export default function Hero() {
             }}
             style={{ left: "50%", top: "50%" }}
           >
-            <Sparkles className="h-8 w-8 text-white/80 drop-shadow-lg" />
+            <Sparkles className="h-8 w-8 text-purple-400 drop-shadow-lg" />
           </motion.span>
         ))}
       </AnimatePresence>
       <span className="relative inline-block mb-6">
         <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl transform -rotate-6"></div>
-        <Home className="h-20 w-20 text-primary relative animate-bounce" />
+        <Calculator className="h-20 w-20 text-primary relative animate-bounce" />
       </span>
       <motion.h1
         className="text-5xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-fuchsia-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg"
@@ -90,10 +90,10 @@ export default function Hero() {
             transition={{ duration: 0.4 }}
           >
             {/* Glow effect */}
-            <span className="absolute inset-0 bg-white/30 blur-2xl rounded-full animate-pulse" />
+            <span className="absolute inset-0 bg-purple-400/30 blur-2xl rounded-full animate-pulse" />
           </motion.span>
           <span className="relative z-10 flex items-center gap-2">
-            <Sparkles className="h-6 w-6 animate-spin-slow text-yellow-200 drop-shadow" />
+            <Sparkles className="h-6 w-6 animate-spin-slow text-purple-200 drop-shadow" />
             Get Started
           </span>
         </Button>
