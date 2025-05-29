@@ -2,6 +2,28 @@
 
 ## Active Tasks
 
+### 2025-05-29: Refactor Feedback System Modularity
+*   **Description:** Refactor `src/data/feedbackRules.ts` and `src/utils/feedbackUtils.ts` to improve modularity by splitting rules and potentially utilities into calculator-specific files.
+*   **Files Affected:** `src/data/feedbackRules.ts`, `src/utils/feedbackUtils.ts`, new files in `src/data/feedbackRules/`
+*   **Sub-tasks:**
+    *   [x] Create `src/data/refactorPlan.md`. (Completed 2025-05-29)
+    *   [ ] Create new directory: `src/data/feedbackRules/`.
+    *   [ ] Create new directory: `src/utils/feedbackUtils/` (if needed).
+    *   [ ] **Refactor `src/data/feedbackRules.ts`**:
+        *   [ ] Create `src/data/feedbackRules/cashflowFeedbackRules.ts` and migrate rules.
+        *   [ ] Create `src/data/feedbackRules/profitabilityFeedbackRules.ts` and migrate rules.
+        *   [ ] Create `src/data/feedbackRules/projectionsFeedbackRules.ts` and migrate rules.
+        *   [ ] Create `src/data/feedbackRules/ratiosFeedbackRules.ts` and migrate rules.
+        *   [ ] Create `src/data/feedbackRules/startupcostFeedbackRules.ts` and migrate rules.
+        *   [ ] Create `src/data/feedbackRules/burnRateFeedbackRules.ts` and migrate rules.
+        *   [ ] Create `src/data/feedbackRules/genericFeedbackRules.ts` for rules applicable to multiple/all calculators.
+        *   [ ] Update `src/data/feedbackRules.ts` to import and consolidate all rule arrays.
+    *   [ ] **Refactor `src/utils/feedbackUtils.ts`**:
+        *   [ ] Analyze for calculator-specific utilities.
+        *   [ ] Split if necessary and update imports/exports. (Analysis suggests likely no split needed for utils).
+    *   [ ] Verify type checking and perform functional testing.
+    *   [ ] Update `TASK.md` upon completion.
+
 ### 2025-05-29: Enhance Calculator Suite UI/UX and Contextual Feedback
 *   **Description:** Improve features, UI, and UX of all calculators in `src/calculators/suite`. Add valuable contextual feedback specific to the user's Business Type for each calculator. Implement high-value visual cues for positive feedback and opportunities.
 *   **Affected Calculators:**

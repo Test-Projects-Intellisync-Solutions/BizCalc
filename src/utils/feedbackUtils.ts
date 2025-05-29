@@ -390,8 +390,8 @@ export function generateFeedback(
   }
 
   matchedFeedbackItems.sort((a, b) => {
-    const priorityA = allRules.find(r => r.id === a.id.split('-')[1])?.priority || 0;
-    const priorityB = allRules.find(r => r.id === b.id.split('-')[1])?.priority || 0;
+    const priorityA = allRules.find(r => r.id === a.id.split('-')[0])?.priority || 0;
+    const priorityB = allRules.find(r => r.id === b.id.split('-')[0])?.priority || 0;
     return priorityB - priorityA;
   });
 
@@ -401,14 +401,14 @@ export function generateFeedback(
 // Example of how it might be used (will require actual rules and data):
 /*
 import { businessTypes } from '../data/businessTypes';
-import { exampleFeedbackRules } from '../data/feedbackRules';
+import { allFeedbackRules } from '../data/feedbackRules';
 
 const sampleCalcData = { currentRatio: 0.8, quickRatio: 0.5 };
 const selectedBizType = businessTypes.find(bt => bt.value === 'retail');
 const calcType: CalculatorType = 'ratios';
 
 if (selectedBizType) {
-  const feedback = generateFeedback(sampleCalcData, selectedBizType, calcType, exampleFeedbackRules);
+  const feedback = generateFeedback(sampleCalcData, selectedBizType, calcType, allFeedbackRules);
   console.log(feedback);
 }
 */
