@@ -224,7 +224,7 @@ export default function ProfitabilityTab() {
         {/* Placeholder for other potential global selectors for this tab */}
       </div>
 
-      {/* Progress Bar and Feedback Trigger Section */}
+      {/* Progress Bar and Feedback Trigger Section - Commented out during development
       <div className="my-6 px-1">
         <div className="flex items-center gap-2 mb-1">
           <Label htmlFor="profitabilityCompletionProgress" className="text-sm font-medium">Analysis Progress</Label>
@@ -237,6 +237,7 @@ export default function ProfitabilityTab() {
         </div>
         <Progress id="profitabilityCompletionProgress" value={completionPercentage} className="w-full" />
       </div>
+      */}
 
       <h2 className="text-3xl font-bold">Profitability & Break-Even Analysis</h2>
 

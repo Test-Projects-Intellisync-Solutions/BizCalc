@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import GuideCard from '@/components/ui/guide-card';
 import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+// import { Progress } from '@/components/ui/progress'; // Commented out during development
 import {
   Drawer,
   DrawerClose,
@@ -152,9 +152,11 @@ export default function BurnRate() {
           Calculate how long your available capital will last based on monthly expenses.
           Fill in both fields to see your runway and get feedback.
         </CardDescription>
+        {/* Progress indicator commented out during development
         <div className="mt-4">
           <Progress value={completionPercentage} className="w-full" />
         </div>
+        */}
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

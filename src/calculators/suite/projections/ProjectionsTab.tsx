@@ -268,7 +268,7 @@ export default function ProjectionsTab() {
         </div>
       </div>
 
-      {/* Progress Bar and Feedback Trigger Section */}
+      {/* Progress Bar and Feedback Trigger Section - Commented out during development
       <div className="my-6 px-1">
         <div className="flex items-center gap-2 mb-1">
           <Label htmlFor="projectionsCompletionProgress" className="text-sm font-medium">Projections Setup Progress</Label>
@@ -281,6 +281,7 @@ export default function ProjectionsTab() {
         </div>
         <Progress id="projectionsCompletionProgress" value={completionPercentage} className="w-full" />
       </div>
+      */}
 
       <div className="grid gap-6 md:grid-cols-2">
         <RevenueForm onUpdate={handleRevenueUpdate} />

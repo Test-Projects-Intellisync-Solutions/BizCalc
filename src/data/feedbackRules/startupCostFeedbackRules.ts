@@ -132,7 +132,7 @@ export const startupCostFeedbackRules: FeedbackRule[] = [
     id: 'rule-startup-costs-balanced',
     calculatorType: 'startupcost',
     businessType: Object.values(businessTypes).map(bt => bt.value),
-      conditions: [
+    conditions: [
       { metric: 'costSpreadEvenness', operator: '>=', value: 0.75 },
     ],
     feedbackTemplate: {

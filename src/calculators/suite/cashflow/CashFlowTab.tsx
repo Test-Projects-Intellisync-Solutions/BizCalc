@@ -349,8 +349,8 @@ export default function CashFlowTab() {
         </div>
       </div>
 
-      {/* Progress Bar and Feedback Trigger Section */}
-      <div className="my-6 px-1"> {/* Adjusted padding to align with other elements */}
+      {/* Progress Bar and Feedback Trigger Section - Commented out during development
+      <div className="my-6 px-1">
         <div className="flex items-center gap-2 mb-1">
           <Label htmlFor="cashflowCompletionProgress" className="text-sm font-medium">Setup Progress</Label>
           {completionPercentage === 100 && (
@@ -362,6 +362,7 @@ export default function CashFlowTab() {
         </div>
         <Progress id="cashflowCompletionProgress" value={completionPercentage} className="w-full" />
       </div>
+      */}
 
       {monthlyNetCashFlow < 0 && (
         <Alert variant="destructive">

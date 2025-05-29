@@ -317,7 +317,7 @@ export default function StartupCostTab() {
             <CardTitle>Startup Cost Estimator</CardTitle>
           </CardHeader>
 
-          {/* Progress Bar and Feedback Trigger Section */}
+          {/* Progress Bar and Feedback Trigger Section - Commented out during development
           <div className="my-4 px-6">
             <div className="flex items-center gap-2 mb-1">
               <Label htmlFor="completionProgress" className="text-sm font-medium">Estimate Progress</Label>
@@ -330,6 +330,7 @@ export default function StartupCostTab() {
             </div>
             <Progress id="completionProgress" value={completionPercentage} className="w-full" />
           </div>
+          */}
           <CardContent className="space-y-4">
             <Select value={businessType} onValueChange={applyTemplate}>
               <SelectTrigger>
