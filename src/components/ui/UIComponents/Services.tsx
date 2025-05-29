@@ -156,6 +156,22 @@ function InfiniteScroller({ cards }: { cards: typeof services }) {
   const GAP = 24; // space-x-6
   const TOTAL_WIDTH = cardSet.length * (CARD_WIDTH + GAP);
 
+  const navigateToService = (serviceUrl?: string) => {
+    if (serviceUrl) {
+      window.location.hash = serviceUrl;
+
+      if (serviceUrl.startsWith('calculators#')) {
+        const tabName = serviceUrl.split('#')[1];
+        if (tabName) {
+          const event = new CustomEvent('tabChange', { detail: tabName });
+          window.dispatchEvent(event);
+        }
+      }
+    } else {
+      console.warn("navigateToService called with undefined URL for a service card.");
+    }
+  };
+
   // Start the animation
   const startAnimation = () => {
     controls.start({
@@ -185,19 +201,7 @@ function InfiniteScroller({ cards }: { cards: typeof services }) {
       {cardSet.map((srv, i) => (
         <motion.div
           key={srv.title + i}
-          onClick={() => {
-            // Navigate to the calculators page with the specific tab
-            if (srv.tab) {
-              // Update URL directly without page reload
-              window.history.pushState({}, '', `#${srv.tab}`);
-              // Dispatch a custom event to notify the calculators page
-              const event = new CustomEvent('tabChange', { detail: srv.tab });
-              window.dispatchEvent(event);
-            } else {
-              // Default to calculators page if no specific tab
-              window.location.hash = 'calculators';
-            }
-          }}
+          onClick={() => navigateToService(srv.url)}
           className={`flex-shrink-0 w-80 group p-6 rounded-3xl bg-gradient-to-br ${srv.color} shadow-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 relative cursor-pointer`}
           whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
           whileTap={{ scale: 0.98 }}
@@ -205,25 +209,16 @@ function InfiniteScroller({ cards }: { cards: typeof services }) {
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              if (srv.tab) {
-                // Update URL directly without page reload
-                window.history.pushState({}, '', `#${srv.tab}`);
-                // Dispatch a custom event to notify the calculators page
-                const event = new CustomEvent('tabChange', { detail: srv.tab });
-                window.dispatchEvent(event);
-              } else {
-                // Default to calculators page if no specific tab
-                window.location.hash = 'calculators';
-              }
+              navigateToService(srv.url);
             }
           }}
         >
           <div className="absolute right-6 top-6 opacity-10 text-white text-8xl pointer-events-none">
-            <BarChart className="h-24 w-24" />
+            <srv.icon className="h-24 w-24" />
           </div>
           <div className="relative z-10 flex flex-col items-start">
             <span className="inline-flex items-center justify-center rounded-full bg-white/20 p-3 mb-4 animate-pulse">
-              <BarChart className="h-8 w-8 text-white drop-shadow" />
+              <srv.icon className="h-8 w-8 text-white drop-shadow" />
             </span>
             <h3 className="text-xl font-bold text-white mb-2 drop-shadow-lg">{srv.title}</h3>
             <p className="text-white/90 mb-0 drop-shadow-sm">{srv.desc}</p>

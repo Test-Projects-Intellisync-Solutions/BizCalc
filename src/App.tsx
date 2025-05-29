@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Menu, Wrench, Book, Home } from 'lucide-react';
+import { Calculator, Menu } from 'lucide-react';
 
 // UI Components
 import { ThemeProvider } from '@/components/ui/UIComponents/theme-provider';
@@ -8,12 +8,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuLink,
-} from '@/components/ui/navigation-menu';
+import { Navigation, MobileNavigation } from '@/components/ui/UIComponents/Navigation/Navigation';
 
 // Pages
 import DocsPage from '@/pages/DocsPage/DocsPage';
@@ -28,22 +23,48 @@ import Footer from '@/components/ui/UIComponents/Footer';
 import Hero from '@/components/ui/UIComponents/Hero';
 import Services from '@/components/ui/UIComponents/Services';
 import ScrollToTop from '@/components/ui/UIComponents/ScrollToTop';
+import { NavigationMenu } from '@radix-ui/react-navigation-menu';
 // import CTA from '@/components/ui/UIComponents/CTA'; For Future Use
 // import PricingPage from '@/components/pricing/PricingPage'; For Future Use
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Listen to URL hash changes to update the active tab
+  // Handle tab change
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    window.location.hash = tab;
+    setIsMobileMenuOpen(false); // Close mobile menu on navigation
+  };
+
+  // Listen to URL hash changes
   useEffect(() => {
-    const hash = window.location.hash.replace('#', '');
-    if (hash) setActiveTab(hash);
-    const handleHashChange = () => {
-      const newHash = window.location.hash.replace('#', '');
-      if (newHash) setActiveTab(newHash);
+    const processHash = () => {
+      const fullHash = window.location.hash.replace('#', '');
+      // Define valid main tabs based on your TabsContent values.
+      // 'pricing' is commented out in TabsContent, so exclude it unless active.
+      const validMainTabs = ['home', 'calculators', 'tools', 'docs']; 
+      
+      if (fullHash) {
+        const mainTab = fullHash.split(/[#?]/)[0]; // Extracts 'calculators' from 'calculators#startup' or 'docs' from 'docs?section=planning'
+        if (validMainTabs.includes(mainTab)) {
+          setActiveTab(mainTab);
+        } else {
+          // If the base part of the hash isn't a recognized main tab (e.g., 'unknown#details'),
+          // or if the hash is like '#subtabonly' which doesn't match a main tab after splitting,
+          // fall back to 'home'.
+          setActiveTab('home');
+        }
+      } else { // No hash, or hash is just '#'
+        setActiveTab('home');
+      }
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+
+    processHash(); // Process initial hash on component mount
+    
+    window.addEventListener('hashchange', processHash); // Process subsequent hash changes
+    return () => window.removeEventListener('hashchange', processHash);
   }, []);
 
   return (
@@ -59,217 +80,18 @@ function App() {
               </div>
               {/* Desktop Navigation */}
               <nav className="hidden md:block">
-                <NavigationMenu>
-                  <NavigationMenuList>
-                    {/* Animated Desktop Navigation Links */}
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'home';
-                          setActiveTab('home');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.05, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Home className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline">Home</NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'calculators';
-                          setActiveTab('calculators');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.10, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Calculator className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline">Calculators</NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'tools';
-                          setActiveTab('tools');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Wrench className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline">Tools</NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem asChild>
-                      <motion.button
-                        className="px-4 py-2 flex items-center gap-2 group hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'docs';
-                          setActiveTab('docs');
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.20, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Book className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        <NavigationMenuLink className="transition-colors group-hover:underline">Resources</NavigationMenuLink>
-                      </motion.button>
-                    </NavigationMenuItem>
-                    {/*
-                    <NavigationMenuItem asChild>
-                      <button
-                        className="px-4 py-2 hover:text-primary"
-                        onClick={() => {
-                          window.location.hash = 'pricing';
-                          setActiveTab('pricing');
-                        }}
-                      >
-                        <NavigationMenuLink>Pricing</NavigationMenuLink>
-                      </button>
-                    </NavigationMenuItem>
-                    // Pricing link commented out for testing
-                    */}
-                    {/* Sign In Button - Temporarily disabled for future authentication implementation
-                    <NavigationMenuItem>
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.25, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <Button variant="outline" className="flex items-center gap-2 group">
-                          <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                            <LogIn className="h-5 w-5 transition-colors" />
-                          </motion.span>
-                          <span className="transition-colors group-hover:underline group-hover:decoration-wavy">Sign In</span>
-                        </Button>
-                      </motion.div>
-                    </NavigationMenuItem>
-                    */}
-                  </NavigationMenuList>
-                </NavigationMenu>
+                <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
               </nav>
               {/* Mobile Navigation */}
               <div className="md:hidden">
-                <Sheet>
+                <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="outline" size="icon">
+                    <Button variant="outline" size="icon" onClick={() => setIsMobileMenuOpen(true)}>
                       <Menu className="h-6 w-6" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent>
-                    <nav className="flex flex-col space-y-4">
-                      <motion.button
-                        onClick={() => {
-                          window.location.hash = 'home';
-                          setActiveTab('home');
-                        }}
-                        className="text-lg hover:text-primary text-left flex items-center gap-2 group"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.05, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Home className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        Home
-                      </motion.button>
-                      <motion.button
-                        onClick={() => {
-                          window.location.hash = 'calculators';
-                          setActiveTab('calculators');
-                        }}
-                        className="text-lg hover:text-primary text-left flex items-center gap-2 group"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.10, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Calculator className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        Calculators
-                      </motion.button>
-                      <motion.button
-                        onClick={() => {
-                          window.location.hash = 'tools';
-                          setActiveTab('tools');
-                        }}
-                        className="text-lg hover:text-primary text-left flex items-center gap-2 group"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Wrench className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        Tools
-                      </motion.button>
-                      <motion.button
-                        onClick={() => {
-                          window.location.hash = 'docs';
-                          setActiveTab('docs');
-                        }}
-                        className="text-lg hover:text-primary text-left flex items-center gap-2 group"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.20, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                          <Book className="h-5 w-5 transition-colors" />
-                        </motion.span>
-                        Resources
-                      </motion.button>
-                      {/*
-                      <button
-                        onClick={() => {
-                          window.location.hash = 'pricing';
-                          setActiveTab('pricing');
-                        }}
-                        className="text-lg hover:text-primary text-left"
-                      >
-                        Pricing
-                      </button>
-                      // Pricing link commented out for futre use.
-                      */}
-                      {/* CTA Button - Temporarily disabled for future implementation
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.25, type: 'spring', stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.07 }}
-                      >
-                        <Button className="flex items-center gap-2 group">
-                          <motion.span whileHover={{ color: '#6366f1', scale: 1.2 }} transition={{ type: 'spring', stiffness: 300 }}>
-                            <LogIn className="h-5 w-5 transition-colors" />
-                          </motion.span>
-                          <span className="transition-colors group-hover:underline">Sign In</span>
-                        </Button>
-                      </motion.div>
-                      */}
-                    </nav>
+                    <MobileNavigation activeTab={activeTab} onTabChange={handleTabChange} />
                   </SheetContent>
                 </Sheet>
               </div>
