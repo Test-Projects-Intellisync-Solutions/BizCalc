@@ -238,7 +238,7 @@ export default function RatiosTab() {
     type: 'ratios' as const,
     data: { ...financialData },
     selectedBusinessType,
-    // completionPercentage, // Not typically part of exported raw data, but can be kept if used by import logic
+    // completionPercentage, // Not typically part of exported raw data, but can be kept if to beused by import logic
     timestamp: new Date().toISOString(),
     version: '1.0.1' // Updated version
   }), [financialData, selectedBusinessType]);
@@ -285,6 +285,7 @@ export default function RatiosTab() {
           </Button>
         </div>
 
+        {/* Progress indicator section commented out during development
         <div className="space-y-2 p-4 border rounded-lg shadow">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Calculation Progress</h3>
@@ -296,6 +297,8 @@ export default function RatiosTab() {
           <p className="text-xs text-muted-foreground">
             Complete key financial data to unlock full ratio analysis and tailored insights. Click the button below to see feedback.
           </p>
+        </div>
+        */}
 
           <Button onClick={() => setIsFeedbackDrawerOpen(true)} variant="outline" className="w-full md:w-auto">
             <MessageSquareText className="mr-2 h-4 w-4" /> View Feedback & Insights
@@ -399,7 +402,6 @@ export default function RatiosTab() {
             </div>
           </TabsContent>
         </Tabs>
-      </div> {/* End of main content wrapper div */} 
 
       <FeedbackDrawer
         isOpen={isFeedbackDrawerOpen}
