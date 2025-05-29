@@ -1,22 +1,31 @@
-import { useState } from 'react';
-import { Calculator, DollarSign, TrendingDown, LineChart, PiggyBank, BarChart, ArrowDownUp, Scale, Building, PercentCircle, FileText, ClipboardList } from 'lucide-react';
+import { useState, lazy, Suspense } from 'react';
+import { Calculator, DollarSign, TrendingDown, LineChart, PiggyBank, BarChart, ArrowDownUp, Scale, Building, PercentCircle, FileText, ClipboardList, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GuideCard from '@/components/ui/guide-card';
-import BurnRateCalculator from '@/calculators/tools/financial/BurnRate/BurnRateCalculator';
-import LoanCalculator from '@/calculators/tools/operations/Loan/LoanCalculator';
-import ValuationCalculator from '@/calculators/tools/business/Valuation/ValuationCalculator';
-import RoiCalculator from '@/calculators/tools/business/Roi/RoiCalculator';
-import SalaryCalculator from '@/calculators/tools/operations/Salary/SalaryCalculator';
-import BreakEvenCalculator from '@/calculators/tools/financial/BreakEven/BreakEvenCalculator';
-import CashFlowForecast from '@/calculators/tools/operations/CashFlowForecast/CashFlowForecast';
-import LeaseVsBuyCalculator from '@/calculators/tools/business/LeaseVsBuy/LeaseVsBuyCalculator';
-import ProfitMarginCalculator from '@/calculators/tools/financial/ProfitMargin/ProfitMarginCalculator';
-import StartupCostEstimator from '@/calculators/suite/startupcost/StartupCostTab';
 import { businessPlanningDocs } from '@/components/docs/content/business-planning';
 import { MarkdownViewer } from '../DocsPage/MarkdownViewer';
+
+// Lazy load tool components
+const BurnRateCalculator = lazy(() => import('@/calculators/tools/financial/BurnRate/BurnRateCalculator'));
+const LoanCalculator = lazy(() => import('@/calculators/tools/operations/Loan/LoanCalculator'));
+const ValuationCalculator = lazy(() => import('@/calculators/tools/business/Valuation/ValuationCalculator'));
+const RoiCalculator = lazy(() => import('@/calculators/tools/business/Roi/RoiCalculator'));
+const SalaryCalculator = lazy(() => import('@/calculators/tools/operations/Salary/SalaryCalculator'));
+const BreakEvenCalculator = lazy(() => import('@/calculators/tools/financial/BreakEven/BreakEvenCalculator'));
+const CashFlowForecast = lazy(() => import('@/calculators/tools/operations/CashFlowForecast/CashFlowForecast'));
+const LeaseVsBuyCalculator = lazy(() => import('@/calculators/tools/business/LeaseVsBuy/LeaseVsBuyCalculator'));
+const ProfitMarginCalculator = lazy(() => import('@/calculators/tools/financial/ProfitMargin/ProfitMarginCalculator'));
+const StartupCostTab = lazy(() => import('@/calculators/suite/startupcost/StartupCostTab'));
+
+// Loading component for tools
+const ToolLoading = () => (
+  <div className="flex items-center justify-center min-h-[300px]">
+    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+  </div>
+);
 
 const calculators = [
   // Financial Health
@@ -55,7 +64,7 @@ const calculators = [
     name: 'Startup Cost Estimator',
     description: 'Estimate initial business expenses and plan your funding needs.',
     icon: Building,
-    component: StartupCostEstimator,
+    component: StartupCostTab,
   },
   {
     id: 'valuation',
@@ -225,7 +234,9 @@ export default function ToolsPage() {
               </SheetHeader>
               <div className="flex-1 overflow-y-auto mt-6 pr-6">
                 {'component' in selectedItem ? (
-                  <selectedItem.component />
+                  <Suspense fallback={<ToolLoading />}>
+                    <selectedItem.component />
+                  </Suspense>
                 ) : 'content' in selectedItem ? (
                   <MarkdownViewer content={selectedItem.content} />
                 ) : null}

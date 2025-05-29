@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Calculator, Menu } from 'lucide-react';
+import { useState, useEffect, Suspense, lazy } from 'react';
+
+import { Calculator, Menu, Loader2 } from 'lucide-react';
 
 // UI Components
 import { ThemeProvider } from '@/components/ui/UIComponents/theme-provider';
@@ -10,10 +10,17 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Navigation, MobileNavigation } from '@/components/ui/UIComponents/Navigation/Navigation';
 
-// Pages
-import DocsPage from '@/pages/DocsPage/DocsPage';
-import CalculatorsPage from '@/pages/CalculatorsPage/CalculatorsPage';
-import ToolsPage from '@/pages/ToolsPage/ToolsPage';
+// Lazy-loaded pages
+const DocsPage = lazy(() => import('@/pages/DocsPage/DocsPage'));
+const CalculatorsPage = lazy(() => import('@/pages/CalculatorsPage/CalculatorsPage'));
+const ToolsPage = lazy(() => import('@/pages/ToolsPage/ToolsPage'));
+
+// Loading component
+const PageLoading = () => (
+  <div className="flex items-center justify-center min-h-[400px]">
+    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+  </div>
+);
 
 // Utils
 // import { cn } from '@/lib/utils'; For Future Use
@@ -23,7 +30,7 @@ import Footer from '@/components/ui/UIComponents/Footer';
 import Hero from '@/components/ui/UIComponents/Hero';
 import Services from '@/components/ui/UIComponents/Services';
 import ScrollToTop from '@/components/ui/UIComponents/ScrollToTop';
-import { NavigationMenu } from '@radix-ui/react-navigation-menu';
+
 // import CTA from '@/components/ui/UIComponents/CTA'; For Future Use
 // import PricingPage from '@/components/pricing/PricingPage'; For Future Use
 
@@ -121,17 +128,23 @@ function App() {
 
               {/* Calculators Tab */}
               <TabsContent value="calculators" className="mt-6">
-                <CalculatorsPage />
+                <Suspense fallback={<PageLoading />}>
+                  <CalculatorsPage />
+                </Suspense>
               </TabsContent>
 
               {/* Tools Tab */}
               <TabsContent value="tools" className="mt-6">
-                <ToolsPage />
+                <Suspense fallback={<PageLoading />}>
+                  <ToolsPage />
+                </Suspense>
               </TabsContent>
 
               {/* Resources Tab */}
               <TabsContent value="docs" className="mt-6">
-                <DocsPage />
+                <Suspense fallback={<PageLoading />}>
+                  <DocsPage />
+                </Suspense>
               </TabsContent>
               
               {/*

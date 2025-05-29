@@ -52,7 +52,7 @@
                 *   [ ] Modify `handleExport` to include this data.
                 *   [ ] Modify `handleImport` to potentially read and utilize this data.
         *   [ ] **Integrate into Calculators:**
-            *   [ ] Update `StartupCostEstimator.tsx` with UI/UX improvements, feedback system, and visual cues.
+            *   [ ] Update `StartupCostTab.tsx` with UI/UX improvements, feedback system, and visual cues.
             *   [ ] Update `CashFlowTab.tsx` with UI/UX improvements, feedback system, and visual cues.
             *   [ ] Update `ProfitabilityTab.tsx` with UI/UX improvements, feedback system, and visual cues.
             *   [ ] Update `ProjectionsTab.tsx` with UI/UX improvements, feedback system, and visual cues.
@@ -60,8 +60,22 @@
 *   **Discovered During Work:**
     *   `PLANNING.md` and `TASK.md` were not present and have been created.
     *   `src/data` directory was created for `businessTypes.ts`.
-    *   Noted discrepancy: The `businessTypes.ts` list was initially different from the full list previously hardcoded in `StartupCostEstimator`'s `Select` component. This has been reconciled: `businessTypes.ts` is now comprehensive, and `StartupCostEstimator.tsx` uses this shared list. The `applyTemplate` function has placeholder cases for the newly added types.
+    *   Noted discrepancy: The `businessTypes.ts` list was initially different from the full list previously hardcoded in `StartupCostTab`'s `Select` component. This has been reconciled: `businessTypes.ts` is now comprehensive, and `StartupCostTab.tsx` uses this shared list. The `applyTemplate` function has placeholder cases for the newly added types.
     *   Resolved JSX lint errors in `RatiosTab.tsx` (IDs: 8dc01901, 47d94d73, 823ded5d, 91117d0a, b3ae98a3, ef275dd7, cac9a522, 08af6dd0) related to unclosed tags after integrating Progress bar and Drawer components.
 
 ## Completed Tasks
-*(No tasks completed yet)*
+
+### 2025-05-29: Performance Optimization & Code Splitting
+*   **Description:** Implemented code-splitting and build optimizations to improve application performance.
+*   **Changes Made:**
+    *   [x] Added React.lazy and Suspense for lazy loading of calculator components
+    *   [x] Implemented code-splitting for tools in `ToolsPage.tsx`
+    * [x] Added loading states with visual feedback during component loading
+    * [x] Configured Vite build optimizations with manual chunking
+    * [x] Grouped vendor dependencies into logical chunks (React, UI components, charts, etc.)
+    * [x] Increased chunk size warning limit to 1000KB
+*   **Impact:**
+    * Reduced initial bundle size
+    * Faster page load times
+    * Improved perceived performance with loading states
+    * Better caching through optimized chunking strategy

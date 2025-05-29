@@ -1,11 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import StartupCostTab from '@/calculators/suite/startupcost/StartupCostTab';
-import BurnRate from '@/calculators/suite/startup/BurnRate/BurnRate';
-import ProjectionsTab from '@/calculators/suite/projections/ProjectionsTab';
-import CashFlowTab from '@/calculators/suite/cashflow/CashFlowTab';
-import ProfitabilityTab from '@/calculators/suite/profitability/ProfitabilityTab';
-import RatiosTab from '@/calculators/suite/ratios/RatiosTab';
+import { Loader2 } from 'lucide-react';
+
+// Lazy load calculator components
+const StartupCostTab = lazy(() => import('@/calculators/suite/startupcost/StartupCostTab'));
+const BurnRate = lazy(() => import('@/calculators/suite/startup/BurnRate/BurnRate'));
+const ProjectionsTab = lazy(() => import('@/calculators/suite/projections/ProjectionsTab'));
+const CashFlowTab = lazy(() => import('@/calculators/suite/cashflow/CashFlowTab'));
+const ProfitabilityTab = lazy(() => import('@/calculators/suite/profitability/ProfitabilityTab'));
+const RatiosTab = lazy(() => import('@/calculators/suite/ratios/RatiosTab'));
+
+// Loading component for calculator tabs
+const CalculatorLoading = () => (
+  <div className="flex items-center justify-center min-h-[400px]">
+    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+  </div>
+);
 
 const CalculatorsPage = () => {
   // Default to 'startup' tab if no hash is present
@@ -72,26 +82,36 @@ const CalculatorsPage = () => {
         </TabsList>
         
         <TabsContent value="startup" className="space-y-6">
-          <div className="grid gap-6">
-            <StartupCostTab />
-            <BurnRate />
-          </div>
+          <Suspense fallback={<CalculatorLoading />}>
+            <div className="grid gap-6">
+              <StartupCostTab />
+              <BurnRate />
+            </div>
+          </Suspense>
         </TabsContent>
         
         <TabsContent value="projections" className="space-y-6">
-          <ProjectionsTab />
+          <Suspense fallback={<CalculatorLoading />}>
+            <ProjectionsTab />
+          </Suspense>
         </TabsContent>
         
         <TabsContent value="cashflow" className="space-y-6">
-          <CashFlowTab />
+          <Suspense fallback={<CalculatorLoading />}>
+            <CashFlowTab />
+          </Suspense>
         </TabsContent>
         
         <TabsContent value="profitability" className="space-y-6">
-          <ProfitabilityTab />
+          <Suspense fallback={<CalculatorLoading />}>
+            <ProfitabilityTab />
+          </Suspense>
         </TabsContent>
         
         <TabsContent value="ratios" className="space-y-6">
-          <RatiosTab />
+          <Suspense fallback={<CalculatorLoading />}>
+            <RatiosTab />
+          </Suspense>
         </TabsContent>
       </Tabs>
     </div>
