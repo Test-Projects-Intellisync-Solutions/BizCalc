@@ -83,6 +83,10 @@ export default function ProfitabilityTab() {
     breakEvenRevenue,
   } = calculateMetrics();
 
+  const highlightDataPoints = feedbackItems.filter(
+    (item) => item.uiTarget?.scope === 'chart'
+  );
+
   const handleGetFeedback = () => {
     const selectedBizTypeData = businessTypes.find(bt => bt.value === selectedBusinessType);
     const calculated = calculateMetrics(); 
@@ -130,6 +134,26 @@ export default function ProfitabilityTab() {
     else if (score === 1) setCompletionPercentage(50);
     else setCompletionPercentage(100);
   }, [metrics]);
+
+  const getSummaryCardClassNameForProfitability = (metricName: string, currentFeedbackItems: FeedbackItem[]): string => {
+    const relevantFeedback = currentFeedbackItems.find(
+      (item) => item.uiTarget?.scope === 'summaryMetric' && item.uiTarget?.identifier === metricName
+    );
+
+    if (relevantFeedback) {
+      switch (relevantFeedback.severity) {
+        case 'critical':
+          return 'border-l-4 border-red-500';
+        case 'warning':
+          return 'border-l-4 border-yellow-500';
+        case 'good': // Corrected from 'success'
+          return 'border-l-4 border-green-500';
+        default:
+          return '';
+      }
+    }
+    return '';
+  };
 
   return (
     <>
@@ -234,11 +258,12 @@ export default function ProfitabilityTab() {
           variableCostPerUnit={metrics.variableCostPerUnit}
           pricePerUnit={metrics.pricePerUnit}
           maxUnits={breakEvenUnits * 2}
+          highlightDataPoints={highlightDataPoints} // Pass the derived highlights
         />
       )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className={getSummaryCardClassNameForProfitability('grossMargin', feedbackItems)}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-green-600" />
@@ -255,7 +280,7 @@ export default function ProfitabilityTab() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={getSummaryCardClassNameForProfitability('netMargin', feedbackItems)}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-blue-600" />
@@ -272,7 +297,7 @@ export default function ProfitabilityTab() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={getSummaryCardClassNameForProfitability('contributionMarginRatio', feedbackItems)}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingDown className="h-5 w-5 text-purple-600" />
@@ -289,7 +314,7 @@ export default function ProfitabilityTab() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={getSummaryCardClassNameForProfitability('breakEvenUnits', feedbackItems)}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-orange-600" />

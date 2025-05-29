@@ -15,6 +15,26 @@ import { generateFeedback } from '../../../utils/feedbackUtils';
 import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer'; 
 import { MessageSquareText } from 'lucide-react';
 
+const getSummaryCardClassNameForProjections = (metricName: string, currentFeedbackItems: FeedbackItem[]): string => {
+  const relevantFeedback = currentFeedbackItems.find(
+    (item) => item.uiTarget?.scope === 'summaryMetric' && item.uiTarget?.identifier === metricName
+  );
+
+  if (relevantFeedback) {
+    switch (relevantFeedback.severity) {
+      case 'critical':
+        return 'border-l-4 border-red-500';
+      case 'warning':
+        return 'border-l-4 border-yellow-500';
+      case 'good':
+        return 'border-l-4 border-green-500';
+      default:
+        return '';
+    }
+  }
+  return '';
+};
+
 export default function ProjectionsTab() {
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [isFeedbackDrawerOpen, setIsFeedbackDrawerOpen] = useState(false); 
@@ -24,6 +44,31 @@ export default function ProjectionsTab() {
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>(businessTypes[0]?.value || '');
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
   const [chartHighlightPoints, setChartHighlightPoints] = useState<HighlightPoint[]>([]); 
+
+  useEffect(() => {
+    const newHighlightPoints = feedbackItems
+      .filter(
+        (item): item is FeedbackItem & { uiTarget: { scope: 'chart'; identifier: string; details: { monthIndex: number } } } =>
+          item.uiTarget?.scope === 'chart' &&
+          typeof item.uiTarget.identifier === 'string' &&
+          item.uiTarget.details !== undefined && 
+          typeof item.uiTarget.details.monthIndex === 'number'
+      )
+      .map((item): HighlightPoint | null => {
+        const dataKey = item.uiTarget.identifier as HighlightPoint['dataKey'];
+        if (['revenue', 'expenses', 'netCashFlow'].includes(dataKey)) {
+          return {
+            monthIndex: item.uiTarget.details.monthIndex,
+            dataKey,
+            severity: item.severity,
+          };
+        }
+        return null;
+      })
+      .filter((point): point is HighlightPoint => point !== null);
+
+    setChartHighlightPoints(newHighlightPoints);
+  }, [feedbackItems]);
 
   const handleImportData = (data: Record<string, unknown>, importedFeedbackItems?: FeedbackItem[]) => {
     if (data.revenueStreams && Array.isArray(data.revenueStreams)) {
@@ -250,7 +295,7 @@ export default function ProjectionsTab() {
       />
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card>
+        <Card className={getSummaryCardClassNameForProjections('totalRevenue', feedbackItems)}>
           <CardHeader>
             <CardTitle>Total Revenue</CardTitle>
           </CardHeader>
@@ -261,7 +306,7 @@ export default function ProjectionsTab() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={getSummaryCardClassNameForProjections('totalExpenses', feedbackItems)}>
           <CardHeader>
             <CardTitle>Total Expenses</CardTitle>
           </CardHeader>
@@ -272,7 +317,7 @@ export default function ProjectionsTab() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={getSummaryCardClassNameForProjections('netCashFlow', feedbackItems)}>
           <CardHeader>
             <CardTitle>Net Cash Flow</CardTitle>
           </CardHeader>

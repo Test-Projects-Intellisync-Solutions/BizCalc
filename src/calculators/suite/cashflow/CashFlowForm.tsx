@@ -14,6 +14,7 @@ export interface CashFlowItem {
   category: 'inflow' | 'outflow';
   amount: number;
   frequency: 'monthly' | 'quarterly' | 'annually';
+  startMonth?: number; // Added to specify the starting month for quarterly/annual items
   notes?: string;
 }
 

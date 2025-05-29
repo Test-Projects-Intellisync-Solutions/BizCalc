@@ -10,12 +10,14 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { type FeedbackItem } from '../../../data/feedbackRules';
 
 interface ProfitabilityChartProps {
   fixedCosts: number;
   variableCostPerUnit: number;
   pricePerUnit: number;
   maxUnits: number;
+  highlightDataPoints?: FeedbackItem[];
 }
 
 export default function ProfitabilityChart({
@@ -23,7 +25,27 @@ export default function ProfitabilityChart({
   variableCostPerUnit,
   pricePerUnit,
   maxUnits,
+  highlightDataPoints = [],
 }: ProfitabilityChartProps) {
+  const getLineStrokeColor = (lineIdentifier: string, defaultColor: string): string => {
+    const feedback = highlightDataPoints.find(
+      item => item.uiTarget?.scope === 'chart' && item.uiTarget?.identifier === lineIdentifier
+    );
+    if (feedback) {
+      switch (feedback.severity) {
+        case 'critical': return 'hsl(var(--destructive))';
+        case 'warning': return 'hsl(var(--warning))';
+        case 'good': return 'hsl(var(--success))';
+        default: return defaultColor;
+      }
+    }
+    return defaultColor;
+  };
+
+  const revenueLineColor = getLineStrokeColor('revenueLine', 'hsl(var(--chart-1))');
+  const totalCostsLineColor = getLineStrokeColor('totalCostsLine', 'hsl(var(--chart-2))');
+  const profitLineColor = getLineStrokeColor('profitLine', 'hsl(var(--chart-3))');
+
   const data = Array.from({ length: maxUnits + 1 }, (_, units) => {
     const revenue = units * pricePerUnit;
     const totalCosts = fixedCosts + (units * variableCostPerUnit);
@@ -38,6 +60,25 @@ export default function ProfitabilityChart({
   });
 
   const breakEvenPoint = Math.ceil(fixedCosts / (pricePerUnit - variableCostPerUnit));
+
+  const breakEvenHighlight = highlightDataPoints.find(
+    item => item.uiTarget?.scope === 'chart' && item.uiTarget?.identifier === 'breakEvenPointLine'
+  ); // Keep existing breakEvenPointLine specific logic separate for clarity
+
+  let breakEvenLineColor = 'hsl(var(--primary))';
+  if (breakEvenHighlight) {
+    switch (breakEvenHighlight.severity) {
+      case 'critical':
+        breakEvenLineColor = 'hsl(var(--destructive))';
+        break; 
+      case 'warning':
+        breakEvenLineColor = 'hsl(var(--warning))';
+        break;
+      case 'good':
+        breakEvenLineColor = 'hsl(var(--success))';
+        break;
+    }
+  }
 
   return (
     <Card>
@@ -60,26 +101,26 @@ export default function ProfitabilityChart({
               <Legend />
               <ReferenceLine
                 x={breakEvenPoint}
-                stroke="hsl(var(--primary))"
+                stroke={breakEvenLineColor}
                 strokeDasharray="3 3"
                 label={{ value: 'Break-Even Point', position: 'top' }}
               />
               <Line
                 type="monotone"
                 dataKey="revenue"
-                stroke="hsl(var(--chart-1))"
+                stroke={revenueLineColor}
                 name="Revenue"
               />
               <Line
                 type="monotone"
                 dataKey="totalCosts"
-                stroke="hsl(var(--chart-2))"
+                stroke={totalCostsLineColor}
                 name="Total Costs"
               />
               <Line
                 type="monotone"
                 dataKey="profit"
-                stroke="hsl(var(--chart-3))"
+                stroke={profitLineColor}
                 name="Profit"
               />
             </LineChart>

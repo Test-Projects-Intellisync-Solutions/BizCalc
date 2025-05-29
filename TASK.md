@@ -66,17 +66,20 @@
                 *   [x] **Modify `handleImport` to potentially read and utilize this data.**
                     *   **Done:** `onImport` prop in `ImportExportProps` changed to `(data: Record<string, unknown>, feedbackItems?: FeedbackItem[]) => void`. `handleImport` in `ImportExport.tsx` now passes `importedData.feedbackItems`.
                     *   **Done (ProjectionsTab Example):** `ProjectionsTab.tsx` updated to pass its `feedbackItems` to `ImportExport` and its `handleImportData` now accepts and sets imported feedback, opening the drawer if feedback is present.
-                *   [x] **Apply similar integration to other relevant calculator tabs** (e.g., `RatiosTab.tsx`, `CashflowTab.tsx`, `ProfitabilityTab.tsx`, `StartupCostTab.tsx`).
                     *   **Done:** `RatiosTab.tsx` updated.
                     *   **Done:** `ProfitabilityTab.tsx` updated.
                     *   **Done:** `StartupCostTab.tsx` (as `startupCosts`) updated.
                     *   **Done:** `CashflowTab.tsx` updated.
         *   [ ] **Integrate into Calculators:**
             *   [x] Update `StartupCostTab.tsx` with UI/UX improvements (visual cues for summary figures, category costs, and cost items based on feedback), and enhanced feedback system (category dominance rule). (Partially complete, ongoing for other general UI/UX if needed)
-            *   [ ] Update `CashFlowTab.tsx` with UI/UX improvements, feedback system, and visual cues.
-            *   [ ] Update `ProfitabilityTab.tsx` with UI/UX improvements, feedback system, and visual cues.
-            *   [ ] Update `ProjectionsTab.tsx` with UI/UX improvements, feedback system, and visual cues.
-            *   [ ] Update `RatiosTab.tsx` with UI/UX improvements, feedback system, and visual cues.
+            *   [~] Update `CashFlowTab.tsx` with UI/UX improvements, feedback system, and visual cues. (Partially complete: Summary card visual cues confirmed. `CashFlowChart.tsx` enhanced for `highlightDataPoints` and default negative value coloring; `CashFlowTab.tsx` passes derived highlights. Further general UI/UX review if needed.)
+            *   [x] Update `ProfitabilityTab.tsx` with UI/UX improvements, feedback system, and visual cues. (Completed: Summary card visual cues implemented. ProfitabilityChart.tsx enhanced for break-even line highlighting based on feedback; ProfitabilityTab.tsx passes derived highlights.)
+                *   **ProfitabilityTab:** Implement full chart highlighting (break-even line done, profit line highlighting done).
+                *   **Details:** Modified `ProfitabilityChart.tsx` to dynamically color `revenueLine`, `totalCostsLine`, and `profitLine` based on `FeedbackItem` severity via the `highlightDataPoints` prop.
+                *   **Details:** Added new feedback rules to `feedbackRules.ts` (`rule-profitability-cmr-critical`, `rule-profitability-cmr-warning`, `rule-profitability-cmr-good`) to target `profitLine` based on `contributionMarginRatio`.
+            *   [~] Update `ProjectionsTab.tsx` with UI/UX improvements, feedback system, and visual cues. (Partially complete: Summary card visual cues implemented. `ProjectionChart.tsx` uses `highlightDataPoints` passed from `ProjectionsTab.tsx` which are derived from `feedbackItems`. Further general UI/UX review if needed.)
+            *   [x] Update `RatiosTab.tsx` with UI/UX improvements, feedback system, and visual cues. (Completed 2025-05-29)
+                *   Resolved type errors for `RatioCard` status prop, implemented dynamic border styling based on feedback severity, and cleaned up related helper functions (`getSafeRatioStatusFromFeedback`, removed old `getRatioStatus`).
 *   **Discovered During Work:**
     *   `PLANNING.md` and `TASK.md` were not present and have been created.
     *   `src/data` directory was created for `businessTypes.ts`.

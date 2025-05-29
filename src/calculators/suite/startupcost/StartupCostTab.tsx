@@ -472,7 +472,8 @@ export default function StartupCostTab() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
             
             <Button
               variant="outline"

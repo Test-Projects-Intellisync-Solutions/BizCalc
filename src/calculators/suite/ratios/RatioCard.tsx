@@ -9,9 +9,10 @@ interface RatioCardProps {
   description: string;
   status: 'good' | 'warning' | 'critical';
   suffix?: string;
+  className?: string; // Added for external styling, e.g., borders
 }
 
-export default function RatioCard({ title, value, formula, description, status, suffix = '' }: RatioCardProps) {
+export default function RatioCard({ title, value, formula, description, status, suffix = '', className }: RatioCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'good':
@@ -26,7 +27,7 @@ export default function RatioCard({ title, value, formula, description, status, 
   };
 
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
           {title}

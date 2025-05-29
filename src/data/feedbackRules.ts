@@ -709,6 +709,218 @@ export const allFeedbackRules: FeedbackRule[] = [
     priority: 20,
   },
 
+  // ===== PROFITABILITY CALCULATOR RULES =====
+  {
+    id: 'rule-profitability-be-units-high',
+    calculatorType: 'profitability',
+    conditions: [
+      {
+        metric: 'breakEvenUnits', // This metric comes from the data passed to feedbackUtils
+        operator: '>',
+        value: 1000, // Example threshold: if break-even is over 1000 units
+      },
+    ],
+    feedbackTemplate: {
+      title: 'High Break-Even Point (Units)',
+      message: 'Your break-even point of {breakEvenUnits} units seems high. Reaching this volume might be challenging.',
+      severity: 'warning',
+      implication: 'A high break-even point means you need to sell a large volume to start making a profit, increasing risk.',
+      recommendation: 'Review your fixed costs to see if they can be reduced, or explore ways to increase your contribution margin per unit (e.g., by increasing price or reducing variable costs).',
+      uiTarget: {
+        scope: 'chart',
+        identifier: 'breakEvenPointLine', // This targets the break-even line in ProfitabilityChart
+      }
+    },
+    priority: 50,
+  },
+  // New rules for Profit Line Highlighting based on Contribution Margin Ratio
+  {
+    id: 'rule-profitability-cmr-critical',
+    calculatorType: 'profitability',
+    conditions: [
+      {
+        metric: 'contributionMarginRatio',
+        operator: '<',
+        value: 15, // Critically low if less than 15%
+      },
+    ],
+    feedbackTemplate: {
+      title: 'Critically Low Contribution Margin',
+      message: 'Your contribution margin ratio of {contributionMarginRatio}% is critically low. This severely impacts your ability to cover fixed costs and achieve profit.',
+      severity: 'critical',
+      implication: 'High risk of losses even with moderate sales volume. Profitability is very challenging.',
+      recommendation: 'Urgently review pricing strategy and variable costs per unit. Explore all avenues to increase price or decrease variable costs significantly.',
+      uiTarget: {
+        scope: 'chart',
+        identifier: 'profitLine',
+      }
+    },
+    priority: 60, // Higher priority than warning
+  },
+  {
+    id: 'rule-profitability-cmr-warning',
+    calculatorType: 'profitability',
+    conditions: [
+      {
+        metric: 'contributionMarginRatio',
+        operator: '>=',
+        value: 15,
+      },
+      {
+        metric: 'contributionMarginRatio',
+        operator: '<',
+        value: 30, // Warning if between 15% and 30%
+      },
+    ],
+    conditionLogic: 'AND',
+    feedbackTemplate: {
+      title: 'Low Contribution Margin',
+      message: 'Your contribution margin ratio of {contributionMarginRatio}% is low. This may make it difficult to cover fixed costs and generate substantial profit.',
+      severity: 'warning',
+      implication: 'Profitability may be challenging without high sales volume.',
+      recommendation: 'Consider strategies to improve your contribution margin, such as moderately increasing prices or finding ways to reduce variable costs per unit.',
+      uiTarget: {
+        scope: 'chart',
+        identifier: 'profitLine',
+      }
+    },
+    priority: 55,
+  },
+  {
+    id: 'rule-profitability-cmr-good',
+    calculatorType: 'profitability',
+    conditions: [
+      {
+        metric: 'contributionMarginRatio',
+        operator: '>=',
+        value: 50, // Good if 50% or higher
+      },
+    ],
+    feedbackTemplate: {
+      title: 'Healthy Contribution Margin',
+      message: 'Your contribution margin ratio of {contributionMarginRatio}% is healthy! This provides a good foundation for covering fixed costs and generating profit.',
+      severity: 'good',
+      implication: 'Strong potential for profitability as sales volume increases.',
+      recommendation: 'Maintain efficient variable cost management and monitor market conditions to sustain this strong margin.',
+      uiTarget: {
+        scope: 'chart',
+        identifier: 'profitLine',
+      }
+    },
+    priority: 50, // Can co-exist with other rules of same priority
+  },
+
+// ===== CASHFLOW CALCULATOR RULES =====
+  {
+    id: 'rule-cashflow-monthly-endingBalance-critical',
+    calculatorType: 'cashflow',
+    conditions: [
+      { metric: 'currentMonthEndingBalance', operator: '<', value: 0 }
+    ],
+    feedbackTemplate: {
+      title: 'Critical Monthly Cash Balance',
+      message: 'In Month {month}, your cash balance is projected to be {currentMonthEndingBalance, currency}, which is negative. This requires immediate attention.',
+      severity: 'critical',
+      implication: 'Potential inability to cover expenses for Month {month}. You may default on payments.',
+      recommendation: 'Urgently review inflows and outflows for Month {month}. Consider delaying non-essential expenses, accelerating receivables, or securing short-term funding.',
+      uiTarget: {
+        scope: 'chart',
+        identifier: 'cashFlowChart',
+        details: { dataKey: 'balance' }
+      }
+    },
+    priority: 90
+  },
+  {
+    id: 'rule-cashflow-monthly-endingBalance-warning',
+    calculatorType: 'cashflow',
+    conditions: [
+      { metric: 'currentMonthEndingBalance', operator: '>', value: 0 },
+      { metric: 'currentMonthEndingBalance', operator: '<', comparisonMetric: 'halfAverageMonthlyOverallExpenses' }
+    ],
+    conditionLogic: 'AND',
+    feedbackTemplate: {
+      title: 'Low Monthly Cash Balance',
+      message: 'In Month {month}, your cash balance of {currentMonthEndingBalance, currency} is positive but low (less than half of your average monthly expenses of {averageMonthlyOverallExpenses, currency}). Monitor closely.',
+      severity: 'warning',
+      implication: 'Reduced buffer for unexpected expenses in Month {month}.',
+      recommendation: 'Review Month {month} cash flow. Aim to maintain a balance that covers at least one to two months of average expenses.',
+      uiTarget: {
+        scope: 'chart',
+        identifier: 'cashFlowChart',
+        details: { dataKey: 'balance' }
+      }
+    },
+    priority: 70
+  },
+  {
+    id: 'rule-cashflow-monthly-netCashFlow-warning',
+    calculatorType: 'cashflow',
+    conditions: [
+      { metric: 'currentMonthNetCashFlow', operator: '<', value: 0 }
+    ],
+    feedbackTemplate: {
+      title: 'Negative Monthly Net Cash Flow',
+      message: 'You have a negative net cash flow of {currentMonthNetCashFlow, currency} in Month {month}. Consistent negative flow can deplete reserves.',
+      severity: 'warning',
+      implication: 'Your expenses exceeded your income for Month {month}.',
+      recommendation: 'Analyze outflows for Month {month} to identify potential reductions, or explore ways to increase inflows for that period.',
+      uiTarget: {
+        scope: 'chart',
+        identifier: 'cashFlowChart',
+        details: { dataKey: 'netCashFlow' }
+      }
+    },
+    priority: 65
+  },
+  {
+    id: 'rule-cashflow-overall-endingBalance-critical',
+    calculatorType: 'cashflow',
+    conditions: [
+      { metric: 'endingBalance', operator: '<', value: 0 }
+    ],
+    feedbackTemplate: {
+      title: 'Critical Projected Ending Balance',
+      message: 'Your projected ending cash balance after {projectionMonths} months is {endingBalance, currency}, which is negative. Significant adjustments are urgently needed.',
+      severity: 'critical',
+      implication: 'High risk of insolvency if current trends continue without intervention.',
+      recommendation: 'Thoroughly review your entire cash flow projection. Identify major areas for cost reduction or revenue enhancement. Consider seeking financial advice.'
+    },
+    priority: 95
+  },
+  {
+    id: 'rule-cashflow-overall-endingBalance-warning',
+    calculatorType: 'cashflow',
+    conditions: [
+      { metric: 'endingBalance', operator: '>', value: 0 },
+      { metric: 'endingBalance', operator: '<', comparisonMetric: 'averageMonthlyOverallExpenses' }
+    ],
+    conditionLogic: 'AND',
+    feedbackTemplate: {
+      title: 'Low Projected Ending Balance',
+      message: 'Your projected ending cash balance after {projectionMonths} months is {endingBalance, currency}. This is positive, but less than one average month of your expenses ({averageMonthlyOverallExpenses, currency}).',
+      severity: 'warning',
+      implication: 'Limited buffer for future uncertainties or growth opportunities.',
+      recommendation: 'Aim to build a larger cash reserve, ideally covering 3-6 months of operating expenses. Explore ways to improve overall net cash flow.'
+    },
+    priority: 75
+  },
+  {
+    id: 'rule-cashflow-overall-avgNetCashFlow-warning',
+    calculatorType: 'cashflow',
+    conditions: [
+      { metric: 'averageNetCashFlow', operator: '<', value: 0 }
+    ],
+    feedbackTemplate: {
+      title: 'Negative Average Net Cash Flow',
+      message: 'Your average monthly net cash flow over {projectionMonths} months is {averageNetCashFlow, currency}. This indicates that, on average, your expenses are exceeding your income.',
+      severity: 'warning',
+      implication: 'Sustained negative average net cash flow will continually deplete your cash reserves.',
+      recommendation: 'Focus on strategies to achieve a positive average net cash flow. This may involve increasing prices, boosting sales volume, or reducing recurring expenses.'
+    },
+    priority: 60
+  },
+
   // ===== BURN RATE CALCULATOR RULES =====
   {
     id: 'rule-burn-rate-high',

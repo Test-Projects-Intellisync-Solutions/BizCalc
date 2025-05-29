@@ -66,35 +66,150 @@ export default function CashFlowTab() {
 
   const { inflows, outflows, monthlyNetCashFlow, runway } = calculateMetrics();
 
+  const chartHighlights = React.useMemo(() => {
+    return feedbackItems
+      .filter(
+        (item) =>
+          item.uiTarget?.scope === 'chart' &&
+          item.uiTarget.identifier && 
+          typeof item.uiTarget.details?.monthIndex === 'number' &&
+          typeof item.uiTarget.details?.dataKey === 'string'
+      )
+      .map((item) => ({
+        monthIndex: item.uiTarget!.details!.monthIndex as number,
+        dataKey: item.uiTarget!.details!.dataKey as 'balance' | 'inflows' | 'outflows' | 'netCashFlow',
+        severity: item.severity,
+      }));
+  }, [feedbackItems]);
+
   const handleGetFeedback = () => {
     const selectedBizTypeData = businessTypes.find(bt => bt.value === selectedBusinessType);
-    
-    const calculatedMetrics = calculateMetrics(); 
+    const businessTypeSpecificData = selectedBizTypeData?.benchmarks || {};
 
-    const calculatorData: Record<string, number | string | undefined> = {
-      netCashFlow: calculatedMetrics.monthlyNetCashFlow,
-      runwayMonths: calculatedMetrics.runway === Infinity ? 999 : calculatedMetrics.runway, 
-      totalInflows: calculatedMetrics.inflows,
-      totalOutflows: calculatedMetrics.outflows,
-      openingBalance: openingBalance,
-      // Add other relevant metrics from 'items' if needed for specific rules, e.g., specific inflow/outflow categories
+    let allGeneratedFeedback: FeedbackItem[] = [];
+
+    // Calculate detailed monthly data first to get total expenses for averages and other metrics
+    let runningBalance = openingBalance;
+    let totalOverallExpenses = 0;
+    const monthlyDataForCalculations = Array.from({ length: projectionMonths }, (_, monthIndex) => {
+      let monthInflows = 0;
+      let monthOutflows = 0;
+      items.forEach(item => {
+        const itemAmount = item.amount || 0;
+        const itemStartMonth = item.startMonth === undefined ? 1 : item.startMonth; // Default to 1 if not set
+        const currentProcessingMonth = monthIndex + 1; // 1-indexed month
+
+        if (item.category === 'inflow') {
+          if (item.frequency === 'monthly') monthInflows += itemAmount;
+          else if (item.frequency === 'quarterly' && (currentProcessingMonth - itemStartMonth + 1) % 3 === 1 && currentProcessingMonth >= itemStartMonth) monthInflows += itemAmount;
+          else if (item.frequency === 'annually' && (currentProcessingMonth - itemStartMonth + 1) % 12 === 1 && currentProcessingMonth >= itemStartMonth) monthInflows += itemAmount;
+        } else {
+          if (item.frequency === 'monthly') monthOutflows += itemAmount;
+          else if (item.frequency === 'quarterly' && (currentProcessingMonth - itemStartMonth + 1) % 3 === 1 && currentProcessingMonth >= itemStartMonth) monthOutflows += itemAmount;
+          else if (item.frequency === 'annually' && (currentProcessingMonth - itemStartMonth + 1) % 12 === 1 && currentProcessingMonth >= itemStartMonth) monthOutflows += itemAmount;
+        }
+      });
+      totalOverallExpenses += monthOutflows;
+      const currentMonthNetCashFlow = monthInflows - monthOutflows;
+      runningBalance += currentMonthNetCashFlow;
+      return {
+        monthIndex, // 0-indexed
+        month: monthIndex + 1, // 1-indexed for messages
+        currentMonthInflows: monthInflows,
+        currentMonthOutflows: monthOutflows,
+        currentMonthNetCashFlow,
+        currentMonthEndingBalance: runningBalance,
+      };
+    });
+
+    const averageMonthlyOverallExpenses = projectionMonths > 0 ? totalOverallExpenses / projectionMonths : 0;
+    const halfAverageMonthlyOverallExpenses = averageMonthlyOverallExpenses / 2;
+    const finalEndingBalance = monthlyDataForCalculations.length > 0 ? monthlyDataForCalculations[monthlyDataForCalculations.length - 1].currentMonthEndingBalance : openingBalance;
+    const totalNetCashFlowOverall = monthlyDataForCalculations.reduce((sum, month) => sum + month.currentMonthNetCashFlow, 0);
+    const averageNetCashFlowOverall = projectionMonths > 0 ? totalNetCashFlowOverall / projectionMonths : 0;
+
+    // Prepare data for overall feedback rules
+    const overallCalculatorData = {
+      openingBalance,
+      projectionMonths,
+      completionPercentage,
+      endingBalance: finalEndingBalance,
+      averageNetCashFlow: averageNetCashFlowOverall,
+      totalInflows: monthlyDataForCalculations.reduce((sum, m) => sum + m.currentMonthInflows, 0),
+      totalOutflows: totalOverallExpenses,
+      averageMonthlyOverallExpenses,
+      halfAverageMonthlyOverallExpenses,
+      ...businessTypeSpecificData,
     };
 
-    const filteredCalculatorData = Object.entries(calculatorData)
-      .filter(([_, value]) => value !== undefined && !isNaN(Number(value)))
-      .reduce((obj, [key, value]) => {
-        obj[key] = Number(value);
-        return obj;
-      }, {} as Record<string, number | string>);
-
-    const generatedItems = generateFeedback(
-      filteredCalculatorData,
+    const overallFeedback = generateFeedback(
+      overallCalculatorData,
       selectedBizTypeData,
       'cashflow' as CalculatorType,
       allFeedbackRules
     );
-    setFeedbackItems(generatedItems);
-    setIsFeedbackDrawerOpen(true);
+    allGeneratedFeedback = allGeneratedFeedback.concat(overallFeedback);
+
+    // Generate feedback for each month using pre-calculated monthlyDataForCalculations
+    monthlyDataForCalculations.forEach(monthDetail => {
+      const monthCalculatorData = {
+        ...monthDetail, // Contains month, monthIndex, currentMonthInflows, etc.
+        openingBalance, 
+        projectionMonths, 
+        completionPercentage,
+        averageMonthlyOverallExpenses, // For context in monthly rules
+        halfAverageMonthlyOverallExpenses, // For context in monthly rules
+        ...businessTypeSpecificData,
+      };
+
+      const monthFeedbackItems = generateFeedback(
+        monthCalculatorData,
+        selectedBizTypeData,
+        'cashflow' as CalculatorType,
+        allFeedbackRules
+      );
+
+      // Add monthIndex to uiTarget.details for chart highlighting
+      const processedMonthFeedback = monthFeedbackItems.map(fbItem => {
+        if (
+          fbItem.uiTarget &&
+          fbItem.uiTarget.scope === 'chart' &&
+          fbItem.uiTarget.identifier === 'cashFlowChart' &&
+          fbItem.uiTarget.details && typeof fbItem.uiTarget.details.dataKey === 'string'
+        ) {
+          return {
+            ...fbItem,
+            uiTarget: {
+              ...fbItem.uiTarget,
+              details: {
+                ...fbItem.uiTarget.details,
+                monthIndex: monthDetail.monthIndex, // Ensure 0-indexed monthIndex is attached
+              },
+            },
+          };
+        }
+        return fbItem;
+      });
+      allGeneratedFeedback = allGeneratedFeedback.concat(processedMonthFeedback);
+    });
+
+    // Deduplicate and sort feedback
+    const finalFeedbackMap = new Map<string, FeedbackItem>();
+    allGeneratedFeedback.forEach(item => {
+      const key = `${item.title}-${item.message}-${item.severity}-${item.uiTarget?.details?.monthIndex ?? 'overall'}`;
+      if (!finalFeedbackMap.has(key)) {
+        finalFeedbackMap.set(key, item);
+      }
+    });
+    const finalFeedback = Array.from(finalFeedbackMap.values()).sort((a, b) => {
+      const severityOrder = { critical: 0, warning: 1, good: 2, info: 3 };
+      return severityOrder[a.severity] - severityOrder[b.severity];
+    });
+
+    setFeedbackItems(finalFeedback);
+    if (finalFeedback.length > 0) {
+      setIsFeedbackDrawerOpen(true);
+    }
   };
 
   const getSummaryCardClassNameForCashFlow = (identifier: string, currentFeedbackItems: FeedbackItem[]): string => {
@@ -269,6 +384,7 @@ export default function CashFlowTab() {
         items={items}
         openingBalance={openingBalance}
         months={projectionMonths}
+        highlightDataPoints={chartHighlights}
       />
 
       <div className="grid gap-6 md:grid-cols-3">

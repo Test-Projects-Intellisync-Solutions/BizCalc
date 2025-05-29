@@ -16,6 +16,43 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer'; // New FeedbackDrawer import
 
+// Helper to determine border class based on feedback
+const getRatioCardClassName = (ratioIdentifier: string, currentFeedbackItems: FeedbackItem[]): string => {
+  const relevantFeedback = currentFeedbackItems.find(
+    (item) => item.uiTarget?.scope === 'summaryMetric' && item.uiTarget?.identifier === ratioIdentifier
+  );
+  if (relevantFeedback && relevantFeedback.severity !== 'info') {
+    switch (relevantFeedback.severity) {
+      case 'critical':
+        return 'border-l-4 border-red-500';
+      case 'warning':
+        return 'border-l-4 border-yellow-500';
+      case 'good':
+        return 'border-l-4 border-green-500';
+      default:
+        return '';
+    }
+  }
+  return '';
+};
+
+// Helper to determine status for RatioCard text color, ensuring type safety
+const getSafeRatioStatusFromFeedback = (
+  ratioIdentifier: string,
+  currentFeedbackItems: FeedbackItem[]
+): 'good' | 'warning' | 'critical' => {
+  const relevantFeedback = currentFeedbackItems.find(
+    (item) => item.uiTarget?.identifier === ratioIdentifier && item.severity !== 'info'
+  );
+
+  if (relevantFeedback) {
+    // Because item.severity !== 'info' is part of the find condition,
+    // relevantFeedback.severity here is guaranteed to be 'good', 'warning', or 'critical'.
+    return relevantFeedback.severity as 'good' | 'warning' | 'critical'; // Explicit cast for robustness
+  }
+  return 'good'; // Default status if no specific, non-info feedback is found
+};
+
 const initialFinancialData: FinancialData = {
   currentAssets: 0,
   inventory: 0,
@@ -224,26 +261,6 @@ export default function RatiosTab() {
     }
   }, [allCalculatedRatios, selectedBusinessType]);
 
-  // Determines the status/color for a ratio card
-  const getRatioStatus = (ratio: number, type: string): 'good' | 'warning' | 'critical' => {
-    if (isNaN(ratio) || !isFinite(ratio)) return 'warning'; // Handle NaN or Infinity
-
-    // More nuanced status logic can be added here based on benchmarks
-    if (type === 'margin' || type === 'growth' || type === 'roe' || type === 'roa') {
-      return ratio > 15 ? 'good' : ratio >= 0 ? 'warning' : 'critical';
-    }
-    if (type === 'leverage_lower_better') { // e.g., debtToEquity, debtRatio
-      return ratio < 0.5 ? 'good' : ratio < 1.5 ? 'warning' : 'critical';
-    }
-    if (type === 'coverage_higher_better') { // e.g., interestCoverage
-        return ratio > 3 ? 'good' : ratio > 1 ? 'warning' : 'critical';
-    }
-    if (type === 'liquidity_higher_better') { // e.g., currentRatio, quickRatio, cashRatio
-      return ratio > 1.5 ? 'good' : ratio > 0.8 ? 'warning' : 'critical';
-    }
-    return 'warning';
-  };
-
   return (
     <>
       <div className="space-y-6 p-4 md:p-6 pb-24">
@@ -351,34 +368,34 @@ export default function RatiosTab() {
 
           <TabsContent value="liquidity" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <RatioCard title="Current Ratio" value={allCalculatedRatios.currentRatio} formula="Current Assets / Current Liabilities" description="Measures short-term liquidity" status={getRatioStatus(allCalculatedRatios.currentRatio, 'liquidity_higher_better')} suffix="x" />
-              <RatioCard title="Quick Ratio (Acid Test)" value={allCalculatedRatios.quickRatio} formula="(Current Assets - Inventory) / Current Liabilities" description="More conservative liquidity measure" status={getRatioStatus(allCalculatedRatios.quickRatio, 'liquidity_higher_better')} suffix="x" />
-              <RatioCard title="Cash Ratio" value={allCalculatedRatios.cashRatio} formula="Cash / Current Liabilities" description="Most conservative liquidity measure" status={getRatioStatus(allCalculatedRatios.cashRatio, 'liquidity_higher_better')} suffix="x" />
+              <RatioCard title="Current Ratio" value={allCalculatedRatios.currentRatio} formula="Current Assets / Current Liabilities" description="Measures short-term liquidity" className={getRatioCardClassName('currentRatio', feedbackItems)} status={getSafeRatioStatusFromFeedback('currentRatio', feedbackItems)} suffix="x" />
+              <RatioCard title="Quick Ratio (Acid Test)" value={allCalculatedRatios.quickRatio} formula="(Current Assets - Inventory) / Current Liabilities" description="More conservative liquidity measure" className={getRatioCardClassName('quickRatio', feedbackItems)} status={getSafeRatioStatusFromFeedback('quickRatio', feedbackItems)} suffix="x" />
+              <RatioCard title="Cash Ratio" value={allCalculatedRatios.cashRatio} formula="Cash / Current Liabilities" description="Most conservative liquidity measure" className={getRatioCardClassName('cashRatio', feedbackItems)} status={getSafeRatioStatusFromFeedback('cashRatio', feedbackItems)} suffix="x" />
             </div>
           </TabsContent>
 
           <TabsContent value="profitability" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <RatioCard title="Gross Margin" value={allCalculatedRatios.grossMargin} formula="(Revenue - COGS) / Revenue" description="Revenue retained after direct costs" status={getRatioStatus(allCalculatedRatios.grossMargin, 'margin')} suffix="%" />
-              <RatioCard title="Operating Margin" value={allCalculatedRatios.operatingMargin} formula="Operating Income / Revenue" description="Revenue retained after operating costs" status={getRatioStatus(allCalculatedRatios.operatingMargin, 'margin')} suffix="%" />
-              <RatioCard title="Net Margin" value={allCalculatedRatios.netMargin} formula="Net Income / Revenue" description="Revenue retained after all costs" status={getRatioStatus(allCalculatedRatios.netMargin, 'margin')} suffix="%" />
-              <RatioCard title="Return on Assets (ROA)" value={allCalculatedRatios.roa} formula="Net Income / Total Assets" description="Efficiency of assets in generating earnings" status={getRatioStatus(allCalculatedRatios.roa, 'roa')} suffix="%" />
-              <RatioCard title="Return on Equity (ROE)" value={allCalculatedRatios.roe} formula="Net Income / Shareholder Equity" description="Efficiency of equity in generating earnings" status={getRatioStatus(allCalculatedRatios.roe, 'roe')} suffix="%" />
+              <RatioCard title="Gross Margin" value={allCalculatedRatios.grossMargin} formula="(Revenue - COGS) / Revenue" description="Revenue retained after direct costs" className={getRatioCardClassName('grossMargin', feedbackItems)} status={getSafeRatioStatusFromFeedback('grossMargin', feedbackItems)} suffix="%" />
+              <RatioCard title="Operating Margin" value={allCalculatedRatios.operatingMargin} formula="Operating Income / Revenue" description="Revenue retained after operating costs" className={getRatioCardClassName('operatingMargin', feedbackItems)} status={getSafeRatioStatusFromFeedback('operatingMargin', feedbackItems)} suffix="%" />
+              <RatioCard title="Net Margin" value={allCalculatedRatios.netMargin} formula="Net Income / Revenue" description="Revenue retained after all costs" className={getRatioCardClassName('netMargin', feedbackItems)} status={getSafeRatioStatusFromFeedback('netMargin', feedbackItems)} suffix="%" />
+              <RatioCard title="Return on Assets (ROA)" value={allCalculatedRatios.roa} formula="Net Income / Total Assets" description="Efficiency of assets in generating earnings" className={getRatioCardClassName('roa', feedbackItems)} status={getSafeRatioStatusFromFeedback('roa', feedbackItems)} suffix="%" />
+              <RatioCard title="Return on Equity (ROE)" value={allCalculatedRatios.roe} formula="Net Income / Shareholder Equity" description="Efficiency of equity in generating earnings" className={getRatioCardClassName('roe', feedbackItems)} status={getSafeRatioStatusFromFeedback('roe', feedbackItems)} suffix="%" />
             </div>
           </TabsContent>
 
           <TabsContent value="leverage" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <RatioCard title="Debt to Equity" value={allCalculatedRatios.debtToEquity} formula="Total Liabilities / Shareholder Equity" description="Proportion of debt to equity financing" status={getRatioStatus(allCalculatedRatios.debtToEquity, 'leverage_lower_better')} suffix="x" />
-              <RatioCard title="Debt Ratio" value={allCalculatedRatios.debtRatio} formula="Total Liabilities / Total Assets" description="Proportion of assets financed by debt" status={getRatioStatus(allCalculatedRatios.debtRatio, 'leverage_lower_better')} suffix="x" />
-              <RatioCard title="Interest Coverage" value={allCalculatedRatios.interestCoverage} formula="EBIT / Interest Expense" description="Ability to meet interest payments" status={getRatioStatus(allCalculatedRatios.interestCoverage, 'coverage_higher_better')} suffix="x" />
+              <RatioCard title="Debt to Equity" value={allCalculatedRatios.debtToEquity} formula="Total Liabilities / Shareholder Equity" description="Proportion of debt to equity financing" className={getRatioCardClassName('debtToEquity', feedbackItems)} status={getSafeRatioStatusFromFeedback('debtToEquity', feedbackItems)} suffix="x" />
+              <RatioCard title="Debt Ratio" value={allCalculatedRatios.debtRatio} formula="Total Liabilities / Total Assets" description="Proportion of assets financed by debt" className={getRatioCardClassName('debtRatio', feedbackItems)} status={getSafeRatioStatusFromFeedback('debtRatio', feedbackItems)} suffix="x" />
+              <RatioCard title="Interest Coverage" value={allCalculatedRatios.interestCoverage} formula="EBIT / Interest Expense" description="Ability to meet interest payments" className={getRatioCardClassName('interestCoverage', feedbackItems)} status={getSafeRatioStatusFromFeedback('interestCoverage', feedbackItems)} suffix="x" />
             </div>
           </TabsContent>
 
           <TabsContent value="growth" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <RatioCard title="Revenue Growth" value={allCalculatedRatios.revenueGrowth} formula="(Current Rev - Prev Rev) / Prev Rev" description="Year-over-year revenue growth" status={getRatioStatus(allCalculatedRatios.revenueGrowth, 'growth')} suffix="%" />
-              <RatioCard title="Net Income Growth" value={allCalculatedRatios.netIncomeGrowth} formula="(Current NI - Prev NI) / Prev NI" description="Year-over-year profit growth" status={getRatioStatus(allCalculatedRatios.netIncomeGrowth, 'growth')} suffix="%" />
+              <RatioCard title="Revenue Growth" value={allCalculatedRatios.revenueGrowth} formula="(Current Rev - Prev Rev) / Prev Rev" description="Year-over-year revenue growth" className={getRatioCardClassName('revenueGrowth', feedbackItems)} status={getSafeRatioStatusFromFeedback('revenueGrowth', feedbackItems)} suffix="%" />
+              <RatioCard title="Net Income Growth" value={allCalculatedRatios.netIncomeGrowth} formula="(Current NI - Prev NI) / Prev NI" description="Year-over-year profit growth" className={getRatioCardClassName('netIncomeGrowth', feedbackItems)} status={getSafeRatioStatusFromFeedback('netIncomeGrowth', feedbackItems)} suffix="%" />
             </div>
           </TabsContent>
         </Tabs>

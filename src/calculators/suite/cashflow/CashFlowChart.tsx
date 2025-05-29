@@ -14,14 +14,29 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { CashFlowItem } from './CashFlowForm';
+import { Cell } from 'recharts';
+
+interface HighlightPoint {
+  monthIndex: number; // 0-based index of the month
+  dataKey: 'balance' | 'inflows' | 'outflows' | 'netCashFlow';
+  severity: 'good' | 'warning' | 'critical' | 'info';
+}
 
 interface CashFlowChartProps {
   items: CashFlowItem[];
   openingBalance: number;
   months: number;
+  highlightDataPoints?: HighlightPoint[];
 }
 
-export default function CashFlowChart({ items, openingBalance, months }: CashFlowChartProps) {
+const severityFillColors: Record<HighlightPoint['severity'], string> = {
+  good: 'hsl(var(--chart-2))', // Green
+  warning: 'hsl(var(--chart-5))', // Yellow/Orange
+  critical: 'hsl(var(--chart-3))', // Red
+  info: 'hsl(var(--chart-1))', // Blue
+};
+
+export default function CashFlowChart({ items, openingBalance, months, highlightDataPoints = [] }: CashFlowChartProps) {
   const data = useMemo(() => {
     const monthsArray = Array.from({ length: months }, (_, i) => i);
     let runningBalance = openingBalance;
@@ -91,6 +106,16 @@ export default function CashFlowChart({ items, openingBalance, months }: CashFlo
                   dataKey="balance"
                   stroke="hsl(var(--chart-1))"
                   name="Cash Balance"
+                  dot={(props: any) => {
+                    const { cx, cy, stroke, index, payload } = props;
+                    const highlight = highlightDataPoints.find(
+                      (p) => p.monthIndex === index && p.dataKey === 'balance'
+                    );
+                    const fillColor = highlight ? severityFillColors[highlight.severity] : stroke;
+                    if (payload.balance === undefined) return <g />; // Return empty SVG group if balance is undefined
+                    return <circle cx={cx} cy={cy} r={5} fill={fillColor} stroke={stroke} strokeWidth={1} />;
+                  }}
+                  activeDot={{ r: 7 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -114,7 +139,18 @@ export default function CashFlowChart({ items, openingBalance, months }: CashFlo
                 <ReferenceLine y={0} stroke="#666" />
                 <Bar dataKey="inflows" fill="hsl(var(--chart-2))" name="Cash Inflows" />
                 <Bar dataKey="outflows" fill="hsl(var(--chart-3))" name="Cash Outflows" />
-                <Bar dataKey="netCashFlow" fill="hsl(var(--chart-4))" name="Net Cash Flow" />
+                <Bar dataKey="netCashFlow" name="Net Cash Flow">
+                  {data.map((entry, index) => {
+                    const highlight = highlightDataPoints.find(
+                      (p) => p.monthIndex === index && p.dataKey === 'netCashFlow'
+                    );
+                    let fillColor = highlight ? severityFillColors[highlight.severity] : 'hsl(var(--chart-4))'; // Default color
+                    if (!highlight && entry.netCashFlow < 0) {
+                      fillColor = 'hsl(var(--chart-3))'; // Default red for negative if not otherwise highlighted
+                    }
+                    return <Cell key={`cell-${index}`} fill={fillColor} />;
+                  })}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
