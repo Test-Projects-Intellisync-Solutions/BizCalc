@@ -24,7 +24,7 @@ export default function CashFlowTab() {
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>(businessTypes[0]?.value || '');
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]); 
 
-  const handleImportData = (data: Record<string, unknown>) => {
+  const handleImportData = (data: Record<string, unknown>, importedFeedbackItems?: FeedbackItem[]) => {
     if (data.items && Array.isArray(data.items)) {
       setItems(data.items as CashFlowItem[]);
     }
@@ -36,6 +36,12 @@ export default function CashFlowTab() {
     }
     if (data.selectedBusinessType && typeof data.selectedBusinessType === 'string') {
       setSelectedBusinessType(data.selectedBusinessType);
+    }
+    if (importedFeedbackItems) {
+      setFeedbackItems(importedFeedbackItems);
+      if (importedFeedbackItems.length > 0) {
+        setIsFeedbackDrawerOpen(true);
+      }
     }
   };
 
@@ -66,8 +72,8 @@ export default function CashFlowTab() {
     const calculatedMetrics = calculateMetrics(); 
 
     const calculatorData: Record<string, number | string | undefined> = {
-      monthlyNetCashFlow: calculatedMetrics.monthlyNetCashFlow,
-      cashRunwayMonths: calculatedMetrics.runway === Infinity ? 999 : calculatedMetrics.runway, 
+      netCashFlow: calculatedMetrics.monthlyNetCashFlow,
+      runwayMonths: calculatedMetrics.runway === Infinity ? 999 : calculatedMetrics.runway, 
       totalInflows: calculatedMetrics.inflows,
       totalOutflows: calculatedMetrics.outflows,
       openingBalance: openingBalance,
@@ -89,6 +95,40 @@ export default function CashFlowTab() {
     );
     setFeedbackItems(generatedItems);
     setIsFeedbackDrawerOpen(true);
+  };
+
+  const getSummaryCardClassNameForCashFlow = (identifier: string, currentFeedbackItems: FeedbackItem[]): string => {
+    const relevantFeedback = currentFeedbackItems.filter(
+      (item) =>
+        item.uiTarget?.scope === 'summaryMetric' &&
+        item.uiTarget?.identifier === identifier
+    );
+
+    if (relevantFeedback.length === 0) {
+      return '';
+    }
+
+    let highestSeverity: FeedbackItem['severity'] = 'info';
+    if (relevantFeedback.some((item) => item.severity === 'critical')) {
+      highestSeverity = 'critical';
+    } else if (relevantFeedback.some((item) => item.severity === 'warning')) {
+      highestSeverity = 'warning';
+    } else if (relevantFeedback.some((item) => item.severity === 'good')) {
+      highestSeverity = 'good';
+    }
+
+    switch (highestSeverity) {
+      case 'critical':
+        return 'border-l-4 border-red-500';
+      case 'warning':
+        return 'border-l-4 border-yellow-500';
+      case 'good':
+        return 'border-l-4 border-green-500';
+      case 'info':
+        return 'border-l-4 border-blue-500';
+      default:
+        return '';
+    }
   };
 
   useEffect(() => {
@@ -113,7 +153,8 @@ export default function CashFlowTab() {
       <div className="flex justify-end">
         <ImportExport 
           calculatorType="cashflow"
-          currentData={{ items, openingBalance, projectionMonths, selectedBusinessType, completionPercentage }}
+          currentData={{ items, openingBalance, projectionMonths, selectedBusinessType }}
+          currentFeedbackItems={feedbackItems} // Added currentFeedbackItems
           onImport={handleImportData}
         />
       </div>
@@ -259,7 +300,7 @@ export default function CashFlowTab() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={getSummaryCardClassNameForCashFlow('netCashFlow', feedbackItems)}>
           <CardHeader>
             <CardTitle>Net Monthly Cash Flow</CardTitle>
           </CardHeader>

@@ -7,7 +7,7 @@ import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import RevenueForm, { type RevenueStream } from './RevenueForm';
 import { businessTypes, type BusinessType } from '../../../data/businessTypes';
 import ExpenseForm, { type Expense } from './ExpenseForm';
-import ProjectionChart from './ProjectionChart';
+import ProjectionChart, { type HighlightPoint } from './ProjectionChart';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { allFeedbackRules, type FeedbackItem, type CalculatorType } from '../../../data/feedbackRules'; 
@@ -22,9 +22,10 @@ export default function ProjectionsTab() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [projectionMonths, setProjectionMonths] = useState(12);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>(businessTypes[0]?.value || '');
-  const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]); 
+  const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
+  const [chartHighlightPoints, setChartHighlightPoints] = useState<HighlightPoint[]>([]); 
 
-  const handleImportData = (data: Record<string, unknown>) => {
+  const handleImportData = (data: Record<string, unknown>, importedFeedbackItems?: FeedbackItem[]) => {
     if (data.revenueStreams && Array.isArray(data.revenueStreams)) {
       setRevenueStreams(data.revenueStreams as RevenueStream[]);
     }
@@ -36,6 +37,12 @@ export default function ProjectionsTab() {
     }
     if (data.selectedBusinessType && typeof data.selectedBusinessType === 'string') {
       setSelectedBusinessType(data.selectedBusinessType);
+    }
+    if (importedFeedbackItems) {
+      setFeedbackItems(importedFeedbackItems);
+      if (importedFeedbackItems.length > 0) {
+        setIsFeedbackDrawerOpen(true);
+      }
     }
   };
 
@@ -68,6 +75,7 @@ export default function ProjectionsTab() {
       projectionMonths,
       numberOfRevenueStreams: revenueStreams.length,
       numberOfExpenseCategories: expenses.length,
+      expenseToRevenueRatio: calculated.totalRevenue > 0 ? (calculated.totalExpenses / calculated.totalRevenue) * 100 : undefined, // as percentage
       // Potentially add average revenue per stream, average expense amount etc.
       // Example: averageRevenuePerStream: revenueStreams.length > 0 ? calculated.totalRevenue / revenueStreams.length : 0,
     };
@@ -86,8 +94,34 @@ export default function ProjectionsTab() {
       allFeedbackRules
     );
     setFeedbackItems(generatedItems);
-    setIsFeedbackDrawerOpen(true);
+    if (generatedItems.length > 0) {
+      setIsFeedbackDrawerOpen(true);
+    }
   };
+
+  useEffect(() => {
+    const newHighlightPoints: HighlightPoint[] = [];
+    feedbackItems.forEach(item => {
+      // Hypothetical check: if relevantMetrics contains specific chart highlight details
+      // This structure would need to be populated by the feedback rule definition or generation logic
+      if (item.relevantMetrics?.chartHighlightDetails) {
+        const details = item.relevantMetrics.chartHighlightDetails as any;
+        if (typeof details.monthIndex === 'number' && 
+            typeof details.dataKey === 'string' && 
+            ['revenue', 'expenses', 'netCashFlow'].includes(details.dataKey)) {
+          newHighlightPoints.push({
+            monthIndex: details.monthIndex, // Expects 0-indexed month
+            dataKey: details.dataKey as 'revenue' | 'expenses' | 'netCashFlow',
+            severity: item.severity,
+          });
+        }
+      }
+      // Alternative: Parse item.id or another field if rules are structured that way
+      // Example: if an item.id is 'rule-proj-low-ncf-month-2', parse it to get monthIndex=1, dataKey='netCashFlow'
+      // This would be more complex and rule-dependent.
+    });
+    setChartHighlightPoints(newHighlightPoints);
+  }, [feedbackItems]);
 
   useEffect(() => {
     const hasRevenue = revenueStreams.some(stream => stream.baseAmount > 0);
@@ -108,7 +142,8 @@ export default function ProjectionsTab() {
       <div className="flex justify-end">
         <ImportExport 
           calculatorType="projections"
-          currentData={{ revenueStreams, expenses, projectionMonths, selectedBusinessType, completionPercentage }}
+          currentData={{ revenueStreams, expenses, projectionMonths, selectedBusinessType }}
+          currentFeedbackItems={feedbackItems}
           onImport={handleImportData}
         />
       </div>
@@ -211,6 +246,7 @@ export default function ProjectionsTab() {
         revenueStreams={revenueStreams}
         expenses={expenses}
         months={projectionMonths}
+        highlightDataPoints={chartHighlightPoints}
       />
 
       <div className="grid gap-6 md:grid-cols-3">

@@ -249,8 +249,17 @@ export default function RatiosTab() {
       <div className="space-y-6 p-4 md:p-6 pb-24">
         <ImportExport 
           calculatorType="ratios"
-          currentData={{ financialData, selectedBusinessType }} 
-          onImport={handleImportData} 
+          currentData={{ ...financialData, selectedBusinessType } as Record<string, unknown>} // Corrected currentData and cast
+          currentFeedbackItems={feedbackItems}
+          onImport={(data, importedFeedbackItems?: FeedbackItem[]) => {
+            setFinancialData(data as unknown as FinancialData); // Corrected cast
+            if (importedFeedbackItems) {
+              setFeedbackItems(importedFeedbackItems);
+              if (importedFeedbackItems.length > 0) {
+                setIsFeedbackDrawerOpen(true);
+              }
+            }
+          }} 
         />
         
         <div className="my-4 flex justify-center">

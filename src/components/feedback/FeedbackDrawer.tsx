@@ -83,7 +83,44 @@ export const FeedbackDrawer: React.FC<FeedbackDrawerProps> = ({ isOpen, onClose,
                       Learn more
                     </a>
                   )}
-                  {/* TODO: Display relevantMetrics in a structured way if needed */}
+                  {item.relevantMetrics && Object.keys(item.relevantMetrics).length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mt-2">Key Metrics:</h4>
+                      <ul className="list-disc list-inside pl-1 text-xs">
+                        {Object.entries(item.relevantMetrics).map(([key, value]) => {
+                          let textColorClass = '';
+                          if (typeof value === 'number') {
+                            switch (item.severity) {
+                              case 'good':
+                                textColorClass = 'text-green-500';
+                                break;
+                              case 'warning':
+                                textColorClass = 'text-yellow-500';
+                                break;
+                              case 'critical':
+                                textColorClass = 'text-red-500';
+                                break;
+                              case 'info':
+                                textColorClass = 'text-blue-500';
+                                break;
+                              default:
+                                textColorClass = 'text-gray-700';
+                            }
+                          }
+                          return (
+                            <li key={key}>
+                              {key}:{' '}
+                              {typeof value === 'number' ? (
+                                <span className={`font-semibold ${textColorClass}`}>{value}</span>
+                              ) : (
+                                <span className="font-semibold text-gray-700">{String(value)}</span>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))

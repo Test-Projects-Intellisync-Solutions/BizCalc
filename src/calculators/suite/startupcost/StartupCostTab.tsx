@@ -57,12 +57,18 @@ export default function StartupCostTab() {
     const monthly = items.filter(item => !item.isOneTime).reduce((sum, item) => sum + item.amount, 0);
     const sixMonthOp = oneTime + (monthly * 6);
 
-    const calculatorData: Record<string, number | string | undefined> = {
+    const costsByCategory: Record<string, number> = items.reduce((acc, item) => {
+      acc[item.category] = (acc[item.category] || 0) + item.amount;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const calculatorData: Record<string, any> = {
       totalOneTimeCosts: oneTime,
       totalMonthlyCosts: monthly,
-      sixMonthOperating: sixMonthOp, 
+      sixMonthOperating: sixMonthOp,
       totalStartupCosts: sixMonthOp, // Using sixMonthOp as the main "total startup cost"
       numberOfCostItems: items.length,
+      costsByCategory: costsByCategory,
     };
 
     const filteredCalculatorData = Object.entries(calculatorData)
@@ -75,11 +81,28 @@ export default function StartupCostTab() {
     const generatedItems = generateFeedback(
       filteredCalculatorData,
       selectedBizTypeData,
-      'startupcost' as CalculatorType,
+      'startupCosts' as CalculatorType,
       allFeedbackRules
     );
     setFeedbackItems(generatedItems);
     setIsFeedbackDrawerOpen(true);
+  };
+
+  const getSummaryCardClassName = (metricName: string, defaultClasses: string): string => {
+    const relevantFeedback = feedbackItems.find(
+      fb => fb.uiTarget?.scope === 'summaryMetric' && fb.uiTarget?.identifier === metricName
+    );
+    const severity = relevantFeedback?.severity;
+    if (severity) {
+      switch (severity) {
+        case 'critical': return 'p-4 border-l-4 border-destructive bg-destructive bg-opacity-10';
+        case 'warning': return 'p-4 border-l-4 border-yellow-400 bg-yellow-400 bg-opacity-10';
+        case 'info': return 'p-4 border-l-4 border-blue-400 bg-blue-400 bg-opacity-10';
+        case 'good': return 'p-4 border-l-4 border-green-400 bg-green-400 bg-opacity-10';
+        default: return defaultClasses;
+      }
+    }
+    return defaultClasses;
   };
 
   // Calculate completion percentage based on number of items with a non-zero amount
@@ -260,12 +283,18 @@ export default function StartupCostTab() {
     };
   }).sort((a, b) => b.value - a.value);
 
-  const handleImportData = (data: Record<string, unknown>) => {
+  const handleImportData = (data: Record<string, unknown>, importedFeedbackItems?: FeedbackItem[]) => {
     if (data.items && Array.isArray(data.items)) {
       setItems(data.items as CostItem[]);
     }
     if (data.businessType && typeof data.businessType === 'string') {
       setBusinessType(data.businessType);
+    }
+    if (importedFeedbackItems) {
+      setFeedbackItems(importedFeedbackItems);
+      if (importedFeedbackItems.length > 0) {
+        setIsFeedbackDrawerOpen(true);
+      }
     }
   };
 
@@ -277,8 +306,9 @@ export default function StartupCostTab() {
       <div className="p-4 md:p-6 pb-16">
         <div className="flex justify-end">
           <ImportExport
-            calculatorType="startupCostEstimator"
-            currentData={{ items, businessType, completionPercentage }}
+            calculatorType="startupCosts"
+            currentData={{ items, businessType }}
+            currentFeedbackItems={feedbackItems}
             onImport={handleImportData}
           />
         </div>
@@ -324,8 +354,30 @@ export default function StartupCostTab() {
               </Button>
             </div>
 
-            {items.map((item) => (
-              <div key={item.id} className="p-4 border rounded-lg space-y-4">
+            {items.map((item) => {
+              const relevantFeedback = feedbackItems.find(
+                fb => fb.uiTarget?.scope === 'costItem' && fb.uiTarget?.identifier === item.id
+              );
+              const severity = relevantFeedback?.severity;
+              
+              let classNames = "p-4 rounded-lg space-y-4";
+              if (severity) {
+                let borderColorClass = '';
+                switch (severity) {
+                  case 'critical': borderColorClass = 'border-destructive'; break;
+                  case 'warning': borderColorClass = 'border-yellow-400'; break;
+                  case 'info': borderColorClass = 'border-blue-400'; break;
+                  case 'good': borderColorClass = 'border-green-400'; break;
+                  default: borderColorClass = 'border-border'; // Fallback
+                }
+                classNames += ` border-2 ${borderColorClass}`;
+              } else {
+                classNames += ' border border-border'; // Default border
+              }
+
+              return (
+                <div key={item.id} className={classNames}>
+
                 <div className="flex justify-between items-center">
                   <div className="w-full">
                     <Label className="mb-2 block">Item Name</Label>
@@ -400,13 +452,14 @@ export default function StartupCostTab() {
                     <div className="flex items-center gap-2 mb-2">
                       <Label>Amount ($)</Label>
                       <Tooltip>
-                        <TooltipTrigger type="button">
-                          <Info className="h-4 w-4 text-muted-foreground" />
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 text-muted-foreground " />
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Enter the estimated amount for this expense</p>
                         </TooltipContent>
                       </Tooltip>
+
                     </div>
                     <Input
                       type="number"
@@ -470,11 +523,11 @@ export default function StartupCostTab() {
           <div className="space-y-6">
             {/* Cost Summary Cards */}
             <div className="grid gap-4 md:grid-cols-3">
-              <Card className="p-4 border-l-4 border-primary">
+              <Card className={getSummaryCardClassName('totalOneTimeCosts', 'p-4 border-l-4 border-primary')}>
                 <div className="text-sm text-muted-foreground">One-Time Costs</div>
                 <div className="text-2xl font-bold">${oneTimeCosts.toLocaleString()}</div>
               </Card>
-              <Card className="p-4 border-l-4 border-secondary">
+              <Card className={getSummaryCardClassName('sixMonthOperating', 'p-4 border-l-4 border-secondary')}>
                 <div className="flex items-center text-sm text-muted-foreground">
                   6-Month Operating
                   <TooltipProvider>
@@ -490,7 +543,7 @@ export default function StartupCostTab() {
                 </div>
                 <div className="text-2xl font-bold">${sixMonthOperating.toLocaleString()}</div>
               </Card>
-              <Card className="p-4 border-l-4 border-destructive">
+              <Card className={getSummaryCardClassName('totalStartupCosts', 'p-4 border-l-4 border-destructive')}>
                 <div className="text-sm text-muted-foreground">Total Startup Costs</div>
                 <div className="text-2xl font-bold">${totalStartupCosts.toLocaleString()}</div>
               </Card>
@@ -502,8 +555,27 @@ export default function StartupCostTab() {
               <div className="space-y-4">
                 {categoryData.map((item, index) => {
                   const percentage = totalStartupCosts > 0 ? (item.value / totalStartupCosts) * 100 : 0;
+                  const relevantFeedback = feedbackItems.find(
+                    fb => fb.uiTarget?.scope === 'category' && fb.uiTarget?.identifier === item.name
+                  );
+                  const severity = relevantFeedback?.severity;
+
+                  let categoryClassNames = "space-y-2 p-2 rounded"; // Added padding and rounding
+                  if (severity) {
+                    let borderColorClass = '';
+                    let bgColorClass = 'bg-opacity-10'; // Base for slight background tint
+                    switch (severity) {
+                      case 'critical': borderColorClass = 'border-l-4 border-destructive'; bgColorClass = 'bg-destructive ' + bgColorClass; break;
+                      case 'warning': borderColorClass = 'border-l-4 border-yellow-400'; bgColorClass = 'bg-yellow-400 ' + bgColorClass; break;
+                      case 'info': borderColorClass = 'border-l-4 border-blue-400'; bgColorClass = 'bg-blue-400 ' + bgColorClass; break;
+                      case 'good': borderColorClass = 'border-l-4 border-green-400'; bgColorClass = 'bg-green-400 ' + bgColorClass; break;
+                      default: borderColorClass = ''; bgColorClass = '';
+                    }
+                    categoryClassNames += ` ${borderColorClass} ${bgColorClass}`;
+                  }
+
                   return (
-                    <div key={item.name} className="space-y-2">
+                    <div key={item.name} className={categoryClassNames}>
                       <div className="flex justify-between text-sm">
                         <span className="font-medium">{item.name}</span>
                         <span>${item.value.toLocaleString()} ({percentage.toFixed(1)}%)</span>

@@ -10,8 +10,8 @@
     *   `projections`
     *   `ratios`
     *   `burnRate`
-    *   [x] Update `StartupCostEstimator.tsx` to use `src/data/businessTypes.ts`.
-    *   [x] Reconcile business type list in `businessTypes.ts` (expanded to include all previous options) and update `applyTemplate` in `StartupCostEstimator.tsx` with placeholder cases for new types.
+    *   [x] Update `StartupCostTab.tsx` to use `src/data/businessTypes.ts`.
+    *   [x] Reconcile business type list in `businessTypes.ts` (expanded to include all previous options) and update `applyTemplate` in `StartupCostTab.tsx` with placeholder cases for new types.
     *   [x] Add Business Type selector to `CashFlowTab.tsx` using `src/data/businessTypes.ts`.
     *   [x] Add Business Type selector to other calculators (`profitability`, `projections`, `ratios`) using `src/data/businessTypes.ts`.
     *   [x] Add Business Type selector to `BurnRate.tsx` using `src/data/businessTypes.ts`.
@@ -22,10 +22,10 @@
                 *   [x] Add the selected Drawer component to `@/components/ui/` (User confirmed: Shadcn/ui Drawer added).
             *   [ ] **Task 2: Define Calculator "Completion" & Enhance Progress Interaction:**
                 *   [x] For each calculator, define criteria for 100% completion (e.g., required fields filled, non-zero inputs).
-                *   [x] Implement state (e.g., `isComplete` or `completionPercentage`) in `StartupCostEstimator.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
-                *   [x] Ensure Progress bar shows 100% when complete in `StartupCostEstimator.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
-                *   [x] Add a clickable element (icon button) to open the feedback drawer when complete in `StartupCostEstimator.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
-                *   [x] Implement state for drawer visibility in `StartupCostEstimator.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
+                *   [x] Implement state (e.g., `isComplete` or `completionPercentage`) in `StartupCostTab.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
+                *   [x] Ensure Progress bar shows 100% when complete in `StartupCostTab.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
+                *   [x] Add a clickable element (icon button) to open the feedback drawer when complete in `StartupCostTab.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
+                *   [x] Implement state for drawer visibility in `StartupCostTab.tsx`, `CashFlowTab.tsx`, `ProfitabilityTab.tsx`, `ProjectionsTab.tsx` & `BurnRate.tsx`.
             *   [x] **Task 3: Initial Drawer Integration & Display:**
                 *   [x] Pass placeholder feedback content to the Drawer in one calculator tab as an initial test.
                 *   [x] Ensure the Drawer opens and closes correctly with the trigger mechanism.
@@ -33,26 +33,46 @@
             *   [ ] Review each calculator for general layout improvements and enhanced interactivity (ongoing).
             *   [ ] Confirm contextual feedback will be displayed in the new Drawer.
             *   [ ] Consider overall user flow and consistency across calculators with the new Drawer mechanism.
-        *   [ ] **Phase 2.3: Contextual Feedback Logic & Data (was Contextual Feedback System Development):**
-            *   [ ] **Task 1: Define Feedback Data Structure:**
-                *   [ ] Finalize data structure for feedback rules (e.g., in `src/data/feedbackRules.ts` or similar) linking `Business Type`, `calculatorType`, specific metrics/conditions, thresholds, and feedback messages (text, severity, etc.).
-            *   [ ] **Task 2: Implement Core Feedback Generation Logic:**
-                *   [ ] Create `src/utils/feedbackUtils.ts` (or similar).
-                *   [ ] Implement a core function that takes calculator-specific data, `selectedBusinessType`, and potentially `calculatorType` to filter and return relevant `FeedbackItem[]` based on the defined rules.
-            *   [ ] **Task 3: Integrate Feedback Generation into Calculators:**
-                *   [ ] In each calculator, call the feedback generation logic when relevant data changes or upon completion.
-                *   [ ] Pass the generated `FeedbackItem[]` to the Drawer component.
+        *   [x] **Phase 2.3: Contextual Feedback Logic & Data (was Contextual Feedback System Development):**
+            *   [x] **Task 1: Define Feedback Data Structure:**
+                *   [x] Finalize data structure for feedback rules (e.g., in `src/data/feedbackRules.ts` or similar) linking `Business Type`, `calculatorType`, specific metrics/conditions, thresholds, and feedback messages (text, severity, etc.).
+            *   [x] **Task 2: Implement Core Feedback Generation Logic:**
+                *   [x] Create `src/utils/feedbackUtils.ts` (or similar).
+                *   [x] Implement a core function that takes calculator-specific data, `selectedBusinessType`, and potentially `calculatorType` to filter and return relevant `FeedbackItem[]` based on the defined rules.
+                *   [x] Refined `generateFeedback` in `src/utils/feedbackUtils.ts` to include custom logic for `rule-startup-category-dominance`, allowing dynamic feedback generation for dominant cost categories in `StartupCostTab.tsx`. (2025-05-29)
+            *   [x] **Task 3: Integrate Feedback Generation into Calculators:**
+                *   [x] In each calculator, call the feedback generation logic when relevant data changes or upon completion. *(Covered by Phase 2.1 Task 2 & 3)*
+                *   [x] Pass the generated `FeedbackItem[]` to the Drawer component. *(Covered by Phase 2.1 Task 2 & 3)*
+            *   **Note:** Initial set of contextual feedback rules implemented in `feedbackRules.ts` for `cashflow`, `profitability`, `projections`, `ratios`, and `startupcost` calculators. Further refinements and business-type specific rules may be added.
         *   [ ] **Phase 2.4: Visual Cues & Refinements (was Visual Cues Implementation):**
-            *   [ ] Identify key metrics/areas in each calculator and within the feedback drawer that would benefit from visual cues.
-            *   [ ] Design and implement color-coding schemes (e.g., for feedback severity in the drawer).
-            *   [ ] Select or create icons for feedback items or to enhance the trigger element.
-            *   [ ] Explore dynamic chart highlighting or annotations based on feedback (if applicable).
-            *   [ ] **Task 4: Integrate Feedback into Import/Export:**
-                *   [ ] Update `ExportData` type in `ImportExport.tsx` to include `contextualFeedback` (e.g., `FeedbackItem[]`).
-                *   [ ] Modify `handleExport` to include this data.
-                *   [ ] Modify `handleImport` to potentially read and utilize this data.
+            *   [x] **Identify key metrics/areas in each calculator and within the feedback drawer that would benefit from visual cues.**
+                *   **Done:** Implemented display of `FeedbackItem.relevantMetrics` within the `FeedbackDrawer`. Numeric values in `relevantMetrics` are now color-coded based on feedback severity (e.g., green for 'good', red for 'critical').
+                *   **Identified for Future:** Potential for visual cues (e.g., input field border colors, icons next to metrics) directly within individual calculator UIs, based on active feedback. This would be a separate implementation task.
+            *   [x] **Design and implement color-coding schemes (e.g., for feedback severity in the drawer).**
+                *   **Note:** Addressed by existing `FeedbackDrawer.tsx` implementation (`severityColors` for card theming).
+            *   [x] **Select or create icons for feedback items or to enhance the trigger element.**
+                *   **Note:** Icons for feedback items addressed by `FeedbackDrawer.tsx` (`severityIcons`). Trigger element icons handled in Phase 2.1.
+            *   [x] **Explore dynamic chart highlighting or annotations based on feedback (if applicable).**
+            *   [x] **Implemented visual cues for summary figures (One-Time, 6-Month Operating, Total Startup Costs) in `StartupCostTab.tsx` based on feedback severity.** (2025-05-29)
+                *   **Done:** Implemented infrastructure for highlighting individual data points (e.g., monthly net cash flow) on the `ProjectionChart` in `ProjectionsTab.tsx`. This involves:
+                    *   `ProjectionChart.tsx` now accepts `highlightDataPoints` prop and uses a custom dot renderer to color-code specific data points based on feedback severity.
+                    *   `ProjectionsTab.tsx` derives `highlightDataPoints` from `feedbackItems` (currently expecting details in `item.relevantMetrics.chartHighlightDetails: { monthIndex, dataKey }`).
+                *   **Note:** Full activation of this feature requires feedback rules in `feedbackRules.ts` for the 'projections' calculator to be updated to provide the specific `monthIndex` and `dataKey` for the data points they refer to. Other chart highlighting techniques (e.g., reference lines, custom tooltips) can be explored further if needed.
+            *   [x] **Task 4: Integrate Feedback into Import/Export:**
+                *   [x] **Update `ExportData` type in `ImportExport.tsx` to include `contextualFeedback` (e.g., `FeedbackItem[]`).**
+                    *   **Done:** Added `feedbackItems?: FeedbackItem[]` to `ExportData` type in `src/components/ui/UIComponents/ImportExport.tsx`.
+                *   [x] **Modify `handleExport` to include this data.**
+                    *   **Done:** `ImportExportProps` updated with `currentFeedbackItems?: FeedbackItem[]`. `handleExport` in `ImportExport.tsx` now includes `currentFeedbackItems` in the exported JSON.
+                *   [x] **Modify `handleImport` to potentially read and utilize this data.**
+                    *   **Done:** `onImport` prop in `ImportExportProps` changed to `(data: Record<string, unknown>, feedbackItems?: FeedbackItem[]) => void`. `handleImport` in `ImportExport.tsx` now passes `importedData.feedbackItems`.
+                    *   **Done (ProjectionsTab Example):** `ProjectionsTab.tsx` updated to pass its `feedbackItems` to `ImportExport` and its `handleImportData` now accepts and sets imported feedback, opening the drawer if feedback is present.
+                *   [x] **Apply similar integration to other relevant calculator tabs** (e.g., `RatiosTab.tsx`, `CashflowTab.tsx`, `ProfitabilityTab.tsx`, `StartupCostTab.tsx`).
+                    *   **Done:** `RatiosTab.tsx` updated.
+                    *   **Done:** `ProfitabilityTab.tsx` updated.
+                    *   **Done:** `StartupCostTab.tsx` (as `startupCosts`) updated.
+                    *   **Done:** `CashflowTab.tsx` updated.
         *   [ ] **Integrate into Calculators:**
-            *   [ ] Update `StartupCostTab.tsx` with UI/UX improvements, feedback system, and visual cues.
+            *   [x] Update `StartupCostTab.tsx` with UI/UX improvements (visual cues for summary figures, category costs, and cost items based on feedback), and enhanced feedback system (category dominance rule). (Partially complete, ongoing for other general UI/UX if needed)
             *   [ ] Update `CashFlowTab.tsx` with UI/UX improvements, feedback system, and visual cues.
             *   [ ] Update `ProfitabilityTab.tsx` with UI/UX improvements, feedback system, and visual cues.
             *   [ ] Update `ProjectionsTab.tsx` with UI/UX improvements, feedback system, and visual cues.

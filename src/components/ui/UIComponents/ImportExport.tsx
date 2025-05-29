@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '../button';
+import { FeedbackItem } from '../../../data/feedbackRules'; // Added import
 import { Download, Upload } from 'lucide-react';
 
 // Suite (Comprehensive Calculators)
@@ -8,7 +9,7 @@ type SuiteCalculatorType =
   | 'profitability'      // In-depth profitability analysis
   | 'projections'        // Financial projections
   | 'ratios'             // Financial ratios
-  | 'startupCostEstimator'; // Comprehensive startup cost calculator
+  | 'startupCosts';       // Comprehensive startup cost calculator
 
 // Tools (Simplified Calculators)
 type ToolCalculatorType =
@@ -28,6 +29,7 @@ type CalculatorType = SuiteCalculatorType | ToolCalculatorType;
 type ExportData = {
   type: CalculatorType;
   data: Record<string, unknown>;
+  feedbackItems?: FeedbackItem[]; // Added feedbackItems
   timestamp: string;
   version: string;
 };
@@ -39,7 +41,8 @@ interface ImportExportProps {
    */
   calculatorType: CalculatorType;
   currentData: Record<string, unknown>;
-  onImport?: (data: Record<string, unknown>) => void;
+  currentFeedbackItems?: FeedbackItem[]; // Added currentFeedbackItems
+  onImport?: (data: Record<string, unknown>, feedbackItems?: FeedbackItem[]) => void; // Modified onImport signature
   className?: string;
 }
 
@@ -50,6 +53,7 @@ interface ImportExportProps {
 export const ImportExport: React.FC<ImportExportProps> = ({
   calculatorType,
   currentData,
+  currentFeedbackItems, // Added currentFeedbackItems
   onImport,
   className = '',
 }) => {
@@ -57,6 +61,7 @@ export const ImportExport: React.FC<ImportExportProps> = ({
     const exportData: ExportData = {
       type: calculatorType,
       data: currentData,
+      feedbackItems: currentFeedbackItems, // Added feedbackItems
       timestamp: new Date().toISOString(),
       version: '1.0.0',
     };
@@ -90,7 +95,7 @@ export const ImportExport: React.FC<ImportExportProps> = ({
         }
         
         if (onImport) {
-          onImport(importedData.data);
+          onImport(importedData.data, importedData.feedbackItems);
         }
       } catch (error) {
         console.error('Error parsing JSON file:', error);

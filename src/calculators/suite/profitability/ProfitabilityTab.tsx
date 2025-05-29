@@ -29,7 +29,7 @@ export default function ProfitabilityTab() {
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>(businessTypes[0]?.value || '');
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]); 
 
-  const handleImportData = (data: Record<string, unknown>) => {
+  const handleImportData = (data: Record<string, unknown>, importedFeedbackItems?: FeedbackItem[]) => {
     if (data.metrics && typeof data.metrics === 'object') {
       setMetrics(prevMetrics => ({
         ...prevMetrics,
@@ -38,6 +38,12 @@ export default function ProfitabilityTab() {
     }
     if (data.selectedBusinessType && typeof data.selectedBusinessType === 'string') {
       setSelectedBusinessType(data.selectedBusinessType);
+    }
+    if (importedFeedbackItems) {
+      setFeedbackItems(importedFeedbackItems);
+      if (importedFeedbackItems.length > 0) {
+        setIsFeedbackDrawerOpen(true);
+      }
     }
   };
 
@@ -131,7 +137,8 @@ export default function ProfitabilityTab() {
       <div className="flex justify-end">
         <ImportExport 
           calculatorType="profitability"
-          currentData={{ metrics, selectedBusinessType, completionPercentage }}
+          currentData={{ metrics, selectedBusinessType }}
+          currentFeedbackItems={feedbackItems}
           onImport={handleImportData}
         />
       </div>

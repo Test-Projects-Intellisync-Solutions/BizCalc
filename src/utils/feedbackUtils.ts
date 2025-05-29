@@ -15,33 +15,90 @@ import { BusinessType, Benchmarks } from '../data/businessTypes';
  * @param data An object where keys match placeholders and values are the replacements.
  * @returns The interpolated string.
  */
-export function interpolateString(template: string, data: Record<string, string | number | undefined>): string {
-  if (template === undefined || template === null) return '';
-  let result = template;
-  for (const key in data) {
-    if (data.hasOwnProperty(key)) {
-      const value = data[key];
-      // Ensure value is a string or number before replacing. Handle undefined gracefully.
-      const replacement = (value !== undefined && value !== null) ? String(value) : '';
-      result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), replacement);
-    }
+function applyFormat(value: any, formatter?: string, ...args: string[]): string {
+  if (value === undefined || value === null) return '';
+
+  // For 'exists' and 'notExists', the raw value is more relevant than its numeric conversion
+  if (formatter === 'exists') return (value !== undefined && value !== null) ? 'Exists' : 'Not Found';
+  if (formatter === 'notExists') return (value === undefined || value === null) ? 'Not Found' : 'Exists';
+
+  const numValue = Number(value);
+
+  switch (formatter) {
+    case 'currency':
+      const currencyCode = args[0] || 'USD';
+      const currencyDigits = args[1] !== undefined ? parseInt(args[1], 10) : 2;
+      if (isNaN(numValue)) return String(value); // Fallback for non-numeric
+      return new Intl.NumberFormat('en-US', { 
+        style: 'currency', 
+        currency: currencyCode, 
+        minimumFractionDigits: currencyDigits, 
+        maximumFractionDigits: currencyDigits 
+      }).format(numValue);
+    case 'percent':
+      const percentDigits = args[0] !== undefined ? parseInt(args[0], 10) : 1;
+      if (isNaN(numValue)) return String(value); // Fallback for non-numeric
+      // Assuming the value is already a percentage, e.g., 15.5 for 15.5%
+      return `${numValue.toFixed(percentDigits)}%`;
+    case 'number':
+      const numberDigits = args[0] !== undefined ? parseInt(args[0], 10) : 2;
+      if (isNaN(numValue)) return String(value); // Fallback for non-numeric
+      return numValue.toFixed(numberDigits);
+    default:
+      return String(value);
   }
-  return result;
 }
 
-export function getNestedValue(obj: any, path: string, defaultValue?: any): any {
+export function interpolateString(template: string, data: Record<string, any>): string {
+  if (template === undefined || template === null) return '';
+  if (typeof template !== 'string') {
+    return String(template);
+  }
+
+  // Regex to find placeholders like {path}, {path:formatter}, or {path:formatter:arg1:arg2}
+  return template.replace(/\{([^}]+)\}/g, (match, placeholderContent) => {
+    const parts = placeholderContent.trim().split(':');
+    const path = parts[0];
+    const formatter = parts[1];
+    const formatArgs = parts.slice(2);
+
+    // Check if a pre-formatted version exists (e.g., amountFormatted from generateFeedback)
+    // If no explicit formatter is given in the template, prefer the pre-formatted version.
+    if (!formatter && data.hasOwnProperty(`${path}Formatted`)) {
+      const preFormattedValue = data[`${path}Formatted`];
+      return (preFormattedValue !== undefined && preFormattedValue !== null) ? String(preFormattedValue) : match;
+    }
+
+    const value = getNestedValue(data, path);
+
+    if (value === undefined || value === null) {
+      // If value not found, and a pre-formatted version was not used, return the original placeholder.
+      // This helps identify missing data or typos in paths.
+      return match; 
+    }
+
+    return applyFormat(value, formatter, ...formatArgs);
+  });
+}
+
+export function getNestedValue(obj: any, path: string, defaultValue: any = undefined): any {
   if (!obj || typeof path !== 'string') {
     return defaultValue;
   }
-  const keys = path.split('.');
+
+  // Improved path splitting to handle array indexing like 'array[0].property'
+  const pathParts = path.replace(/\[(\w+)\]/g, '.$1') // Convert array[index] to array.index
+                        .replace(/^\./, '') // Remove leading dot if any
+                        .split('.');
+
   let current = obj;
-  for (const key of keys) {
-    if (current === null || typeof current !== 'object' || !(key in current)) {
+  for (const part of pathParts) {
+    if (current === null || typeof current !== 'object' || !(part in current)) {
       return defaultValue;
     }
-    current = current[key];
+    current = current[part];
   }
-  return current;
+  return current === undefined ? defaultValue : current;
 }
 
 /**
@@ -60,165 +117,240 @@ interface MatchedRuleData {
   businessTypeValue: string; 
 }
 
+/**
+ * Helper to get all benchmark values for interpolation, flattening nested structures.
+ */
+function getFlattenedBenchmarks(businessTypeData?: BusinessType): Record<string, any> {
+  if (!businessTypeData?.benchmarks) return {};
+  const flattened: Record<string, any> = {};
+  Object.entries(businessTypeData.benchmarks).forEach(([key, value]) => {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.entries(value).forEach(([subKey, subValue]) => {
+        flattened[`${key}.${subKey}`] = subValue;
+      });
+    } else {
+      flattened[key] = value;
+    }
+  });
+  return flattened;
+}
+
+/**
+ * Evaluates a single feedback condition.
+ */
+function evaluateCondition(
+  condition: FeedbackCondition,
+  metricValue: any,
+  comparisonValue: any
+): boolean {
+  // Handle 'exists' and 'notExists' first as they don't need comparisonValue or numeric conversion
+  if (condition.operator === 'exists') {
+    return metricValue !== undefined && metricValue !== null;
+  }
+  if (condition.operator === 'notExists') {
+    return metricValue === undefined || metricValue === null;
+  }
+
+  const numMetricValue = Number(metricValue);
+  const numComparisonValue = Number(comparisonValue);
+
+  // For other operators, if either value is not a number (and it's not an existence check),
+  // or if comparisonValue is undefined (which can happen if a comparisonMetric path is bad),
+  // then the condition typically can't be meaningfully evaluated for numeric comparisons.
+  if (comparisonValue === undefined || isNaN(numMetricValue) || isNaN(numComparisonValue)) {
+    // Allow string comparison for '==' and '!=' as a fallback if values are not numbers
+    if (condition.operator === '==') return String(metricValue) === String(comparisonValue);
+    if (condition.operator === '!=') return String(metricValue) !== String(comparisonValue);
+    // For other operators (>, <, >=, <=), non-numeric or missing comparisonValue means condition fails
+    return false; 
+  }
+
+  switch (condition.operator) {
+    case '>':  return numMetricValue > numComparisonValue;
+    case '<':  return numMetricValue < numComparisonValue;
+    case '>=': return numMetricValue >= numComparisonValue;
+    case '<=': return numMetricValue <= numComparisonValue;
+    case '==': return numMetricValue === numComparisonValue; // Numeric comparison
+    case '!=': return numMetricValue !== numComparisonValue; // Numeric comparison
+    default:   return false;
+  }
+}
+
 export function generateFeedback(
-  calculatorData: Record<string, number | string>,
+  calculatorData: Record<string, any>, // Allow any data type for flexibility
   businessTypeData: BusinessType | undefined,
   calculatorType: CalculatorType,
   allRules: FeedbackRule[]
 ): FeedbackItem[] {
-  const matchedRulesData: MatchedRuleData[] = [];
+  const matchedFeedbackItems: FeedbackItem[] = [];
+  const flattenedBenchmarks = getFlattenedBenchmarks(businessTypeData);
+
+  // Base context for interpolation, including all calculator data and flattened benchmarks
+  const baseInterpolationContext: Record<string, any> = {
+    ...calculatorData,
+    ...flattenedBenchmarks,
+    businessTypeName: businessTypeData?.label || 'your business type',
+    businessTypeValue: businessTypeData?.value || 'generic',
+  };
+
+  // Pre-format common numeric values for easier use in templates
+  Object.entries(calculatorData).forEach(([key, value]) => {
+    if (typeof value === 'number') {
+      if (key.toLowerCase().includes('cost') || key.toLowerCase().includes('revenue') || key.toLowerCase().includes('profit') || key.toLowerCase().includes('expense') || key.toLowerCase().includes('amount')) {
+        baseInterpolationContext[`${key}Formatted`] = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+      }
+      if (key.toLowerCase().includes('margin') || key.toLowerCase().includes('rate') || key.toLowerCase().includes('ratio') || key.toLowerCase().includes('percentage')) {
+        baseInterpolationContext[`${key}Formatted`] = `${value.toFixed(1)}%`;
+      }
+    }
+  });
 
   for (const rule of allRules) {
-    // 1. Check if rule applies to this calculatorType
     const ruleAppliesToCalcType =
       Array.isArray(rule.calculatorType) ? 
       rule.calculatorType.includes(calculatorType) : 
       rule.calculatorType === calculatorType;
-    if (!ruleAppliesToCalcType) {
-      continue;
-    }
 
-    // 2. Check if rule applies to this businessType (if specified)
+    if (!ruleAppliesToCalcType) continue;
+
     if (rule.businessType && rule.businessType.length > 0) {
       if (!businessTypeData || !rule.businessType.includes(businessTypeData.value)) {
-        continue; // Skip if rule requires a specific business type and it doesn't match or no business type is selected
+        continue;
       }
-    } else {
-      // This is a generic rule (no specific businessType defined in the rule).
-      // It can apply even if businessTypeData is undefined.
-      // However, if businessTypeData is undefined, conditions using valuePath will likely not be met.
+    }
+
+    if (rule.id === 'rule-startup-category-dominance' && calculatorType === 'startupcost') {
+      const costsByCategory = getNestedValue(calculatorData, 'costsByCategory') as Record<string, number>;
+      const totalStartupCosts = getNestedValue(calculatorData, 'totalStartupCosts') as number;
+
+      if (costsByCategory && totalStartupCosts && totalStartupCosts > 0 && rule.conditions.length > 0) {
+        const thresholdPercentage = rule.conditions[0].value as number; // Assuming the first condition holds the threshold
+
+        for (const categoryName in costsByCategory) {
+          const categoryCost = costsByCategory[categoryName];
+          const categoryPercentage = (categoryCost / totalStartupCosts) * 100;
+
+          if (categoryPercentage > thresholdPercentage) {
+            const dominantCategoryInterpolationData = {
+              ...baseInterpolationContext,
+              dominantCategoryName: categoryName,
+              dominantCategoryPercentage: applyFormat(categoryPercentage, 'number', '1'), // Format to 1 decimal place
+              categoryCost: applyFormat(categoryCost, 'currency'),
+              totalStartupCosts: applyFormat(totalStartupCosts, 'currency'),
+            };
+
+            const dominantCategoryRelevantMetrics = {
+              [categoryName]: applyFormat(categoryCost, 'currency'),
+              [`${categoryName}_percentage`]: applyFormat(categoryPercentage, 'percent', '1'),
+              totalStartupCosts: applyFormat(totalStartupCosts, 'currency'),
+              threshold: `${thresholdPercentage}%`
+            };
+
+            const feedbackItem: FeedbackItem = {
+              id: `${rule.id}-${categoryName}-${Date.now()}`,
+              title: interpolateString(rule.feedbackTemplate.title, dominantCategoryInterpolationData),
+              message: interpolateString(rule.feedbackTemplate.message, dominantCategoryInterpolationData),
+              severity: rule.feedbackTemplate.severity,
+              implication: rule.feedbackTemplate.implication ? interpolateString(rule.feedbackTemplate.implication, dominantCategoryInterpolationData) : undefined,
+              recommendation: rule.feedbackTemplate.recommendation ? interpolateString(rule.feedbackTemplate.recommendation, dominantCategoryInterpolationData) : undefined,
+              relevantMetrics: dominantCategoryRelevantMetrics,
+              link: rule.feedbackTemplate.link ? interpolateString(rule.feedbackTemplate.link, dominantCategoryInterpolationData) : undefined,
+              uiTarget: {
+                scope: 'category',
+                identifier: categoryName,
+              },
+            };
+            matchedFeedbackItems.push(feedbackItem);
+          }
+        }
+      }
+      continue; // Skip standard condition processing for this special rule
     }
 
     const ruleConditionLogic = rule.conditionLogic || 'AND';
-    let allConditionsMetForAND = true;
-    let anyConditionMetForOR = false;
+    const conditionResults: boolean[] = [];
+    const ruleSpecificInterpolationData: Record<string, any> = {};
+    const ruleRelevantMetrics: Record<string, string | number> = {};
 
-    // 3. Evaluate conditions
     for (const condition of rule.conditions) {
-      const metricValue = calculatorData[condition.metric];
-      let comparisonValue = condition.value;
+      const metricValue = getNestedValue(calculatorData, condition.metric);
+      let comparisonValue: any;
+      let comparisonSource = "literal"; // To track where the comparison value came from for interpolation keys
 
-      // If valuePath is provided, try to get the benchmark value
-      // This requires businessTypeData and its benchmarks to be present.
-      if (condition.valuePath) {
-        if (businessTypeData && businessTypeData.benchmarks) {
-        const benchmarkVal = getNestedValue(businessTypeData.benchmarks, condition.valuePath);
+      if (condition.comparisonMetric) {
+        comparisonValue = getNestedValue(calculatorData, condition.comparisonMetric);
+        comparisonSource = condition.comparisonMetric; // Use the metric name as source
+      } else if (condition.valuePath) {
+        const benchmarkVal = getNestedValue(flattenedBenchmarks, condition.valuePath);
         if (benchmarkVal !== undefined) {
           comparisonValue = benchmarkVal;
-        } else {
-          // console.warn(`Benchmark path ${condition.valuePath} not found for ${businessTypeData.label}`);
-          if (ruleConditionLogic === 'AND') {
-            allConditionsMetForAND = false;
-            break;
-          }
-          continue; // Skip for OR
+          comparisonSource = condition.valuePath; // Use the path as source identifier
+        } else if (condition.value !== undefined) { // Fallback to literal if valuePath is specified but not found
+            comparisonValue = condition.value;
         }
-      } else {
-          // valuePath is present, but no businessTypeData or no benchmarks. Condition cannot use benchmark.
-          // This condition cannot be met if it relies on a benchmark that isn't there.
-          if (ruleConditionLogic === 'AND') {
-            allConditionsMetForAND = false;
-            break;
-          }
-          continue; // Skip for OR
-        }
+      } else if (condition.value !== undefined) {
+        comparisonValue = condition.value;
       }
       
-      if (metricValue === undefined) {
-        if (ruleConditionLogic === 'AND') {
-          allConditionsMetForAND = false;
-          break;
-        }
-        continue; // For 'OR', this condition doesn't contribute if metric is missing
+      // Store actual values used in condition for interpolation and relevantMetrics
+      ruleSpecificInterpolationData[condition.metric] = metricValue;
+      // Make the comparison value available using a dynamic key based on its source
+      if (comparisonSource === "literal") {
+        ruleSpecificInterpolationData[`${condition.metric}_comparisonValue`] = comparisonValue;
+      } else {
+        // For benchmarks or other metrics, use a more descriptive key if possible, or a generic one
+        // e.g., if comparisonMetric is 'previousRevenue', key becomes 'previousRevenue_value'
+        // if valuePath is 'some.benchmark.path', key becomes 'some.benchmark.path_value'
+        // This helps avoid clashes and provides clarity in templates.
+        const comparisonKey = comparisonSource.replace(/\./g, '_'); // Sanitize path for key
+        ruleSpecificInterpolationData[comparisonKey] = comparisonValue; 
       }
 
-      let currentConditionResult = false;
-      const numMetricValue = Number(metricValue);
-      const numComparisonValue = Number(comparisonValue);
-
-      switch (condition.operator) {
-        case '>':  currentConditionResult = numMetricValue > numComparisonValue; break;
-        case '<':  currentConditionResult = numMetricValue < numComparisonValue; break;
-        case '>=': currentConditionResult = numMetricValue >= numComparisonValue; break;
-        case '<=': currentConditionResult = numMetricValue <= numComparisonValue; break;
-        case '==': currentConditionResult = numMetricValue === numComparisonValue; break;
-        case '!=': currentConditionResult = numMetricValue !== numComparisonValue; break;
-        default:   currentConditionResult = false;
+      if (metricValue !== undefined) ruleRelevantMetrics[condition.metric] = metricValue;
+      if (comparisonValue !== undefined) {
+        // Add to relevantMetrics, trying to use a meaningful key
+        const relevantComparisonKey = condition.comparisonMetric || condition.valuePath || `comparison_${condition.metric}`;
+        ruleRelevantMetrics[relevantComparisonKey] = comparisonValue;
       }
 
-      if (ruleConditionLogic === 'AND') {
-        if (!currentConditionResult) {
-          allConditionsMetForAND = false;
-          break; // Exit condition loop for this rule
-        }
-      } else { // OR logic
-        if (currentConditionResult) {
-          anyConditionMetForOR = true;
-          break; // Exit condition loop for this rule, OR condition met
-        }
+      if (metricValue === undefined || comparisonValue === undefined) { // Condition cannot be evaluated if either value is missing
+        conditionResults.push(false);
+        continue;
       }
+      conditionResults.push(evaluateCondition(condition, metricValue, comparisonValue));
     }
 
-    const finalConditionsMet = (ruleConditionLogic === 'AND') ? allConditionsMetForAND : anyConditionMetForOR;
+    const conditionsMet = ruleConditionLogic === 'AND' 
+      ? conditionResults.every(Boolean) 
+      : conditionResults.some(Boolean);
 
-    if (finalConditionsMet) {
-      // 4. Prepare data for placeholder interpolation and relevantMetrics
-      const interpolationData: Record<string, string | number | undefined> = {};
-      const preciseRelevantMetrics: Record<string, string | number> = {};
+    if (conditionsMet && conditionResults.length > 0) { // Ensure at least one condition was evaluated
+      const finalInterpolationContext = {
+        ...baseInterpolationContext,
+        ...ruleSpecificInterpolationData,
+      };
 
-      // Populate interpolationData and preciseRelevantMetrics based on the conditions that led to the match
-      // This part needs careful implementation: we need to know which condition(s) made the rule pass,
-      // especially for OR logic. For now, let's assume the *last evaluated* condition that was true for OR,
-      // or all conditions for AND. This is a simplification and might need refinement.
-      // For a simple start, let's try to use the first condition's details if the rule matches.
-      // A more robust solution would track the specific condition(s) that caused the match.
-
-      if (rule.conditions.length > 0) {
-        const firstCondition = rule.conditions[0]; // Simplification for now
-        const metricName = firstCondition.metric;
-        const metricVal = calculatorData[metricName];
-        let compVal = firstCondition.value;
-        if (firstCondition.valuePath && businessTypeData && businessTypeData.benchmarks) {
-          const benchmarkVal = getNestedValue(businessTypeData.benchmarks, firstCondition.valuePath);
-          if (benchmarkVal !== undefined) compVal = benchmarkVal;
-        }
-
-        interpolationData['metricName'] = metricName;
-        interpolationData['metricValue'] = metricVal;
-        interpolationData['comparisonValue'] = compVal;
-        if (firstCondition.valuePath) {
-            interpolationData['benchmarkPath'] = firstCondition.valuePath;
-        }
-
-        if (metricVal !== undefined) preciseRelevantMetrics[metricName] = metricVal;
-        preciseRelevantMetrics[`comparison_${metricName}`] = compVal; // Example naming for comparison value
-      }
-
-      matchedRulesData.push({
-        rule,
-        interpolationData,
-        preciseRelevantMetrics,
-        businessTypeValue: businessTypeData?.value || 'generic',
-      });
+      const feedbackItem: FeedbackItem = {
+        id: `${rule.id}-${calculatorType}-${businessTypeData?.value || 'generic'}-${Date.now()}`,
+        title: interpolateString(rule.feedbackTemplate.title, finalInterpolationContext),
+        message: interpolateString(rule.feedbackTemplate.message, finalInterpolationContext),
+        severity: rule.feedbackTemplate.severity,
+        implication: rule.feedbackTemplate.implication ? interpolateString(rule.feedbackTemplate.implication, finalInterpolationContext) : undefined,
+        recommendation: rule.feedbackTemplate.recommendation ? interpolateString(rule.feedbackTemplate.recommendation, finalInterpolationContext) : undefined,
+        relevantMetrics: ruleRelevantMetrics,
+        link: rule.feedbackTemplate.link ? interpolateString(rule.feedbackTemplate.link, finalInterpolationContext) : undefined,
+      };
+      matchedFeedbackItems.push(feedbackItem);
     }
   }
 
-  // Sort matched rules by priority (descending)
-  matchedRulesData.sort((a, b) => (b.rule.priority || 0) - (a.rule.priority || 0));
+  matchedFeedbackItems.sort((a, b) => {
+    const priorityA = allRules.find(r => r.id === a.id.split('-')[1])?.priority || 0;
+    const priorityB = allRules.find(r => r.id === b.id.split('-')[1])?.priority || 0;
+    return priorityB - priorityA;
+  });
 
-  // Map sorted rules to FeedbackItem array
-  const applicableFeedback: FeedbackItem[] = matchedRulesData.map(data => ({
-    id: `${calculatorType}-${data.rule.id}-${data.businessTypeValue}`,
-    title: interpolateString(data.rule.feedbackTemplate.title, data.interpolationData),
-    message: interpolateString(data.rule.feedbackTemplate.message, data.interpolationData),
-    severity: data.rule.feedbackTemplate.severity,
-    implication: data.rule.feedbackTemplate.implication ? interpolateString(data.rule.feedbackTemplate.implication, data.interpolationData) : undefined,
-    recommendation: data.rule.feedbackTemplate.recommendation ? interpolateString(data.rule.feedbackTemplate.recommendation, data.interpolationData) : undefined,
-    relevantMetrics: data.preciseRelevantMetrics,
-    link: data.rule.feedbackTemplate.link,
-  }));
-
-  return applicableFeedback;
+  return matchedFeedbackItems;
 }
 
 // Example of how it might be used (will require actual rules and data):
