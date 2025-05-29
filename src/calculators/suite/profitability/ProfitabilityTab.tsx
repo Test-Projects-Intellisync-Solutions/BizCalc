@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, TrendingDown, TrendingUp, DollarSign, Target } from 'lucide-react';
+import { AlertCircle, TrendingDown, TrendingUp, DollarSign, Target, MessageSquareText } from 'lucide-react';
 import GuideCard from '@/components/ui/guide-card';
 import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import ProfitabilityForm from './ProfitabilityForm';
+import { businessTypes, type BusinessType } from '../../../data/businessTypes';
+import { allFeedbackRules, type FeedbackItem, type CalculatorType } from '../../../data/feedbackRules'; 
+import { generateFeedback } from '../../../utils/feedbackUtils'; 
+import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer'; 
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ProfitabilityChart from './ProfitabilityChart';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 export default function ProfitabilityTab() {
+  const [completionPercentage, setCompletionPercentage] = useState(0);
+  const [isFeedbackDrawerOpen, setIsFeedbackDrawerOpen] = useState(false); 
   const [metrics, setMetrics] = useState({
     revenue: 0,
     cogs: 0,
@@ -16,6 +26,8 @@ export default function ProfitabilityTab() {
     variableCostPerUnit: 0,
     fixedCosts: 0,
   });
+  const [selectedBusinessType, setSelectedBusinessType] = useState<string>(businessTypes[0]?.value || '');
+  const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]); 
 
   const handleImportData = (data: Record<string, unknown>) => {
     if (data.metrics && typeof data.metrics === 'object') {
@@ -23,6 +35,9 @@ export default function ProfitabilityTab() {
         ...prevMetrics,
         ...(data.metrics as object)
       }));
+    }
+    if (data.selectedBusinessType && typeof data.selectedBusinessType === 'string') {
+      setSelectedBusinessType(data.selectedBusinessType);
     }
   };
 
@@ -62,12 +77,61 @@ export default function ProfitabilityTab() {
     breakEvenRevenue,
   } = calculateMetrics();
 
+  const handleGetFeedback = () => {
+    const selectedBizTypeData = businessTypes.find(bt => bt.value === selectedBusinessType);
+    const calculated = calculateMetrics(); 
+
+    const calculatorData: Record<string, number | string | undefined> = {
+      grossMargin: calculated.grossMargin,
+      netMargin: calculated.netMargin,
+      contributionMarginRatio: calculated.contributionMarginRatio,
+      breakEvenUnits: calculated.breakEvenUnits,
+      breakEvenRevenue: calculated.breakEvenRevenue,
+      revenue: metrics.revenue,
+      cogs: metrics.cogs,
+      operatingExpenses: metrics.operatingExpenses,
+      fixedCosts: metrics.fixedCosts,
+      pricePerUnit: metrics.pricePerUnit,
+      variableCostPerUnit: metrics.variableCostPerUnit,
+    };
+
+    const filteredCalculatorData = Object.entries(calculatorData)
+      .filter(([_, value]) => value !== undefined && !isNaN(Number(value)))
+      .reduce((obj, [key, value]) => {
+        obj[key] = Number(value);
+        return obj;
+      }, {} as Record<string, number | string>);
+
+    const generatedItems = generateFeedback(
+      filteredCalculatorData,
+      selectedBizTypeData,
+      'profitability' as CalculatorType,
+      allFeedbackRules
+    );
+    setFeedbackItems(generatedItems);
+    setIsFeedbackDrawerOpen(true);
+  };
+
+  useEffect(() => {
+    const coreProfitabilityComplete = metrics.revenue > 0 && metrics.cogs >= 0 && metrics.operatingExpenses > 0;
+    const unitEconomicsComplete = metrics.pricePerUnit > 0 && metrics.variableCostPerUnit >= 0 && metrics.fixedCosts > 0;
+
+    let score = 0;
+    if (coreProfitabilityComplete) score++;
+    if (unitEconomicsComplete) score++;
+
+    if (score === 0) setCompletionPercentage(0);
+    else if (score === 1) setCompletionPercentage(50);
+    else setCompletionPercentage(100);
+  }, [metrics]);
+
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6 p-4 md:p-6 pb-16">
       <div className="flex justify-end">
         <ImportExport 
           calculatorType="profitability"
-          currentData={{ metrics }}
+          currentData={{ metrics, selectedBusinessType, completionPercentage }}
           onImport={handleImportData}
         />
       </div>
@@ -106,6 +170,43 @@ export default function ProfitabilityTab() {
           }
         ]}
       />
+
+      <div className="flex items-center justify-start gap-4 mb-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Label htmlFor="businessTypeSelectProfitability">Business Type</Label>
+          <Select
+            value={selectedBusinessType}
+            onValueChange={setSelectedBusinessType}
+          >
+            <SelectTrigger id="businessTypeSelectProfitability" className="w-[200px]">
+              <SelectValue placeholder="Select Business Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {businessTypes.map((type: BusinessType) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Placeholder for other potential global selectors for this tab */}
+      </div>
+
+      {/* Progress Bar and Feedback Trigger Section */}
+      <div className="my-6 px-1">
+        <div className="flex items-center gap-2 mb-1">
+          <Label htmlFor="profitabilityCompletionProgress" className="text-sm font-medium">Analysis Progress</Label>
+          {completionPercentage === 100 && (
+            <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={handleGetFeedback}>
+              <MessageSquareText className="h-4 w-4 text-primary" />
+              <span className="sr-only">View Feedback</span>
+            </Button>
+          )}
+        </div>
+        <Progress id="profitabilityCompletionProgress" value={completionPercentage} className="w-full" />
+      </div>
+
       <h2 className="text-3xl font-bold">Profitability & Break-Even Analysis</h2>
 
       {netMargin < 5 && metrics.revenue > 0 && (
@@ -199,5 +300,13 @@ export default function ProfitabilityTab() {
         </Card>
       </div>
     </div>
+
+      <FeedbackDrawer
+        isOpen={isFeedbackDrawerOpen}
+        onClose={() => setIsFeedbackDrawerOpen(false)}
+        feedbackItems={feedbackItems}
+        calculatorName="Profitability Analysis"
+      />
+    </>
   );
 }

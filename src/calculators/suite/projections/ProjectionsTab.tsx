@@ -1,17 +1,28 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import GuideCard from '@/components/ui/guide-card';
 import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
 import RevenueForm, { type RevenueStream } from './RevenueForm';
+import { businessTypes, type BusinessType } from '../../../data/businessTypes';
 import ExpenseForm, { type Expense } from './ExpenseForm';
 import ProjectionChart from './ProjectionChart';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { allFeedbackRules, type FeedbackItem, type CalculatorType } from '../../../data/feedbackRules'; 
+import { generateFeedback } from '../../../utils/feedbackUtils'; 
+import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer'; 
+import { MessageSquareText } from 'lucide-react';
 
 export default function ProjectionsTab() {
+  const [completionPercentage, setCompletionPercentage] = useState(0);
+  const [isFeedbackDrawerOpen, setIsFeedbackDrawerOpen] = useState(false); 
   const [revenueStreams, setRevenueStreams] = useState<RevenueStream[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [projectionMonths, setProjectionMonths] = useState(12);
+  const [selectedBusinessType, setSelectedBusinessType] = useState<string>(businessTypes[0]?.value || '');
+  const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]); 
 
   const handleImportData = (data: Record<string, unknown>) => {
     if (data.revenueStreams && Array.isArray(data.revenueStreams)) {
@@ -22,6 +33,9 @@ export default function ProjectionsTab() {
     }
     if (data.projectionMonths && typeof data.projectionMonths === 'number') {
       setProjectionMonths(data.projectionMonths);
+    }
+    if (data.selectedBusinessType && typeof data.selectedBusinessType === 'string') {
+      setSelectedBusinessType(data.selectedBusinessType);
     }
   };
 
@@ -43,12 +57,58 @@ export default function ProjectionsTab() {
 
   const { totalRevenue, totalExpenses, netCashFlow } = calculateTotals();
 
+  const handleGetFeedback = () => {
+    const selectedBizTypeData = businessTypes.find(bt => bt.value === selectedBusinessType);
+    const calculated = calculateTotals(); 
+
+    const calculatorData: Record<string, number | string | undefined> = {
+      totalRevenue: calculated.totalRevenue,
+      totalExpenses: calculated.totalExpenses,
+      netCashFlow: calculated.netCashFlow,
+      projectionMonths,
+      numberOfRevenueStreams: revenueStreams.length,
+      numberOfExpenseCategories: expenses.length,
+      // Potentially add average revenue per stream, average expense amount etc.
+      // Example: averageRevenuePerStream: revenueStreams.length > 0 ? calculated.totalRevenue / revenueStreams.length : 0,
+    };
+
+    const filteredCalculatorData = Object.entries(calculatorData)
+      .filter(([_, value]) => value !== undefined && !isNaN(Number(value)))
+      .reduce((obj, [key, value]) => {
+        obj[key] = Number(value);
+        return obj;
+      }, {} as Record<string, number | string>);
+
+    const generatedItems = generateFeedback(
+      filteredCalculatorData,
+      selectedBizTypeData,
+      'projections' as CalculatorType,
+      allFeedbackRules
+    );
+    setFeedbackItems(generatedItems);
+    setIsFeedbackDrawerOpen(true);
+  };
+
+  useEffect(() => {
+    const hasRevenue = revenueStreams.some(stream => stream.baseAmount > 0);
+    const hasExpenses = expenses.some(expense => expense.amount > 0);
+
+    if (hasRevenue && hasExpenses) {
+      setCompletionPercentage(100);
+    } else if (hasRevenue || hasExpenses) {
+      setCompletionPercentage(50);
+    } else {
+      setCompletionPercentage(0);
+    }
+  }, [revenueStreams, expenses]);
+
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6 p-4 md:p-6 pb-16">
       <div className="flex justify-end">
         <ImportExport 
           calculatorType="projections"
-          currentData={{ revenueStreams, expenses, projectionMonths }}
+          currentData={{ revenueStreams, expenses, projectionMonths, selectedBusinessType, completionPercentage }}
           onImport={handleImportData}
         />
       </div>
@@ -87,25 +147,59 @@ export default function ProjectionsTab() {
           }
         ]}
       />
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <h2 className="text-3xl font-bold">Revenue & Expense Projections</h2>
-        <div className="flex items-center gap-4">
-          <Label>Projection Period</Label>
-          <Select
-            value={projectionMonths.toString()}
-            onValueChange={(value) => setProjectionMonths(parseInt(value))}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="3">3 Months</SelectItem>
-              <SelectItem value="6">6 Months</SelectItem>
-              <SelectItem value="12">12 Months</SelectItem>
-              <SelectItem value="24">24 Months</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="businessTypeSelectProjections">Business Type</Label>
+            <Select
+              value={selectedBusinessType}
+              onValueChange={setSelectedBusinessType}
+            >
+              <SelectTrigger id="businessTypeSelectProjections" className="w-[200px]">
+                <SelectValue placeholder="Select Business Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {businessTypes.map((type: BusinessType) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="projectionPeriodSelectProjections">Projection Period</Label>
+            <Select
+              value={projectionMonths.toString()}
+              onValueChange={(value) => setProjectionMonths(parseInt(value))}
+            >
+              <SelectTrigger id="projectionPeriodSelectProjections" className="w-[180px]">
+                <SelectValue placeholder="Select Period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">3 Months</SelectItem>
+                <SelectItem value="6">6 Months</SelectItem>
+                <SelectItem value="12">12 Months</SelectItem>
+                <SelectItem value="24">24 Months</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+      </div>
+
+      {/* Progress Bar and Feedback Trigger Section */}
+      <div className="my-6 px-1">
+        <div className="flex items-center gap-2 mb-1">
+          <Label htmlFor="projectionsCompletionProgress" className="text-sm font-medium">Projections Setup Progress</Label>
+          {completionPercentage === 100 && (
+            <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={handleGetFeedback}>
+              <MessageSquareText className="h-4 w-4 text-primary" />
+              <span className="sr-only">View Feedback</span>
+            </Button>
+          )}
+        </div>
+        <Progress id="projectionsCompletionProgress" value={completionPercentage} className="w-full" />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -154,5 +248,13 @@ export default function ProjectionsTab() {
         </Card>
       </div>
     </div>
+
+      <FeedbackDrawer
+        isOpen={isFeedbackDrawerOpen}
+        onClose={() => setIsFeedbackDrawerOpen(false)}
+        feedbackItems={feedbackItems}
+        calculatorName="Financial Projections"
+      />
+    </>
   );
 }

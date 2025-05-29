@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button'; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Trash2, PlusCircle, Info } from 'lucide-react';
+import { Trash2, PlusCircle, Info, MessageSquareText } from 'lucide-react';
 import { 
   BarChart, 
   Bar,
@@ -14,9 +14,15 @@ import {
   CartesianGrid, 
   ResponsiveContainer,
   Cell,
+  Tooltip as RechartsTooltip, // Alias to avoid conflict with shadcn/ui Tooltip
 } from 'recharts';
 
 import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
+import { businessTypes, type BusinessType } from '@/data/businessTypes';
+import { Progress } from '@/components/ui/progress';
+import { allFeedbackRules, type FeedbackItem, type CalculatorType } from '../../../data/feedbackRules';
+import { generateFeedback } from '../../../utils/feedbackUtils';
+import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer';
 
 interface CostItem {
   id: string;
@@ -26,20 +32,67 @@ interface CostItem {
   isOneTime: boolean;
 }
 
-function StartupCostEstimator() {
+export default function StartupCostTab() {
   const [businessType, setBusinessType] = useState<string>('retail');
+  const [completionPercentage, setCompletionPercentage] = useState(0);
+  const [isFeedbackDrawerOpen, setIsFeedbackDrawerOpen] = useState(false);
+  const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
   const [items, setItems] = useState<CostItem[]>([
-    { id: 'startup1', name: 'Business Registration', amount: 500, category: 'Legal', isOneTime: true },
-    { id: 'startup2', name: 'Equipment', amount: 5000, category: 'Equipment', isOneTime: true },
-    { id: 'startup3', name: 'Rent Deposit', amount: 3000, category: 'Facilities', isOneTime: true },
-    { id: 'startup4', name: 'Initial Inventory', amount: 10000, category: 'Inventory', isOneTime: true },
-    { id: 'startup5', name: 'Website', amount: 2000, category: 'Marketing', isOneTime: true },
-    { id: 'startup6', name: 'Rent', amount: 1500, category: 'Facilities', isOneTime: false },
-    { id: 'startup7', name: 'Utilities', amount: 500, category: 'Facilities', isOneTime: false },
-    { id: 'startup8', name: 'Insurance', amount: 300, category: 'Insurance', isOneTime: false },
-    { id: 'startup9', name: 'Marketing', amount: 1000, category: 'Marketing', isOneTime: false },
-    { id: 'startup10', name: 'Employee Salaries', amount: 5000, category: 'Staffing', isOneTime: false },
+    { id: 'startup1', name: 'Business Registration', amount: 0, category: 'Legal', isOneTime: true },
+    { id: 'startup2', name: 'Equipment', amount: 0, category: 'Equipment', isOneTime: true },
+    { id: 'startup3', name: 'Rent Deposit', amount: 0, category: 'Facilities', isOneTime: true },
+    { id: 'startup4', name: 'Initial Inventory', amount: 0, category: 'Inventory', isOneTime: true },
+    { id: 'startup5', name: 'Website', amount: 0, category: 'Marketing', isOneTime: true },
+    { id: 'startup6', name: 'Rent', amount: 0, category: 'Facilities', isOneTime: false },
+    { id: 'startup7', name: 'Utilities', amount: 0, category: 'Facilities', isOneTime: false },
+    { id: 'startup8', name: 'Insurance', amount: 0, category: 'Insurance', isOneTime: false },
+    { id: 'startup9', name: 'Marketing', amount: 0, category: 'Marketing', isOneTime: false },
+    { id: 'startup10', name: 'Employee Salaries', amount: 0, category: 'Staffing', isOneTime: false },
   ]);
+
+  const handleGetFeedback = () => {
+    const selectedBizTypeData = businessTypes.find(bt => bt.value === businessType);
+    
+    const oneTime = items.filter(item => item.isOneTime).reduce((sum, item) => sum + item.amount, 0);
+    const monthly = items.filter(item => !item.isOneTime).reduce((sum, item) => sum + item.amount, 0);
+    const sixMonthOp = oneTime + (monthly * 6);
+
+    const calculatorData: Record<string, number | string | undefined> = {
+      totalOneTimeCosts: oneTime,
+      totalMonthlyCosts: monthly,
+      sixMonthOperating: sixMonthOp, 
+      totalStartupCosts: sixMonthOp, // Using sixMonthOp as the main "total startup cost"
+      numberOfCostItems: items.length,
+    };
+
+    const filteredCalculatorData = Object.entries(calculatorData)
+      .filter(([_, value]) => value !== undefined && !isNaN(Number(value)))
+      .reduce((obj, [key, value]) => {
+        obj[key] = Number(value);
+        return obj;
+      }, {} as Record<string, number | string>);
+
+    const generatedItems = generateFeedback(
+      filteredCalculatorData,
+      selectedBizTypeData,
+      'startupcost' as CalculatorType,
+      allFeedbackRules
+    );
+    setFeedbackItems(generatedItems);
+    setIsFeedbackDrawerOpen(true);
+  };
+
+  // Calculate completion percentage based on number of items with a non-zero amount
+  useEffect(() => {
+    if (items.length === 0) {
+      setCompletionPercentage(0);
+      return;
+    }
+    const filledItems = items.filter(item => item.amount > 0).length;
+    const totalItems = items.length;
+    const percentage = totalItems > 0 ? (filledItems / totalItems) * 100 : 0;
+    setCompletionPercentage(Math.round(percentage));
+  }, [items]);
 
   const handleItemChange = (id: string, field: keyof CostItem, value: any) => {
     setItems(prevItems => 
@@ -135,6 +188,39 @@ function StartupCostEstimator() {
           { id: 'restaurant14', name: 'Food & Beverage', amount: 10000, category: 'Inventory', isOneTime: false },
         ];
         break;
+      case 'saas':
+        templateItems = []; // Placeholder for SaaS template
+        break;
+      case 'manufacturing':
+        templateItems = []; // Placeholder for Manufacturing template
+        break;
+      case 'ecommerce':
+        templateItems = []; // Placeholder for E-commerce template
+        break;
+      case 'boutique':
+        templateItems = []; // Placeholder for Boutique template
+        break;
+      case 'coworking':
+        templateItems = []; // Placeholder for Co-working Space template
+        break;
+      case 'consulting':
+        templateItems = []; // Placeholder for Consulting Agency template
+        break;
+      case 'creative':
+        templateItems = []; // Placeholder for Creative Studio template
+        break;
+      case 'digitalMarketing':
+        templateItems = []; // Placeholder for Digital Marketing Agency template
+        break;
+      case 'eventPlanning':
+        templateItems = []; // Placeholder for Event Planning template
+        break;
+      case 'foodTruck':
+        templateItems = []; // Placeholder for Food Truck template
+        break;
+      case 'health':
+        templateItems = []; // Placeholder for Health & Wellness template
+        break;
       default:
         templateItems = items;
     }
@@ -183,53 +269,53 @@ function StartupCostEstimator() {
     }
   };
 
+
+
   return (
-    <TooltipProvider>
-      <div className="space-y-6">
-      <div className="flex justify-end">
-        <ImportExport 
-          calculatorType="startupCostEstimator"
-          currentData={{ items, businessType }}
-          onImport={handleImportData}
-        />
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Startup Cost Estimator</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Business Type</Label>
+    <>
+      <TooltipProvider>
+      <div className="p-4 md:p-6 pb-16">
+        <div className="flex justify-end">
+          <ImportExport
+            calculatorType="startupCostEstimator"
+            currentData={{ items, businessType, completionPercentage }}
+            onImport={handleImportData}
+          />
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Startup Cost Estimator</CardTitle>
+          </CardHeader>
+
+          {/* Progress Bar and Feedback Trigger Section */}
+          <div className="my-4 px-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Label htmlFor="completionProgress" className="text-sm font-medium">Estimate Progress</Label>
+              {completionPercentage === 100 && (
+                <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={handleGetFeedback}>
+                  <MessageSquareText className="h-4 w-4 text-primary" />
+                  <span className="sr-only">View Feedback</span>
+                </Button>
+              )}
+            </div>
+            <Progress id="completionProgress" value={completionPercentage} className="w-full" />
+          </div>
+          <CardContent className="space-y-4">
             <Select value={businessType} onValueChange={applyTemplate}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Select a business type template" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="boutique">Boutique</SelectItem>
-                <SelectItem value="coworking">Co-working Space</SelectItem>
-                <SelectItem value="consulting">Consulting Agency</SelectItem>
-                <SelectItem value="creative">Creative Studio</SelectItem>
-                <SelectItem value="digitalMarketing">Digital Marketing Agency</SelectItem>
-                <SelectItem value="ecommerce">E-commerce Store</SelectItem>
-                <SelectItem value="eventPlanning">Event Planning</SelectItem>
-                <SelectItem value="foodTruck">Food Truck</SelectItem>
-                <SelectItem value="health">Health &amp; Wellness</SelectItem>
-                <SelectItem value="homeBased">Home-based Business</SelectItem>
-                <SelectItem value="manufacturing">Manufacturing &amp; Production</SelectItem>
-                <SelectItem value="mobileApp">Mobile App Development</SelectItem>
-                <SelectItem value="online">Online Business</SelectItem>
-                <SelectItem value="realEstate">Real Estate Agency</SelectItem>
-                <SelectItem value="restaurant">Restaurant</SelectItem>
-                <SelectItem value="retail">Retail Store</SelectItem>
-                <SelectItem value="service">Service Business</SelectItem>
-                <SelectItem value="socialEnterprise">Social Enterprise</SelectItem>
-                <SelectItem value="subscription">Subscription Box Service</SelectItem>
-                <SelectItem value="tech">Tech Startup</SelectItem>
+                {businessTypes.map((type: BusinessType) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-          </div>
 
           <div className="space-y-4">
+            {/* ... */}
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Startup Costs</h3>
               <Button variant="outline" size="sm" onClick={addItem}>
@@ -389,7 +475,19 @@ function StartupCostEstimator() {
                 <div className="text-2xl font-bold">${oneTimeCosts.toLocaleString()}</div>
               </Card>
               <Card className="p-4 border-l-4 border-secondary">
-                <div className="text-sm text-muted-foreground">6-Month Operating</div>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  6-Month Operating
+                  <TooltipProvider>
+                    <Tooltip delayDuration={300}>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 ml-1.5 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Estimated operating costs for the first 6 months. <br />This is a common period for initial cash flow planning.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <div className="text-2xl font-bold">${sixMonthOperating.toLocaleString()}</div>
               </Card>
               <Card className="p-4 border-l-4 border-destructive">
@@ -403,7 +501,7 @@ function StartupCostEstimator() {
               <CardTitle className="text-lg mb-6">Costs by Category</CardTitle>
               <div className="space-y-4">
                 {categoryData.map((item, index) => {
-                  const percentage = (item.value / totalStartupCosts) * 100;
+                  const percentage = totalStartupCosts > 0 ? (item.value / totalStartupCosts) * 100 : 0;
                   return (
                     <div key={item.name} className="space-y-2">
                       <div className="flex justify-between text-sm">
@@ -450,7 +548,13 @@ function StartupCostEstimator() {
                       tickLine={false}
                       width={100}
                     />
-                   
+                    <RechartsTooltip 
+                      cursor={{ fill: 'hsl(var(--muted) / 0.5)' }}
+                      contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: 'var(--radius)' }}
+                      labelStyle={{ color: 'hsl(var(--foreground))' }}
+                      itemStyle={{ color: 'hsl(var(--foreground))' }}
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, null]}
+                    />
                     <Bar 
                       dataKey="value" 
                       radius={[0, 4, 4, 0]}
@@ -471,8 +575,14 @@ function StartupCostEstimator() {
         </CardContent>
       </Card>
       </div>
-    </TooltipProvider>
+      </TooltipProvider>
+
+      <FeedbackDrawer
+        isOpen={isFeedbackDrawerOpen}
+        onClose={() => setIsFeedbackDrawerOpen(false)}
+        feedbackItems={feedbackItems}
+        calculatorName="Startup Cost Analysis"
+      />
+    </>
   );
 };
-
-export default StartupCostEstimator;

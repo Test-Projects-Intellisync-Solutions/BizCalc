@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import StartupCostEstimator from '@/calculators/suite/startup/StartupCostEstimator/StartupCostEstimator';
+import StartupCostTab from '@/calculators/suite/startupcost/StartupCostTab';
 import BurnRate from '@/calculators/suite/startup/BurnRate/BurnRate';
 import ProjectionsTab from '@/calculators/suite/projections/ProjectionsTab';
 import CashFlowTab from '@/calculators/suite/cashflow/CashFlowTab';
@@ -73,7 +73,7 @@ const CalculatorsPage = () => {
         
         <TabsContent value="startup" className="space-y-6">
           <div className="grid gap-6">
-            <StartupCostEstimator />
+            <StartupCostTab />
             <BurnRate />
           </div>
         </TabsContent>
