@@ -627,6 +627,66 @@ export const allFeedbackRules: FeedbackRule[] = [
   },
 
   // ===== STARTUP COST CALCULATOR RULES =====
+  // Positive feedback for well-balanced startup costs
+  {
+    id: 'rule-startup-well-balanced',
+    calculatorType: 'startupcost',
+    conditions: [
+      {
+        metric: 'numberOfCostItems',
+        operator: '>=',
+        value: 8, // Reasonable number of cost items
+      },
+      {
+        metric: 'costsByCategory.Legal.percentageOfTotal',
+        operator: '>',
+        value: 0, // Has legal costs
+      },
+      {
+        metric: 'costsByCategory.Marketing.percentageOfTotal',
+        operator: '>',
+        value: 0, // Has marketing costs
+      },
+      {
+        metric: 'costsByCategory.Equipment.percentageOfTotal',
+        operator: '>',
+        value: 0, // Has equipment costs
+      },
+    ],
+    conditionLogic: 'AND',
+    feedbackTemplate: {
+      title: 'Well-Balanced Startup Costs',
+      message: 'Great job! Your startup costs are well-distributed across multiple categories with {numberOfCostItems} cost items. This balanced approach helps ensure all aspects of your business are properly funded.',
+      severity: 'good',
+      implication: 'A well-balanced set of startup costs suggests thorough planning and reduces the risk of unexpected shortfalls in any one area.',
+      recommendation: 'Continue to monitor your actual spending against these estimates as you launch your business. Consider setting aside a small contingency fund if you haven\'t already.',
+    },
+    priority: 30,
+  },
+  // Positive feedback for including a contingency fund
+  {
+    id: 'rule-startup-has-contingency',
+    calculatorType: 'startupcost',
+    conditions: [
+      {
+        metric: 'contingencyAmount',
+        operator: '>=',
+        // Calculate 10% of total startup costs for comparison
+        valuePath: 'totalStartupCosts',
+        value: 0, // This will be overridden by valuePath if available
+      },
+    ],
+    // Custom evaluation function will be needed in generateFeedback to handle the percentage calculation
+    feedbackTemplate: {
+      title: 'Great Contingency Planning',
+      message: 'Excellent! You\'ve included a contingency fund of ${contingencyAmount:currency:0}, which is a smart move for handling unexpected expenses.',
+      severity: 'good',
+      implication: 'A contingency fund provides a financial buffer that can help your business navigate unforeseen challenges during the critical startup phase.',
+      recommendation: 'Aim for a contingency fund of 10-20% of your total startup costs. Consider maintaining this fund even after launch to handle unexpected operational expenses.',
+    },
+    priority: 35,
+  },
+  // Original warning for high costs
   {
     id: 'rule-startup-high-cost',
     calculatorType: 'startupcost',

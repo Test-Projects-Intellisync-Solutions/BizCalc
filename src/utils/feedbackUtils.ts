@@ -219,52 +219,97 @@ export function generateFeedback(
       }
     }
 
-    if (rule.id === 'rule-startup-category-dominance' && calculatorType === 'startupcost') {
-      const costsByCategory = getNestedValue(calculatorData, 'costsByCategory') as Record<string, number>;
-      const totalStartupCosts = getNestedValue(calculatorData, 'totalStartupCosts') as number;
+    // Special handling for startup cost calculator rules
+    if (calculatorType === 'startupcost') {
+      const totalStartupCosts = getNestedValue(calculatorData, 'totalStartupCosts') as number || 0;
+      const costsByCategory = getNestedValue(calculatorData, 'costsByCategory') as Record<string, number> || {};
+      const contingencyAmount = getNestedValue(calculatorData, 'contingencyAmount') as number || 0;
 
-      if (costsByCategory && totalStartupCosts && totalStartupCosts > 0 && rule.conditions.length > 0) {
+      // Handle category dominance rule
+      if (rule.id === 'rule-startup-category-dominance' && rule.conditions.length > 0) {
         const thresholdPercentage = rule.conditions[0].value as number; // Assuming the first condition holds the threshold
 
-        for (const categoryName in costsByCategory) {
-          const categoryCost = costsByCategory[categoryName];
-          const categoryPercentage = (categoryCost / totalStartupCosts) * 100;
+        if (costsByCategory && totalStartupCosts > 0) {
+          for (const categoryName in costsByCategory) {
+            const categoryCost = costsByCategory[categoryName];
+            const categoryPercentage = (categoryCost / totalStartupCosts) * 100;
 
-          if (categoryPercentage > thresholdPercentage) {
-            const dominantCategoryInterpolationData = {
-              ...baseInterpolationContext,
-              dominantCategoryName: categoryName,
-              dominantCategoryPercentage: applyFormat(categoryPercentage, 'number', '1'), // Format to 1 decimal place
-              categoryCost: applyFormat(categoryCost, 'currency'),
-              totalStartupCosts: applyFormat(totalStartupCosts, 'currency'),
-            };
+            if (categoryPercentage > thresholdPercentage) {
+              const dominantCategoryInterpolationData = {
+                ...baseInterpolationContext,
+                dominantCategoryName: categoryName,
+                dominantCategoryPercentage: applyFormat(categoryPercentage, 'number', '1'),
+                categoryCost: applyFormat(categoryCost, 'currency'),
+                totalStartupCosts: applyFormat(totalStartupCosts, 'currency'),
+              };
 
-            const dominantCategoryRelevantMetrics = {
-              [categoryName]: applyFormat(categoryCost, 'currency'),
-              [`${categoryName}_percentage`]: applyFormat(categoryPercentage, 'percent', '1'),
-              totalStartupCosts: applyFormat(totalStartupCosts, 'currency'),
-              threshold: `${thresholdPercentage}%`
-            };
+              const dominantCategoryRelevantMetrics = {
+                [categoryName]: applyFormat(categoryCost, 'currency'),
+                [`${categoryName}_percentage`]: applyFormat(categoryPercentage, 'percent', '1'),
+                totalStartupCosts: applyFormat(totalStartupCosts, 'currency'),
+                threshold: `${thresholdPercentage}%`
+              };
 
-            const feedbackItem: FeedbackItem = {
-              id: `${rule.id}-${categoryName}-${Date.now()}`,
-              title: interpolateString(rule.feedbackTemplate.title, dominantCategoryInterpolationData),
-              message: interpolateString(rule.feedbackTemplate.message, dominantCategoryInterpolationData),
-              severity: rule.feedbackTemplate.severity,
-              implication: rule.feedbackTemplate.implication ? interpolateString(rule.feedbackTemplate.implication, dominantCategoryInterpolationData) : undefined,
-              recommendation: rule.feedbackTemplate.recommendation ? interpolateString(rule.feedbackTemplate.recommendation, dominantCategoryInterpolationData) : undefined,
-              relevantMetrics: dominantCategoryRelevantMetrics,
-              link: rule.feedbackTemplate.link ? interpolateString(rule.feedbackTemplate.link, dominantCategoryInterpolationData) : undefined,
-              uiTarget: {
-                scope: 'category',
-                identifier: categoryName,
-              },
-            };
-            matchedFeedbackItems.push(feedbackItem);
+              const feedbackItem: FeedbackItem = {
+                id: `${rule.id}-${categoryName}-${Date.now()}`,
+                title: interpolateString(rule.feedbackTemplate.title, dominantCategoryInterpolationData),
+                message: interpolateString(rule.feedbackTemplate.message, dominantCategoryInterpolationData),
+                severity: rule.feedbackTemplate.severity,
+                implication: rule.feedbackTemplate.implication ? interpolateString(rule.feedbackTemplate.implication, dominantCategoryInterpolationData) : undefined,
+                recommendation: rule.feedbackTemplate.recommendation ? interpolateString(rule.feedbackTemplate.recommendation, dominantCategoryInterpolationData) : undefined,
+                relevantMetrics: dominantCategoryRelevantMetrics,
+                link: rule.feedbackTemplate.link ? interpolateString(rule.feedbackTemplate.link, dominantCategoryInterpolationData) : undefined,
+                uiTarget: {
+                  scope: 'category',
+                  identifier: categoryName,
+                },
+              };
+              matchedFeedbackItems.push(feedbackItem);
+            }
           }
         }
+        continue; // Skip standard condition processing for this rule
       }
-      continue; // Skip standard condition processing for this special rule
+
+      // Handle contingency fund rule
+      if (rule.id === 'rule-startup-has-contingency' && totalStartupCosts > 0) {
+        const contingencyPercentage = (contingencyAmount / totalStartupCosts) * 100;
+        const minRecommendedContingency = totalStartupCosts * 0.1; // 10% of total costs
+        const maxRecommendedContingency = totalStartupCosts * 0.2; // 20% of total costs
+        
+        // Only show positive feedback if contingency is at least 10%
+        if (contingencyAmount >= minRecommendedContingency) {
+          const contingencyInterpolationData = {
+            ...baseInterpolationContext,
+            contingencyAmount,
+            contingencyPercentage: applyFormat(contingencyPercentage, 'number', '1'),
+            totalStartupCosts: applyFormat(totalStartupCosts, 'currency'),
+            minRecommendedContingency: applyFormat(minRecommendedContingency, 'currency'),
+            maxRecommendedContingency: applyFormat(maxRecommendedContingency, 'currency'),
+          };
+
+          const feedbackItem: FeedbackItem = {
+            id: `${rule.id}-${Date.now()}`,
+            title: interpolateString(rule.feedbackTemplate.title, contingencyInterpolationData),
+            message: interpolateString(rule.feedbackTemplate.message, contingencyInterpolationData),
+            severity: rule.feedbackTemplate.severity,
+            implication: rule.feedbackTemplate.implication ? interpolateString(rule.feedbackTemplate.implication, contingencyInterpolationData) : undefined,
+            recommendation: rule.feedbackTemplate.recommendation ? interpolateString(rule.feedbackTemplate.recommendation, contingencyInterpolationData) : undefined,
+            relevantMetrics: {
+              'Contingency Fund': applyFormat(contingencyAmount, 'currency'),
+              'Contingency %': applyFormat(contingencyPercentage, 'percent', '1'),
+              'Total Startup Costs': applyFormat(totalStartupCosts, 'currency'),
+              'Recommended Range': `${applyFormat(minRecommendedContingency, 'currency')} - ${applyFormat(maxRecommendedContingency, 'currency')}`
+            },
+            uiTarget: {
+              scope: 'summaryMetric',
+              identifier: 'contingencyFund',
+            },
+          };
+          matchedFeedbackItems.push(feedbackItem);
+        }
+        continue; // Skip standard condition processing for this rule
+      }
     }
 
     const ruleConditionLogic = rule.conditionLogic || 'AND';
