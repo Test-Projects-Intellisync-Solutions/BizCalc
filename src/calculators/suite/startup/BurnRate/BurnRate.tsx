@@ -105,147 +105,158 @@ export default function BurnRate() {
 
   return (
     <Drawer open={isFeedbackDrawerOpen} onOpenChange={setIsFeedbackDrawerOpen}>
-      <Card>
-      <GuideCard
-        title="Burn Rate Calculator Guide"
-        steps={[
-          {
-            title: "Enter Available Capital",
-            description: "Input your total available cash or funding"
-          },
-          {
-            title: "Add Monthly Expenses",
-            description: "Enter your total monthly operating costs"
-          },
-          {
-            title: "Review Runway",
-            description: "Check how many months your capital will last"
-          }
-        ]}
-        interpretations={[
-          {
-            title: "Runway < 6 months",
-            description: "Critical - immediate action needed to extend runway"
-          },
-          {
-            title: "Runway 6-12 months",
-            description: "Plan fundraising or revenue growth strategies"
-          },
-          {
-            title: "Runway > 12 months",
-            description: "Healthy position, focus on growth and optimization"
-          }
-        ]}
-      />
-      <CardHeader>
-                <div className="flex justify-between items-center">
-          <CardTitle>Burn Rate Calculator</CardTitle>
-          {completionPercentage === 100 && (
-            <DrawerTrigger asChild>
-              <Button variant="outline" size="icon">
-                <MessageSquareText className="h-4 w-4" />
-              </Button>
-            </DrawerTrigger>
-          )}
+      <div className="p-4 md:p-6 pb-16">
+        <div className="mb-6">
+          <GuideCard
+            title="Burn Rate Calculator Guide"
+            steps={[
+              {
+                title: "Enter Available Capital",
+                description: "Input your total available cash or funding"
+              },
+              {
+                title: "Add Monthly Expenses",
+                description: "Enter your total monthly operating costs"
+              },
+              {
+                title: "Review Runway",
+                description: "Check how many months your capital will last"
+              }
+            ]}
+            interpretations={[
+              {
+                title: "Runway < 6 months",
+                description: "Critical - immediate action needed to extend runway"
+              },
+              {
+                title: "Runway 6-12 months",
+                description: "Plan fundraising or revenue growth strategies"
+              },
+              {
+                title: "Runway > 12 months",
+                description: "Healthy position, focus on growth and optimization"
+              }
+            ]}
+          />
         </div>
-        <CardDescription>
-          Calculate how long your available capital will last based on monthly expenses.
-          Fill in both fields to see your runway and get feedback.
-        </CardDescription>
-        {/* Progress indicator commented out during development
-        <div className="mt-4">
-          <Progress value={completionPercentage} className="w-full" />
+        <div className="flex justify-end">
+          <ImportExport
+            calculatorType="burnRate"
+            currentData={calculatorData}
+            onImport={handleImport}
+          />
         </div>
-        */}
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="businessType">Business Type</Label>
-            <Select
-              value={selectedBusinessType?.value || ''}
-              onValueChange={(valueString) => {
-                const typeObj = businessTypes.find(bt => bt.value === valueString);
-                setSelectedBusinessType(typeObj || null);
-              }}
-            >
-              <SelectTrigger id="businessType">
-                <SelectValue placeholder="Select Business Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {businessTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="capital">Available Capital</Label>
-            <Input
-              id="capital"
-              type="number"
-              min="0"
-              value={availableCapital || ''}
-              onChange={(e) => handleCapitalChange(e.target.value)}
-              placeholder="0.00"
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="expenses">Monthly Expenses</Label>
-            <Input
-              id="expenses"
-              type="number"
-              min="0"
-              value={monthlyExpenses || ''}
-              onChange={(e) => handleExpensesChange(e.target.value)}
-              placeholder="0.00"
-            />
-          </div>
-
-          <div className="pt-4 border-t">
+        <Card>
+          <CardHeader>
             <div className="flex justify-between items-center">
-              <Label className="text-lg font-semibold">Runway (Months)</Label>
-              <span className="text-2xl font-bold">{calculateRunway()}</span>
+              <CardTitle>Burn Rate Calculator</CardTitle>
+              {completionPercentage === 100 && (
+                <DrawerTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <MessageSquareText className="h-4 w-4" />
+                  </Button>
+                </DrawerTrigger>
+              )}
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              {monthlyExpenses > 0
-                ? `At your current burn rate, your capital will last approximately ${calculateRunway()} months.`
-                : 'Enter your monthly expenses to calculate runway.'}
-            </p>
-          </div>
+            <CardDescription>
+              Calculate how long your available capital will last based on monthly expenses.
+              Fill in both fields to see your runway and get feedback.
+            </CardDescription>
+            {/* Progress indicator commented out during development
+            <div className="mt-4">
+              <Progress value={completionPercentage} className="w-full" />
+            </div>
+            */}
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="businessType">Business Type</Label>
+                <Select
+                  value={selectedBusinessType?.value || ''}
+                  onValueChange={(valueString) => {
+                    const typeObj = businessTypes.find(bt => bt.value === valueString);
+                    setSelectedBusinessType(typeObj || null);
+                  }}
+                >
+                  <SelectTrigger id="businessType">
+                    <SelectValue placeholder="Select Business Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {businessTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="mt-4">
-            <ImportExport
-              calculatorType="burnRate"
-              currentData={calculatorData}
-              onImport={handleImport}
-              className="w-full"
-            />
-          </div>
-        </div>
-      </CardContent>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Burn Rate & Runway Feedback</DrawerTitle>
-          <DrawerDescription>
-            Contextual insights for your burn rate.
-          </DrawerDescription>
-        </DrawerHeader>
-        <div className="p-4">
-          <p>Detailed feedback based on your capital and expenses will appear here.</p>
-          {/* Placeholder for actual feedback content */}
-        </div>
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button variant="outline">Close</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Card>
+              <div className="grid gap-2">
+                <Label htmlFor="capital">Available Capital</Label>
+                <Input
+                  id="capital"
+                  type="number"
+                  min="0"
+                  value={availableCapital || ''}
+                  onChange={(e) => handleCapitalChange(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="expenses">Monthly Expenses</Label>
+                <Input
+                  id="expenses"
+                  type="number"
+                  min="0"
+                  value={monthlyExpenses || ''}
+                  onChange={(e) => handleExpensesChange(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="pt-4 border-t">
+                <div className="flex justify-between items-center">
+                  <Label className="text-lg font-semibold">Runway (Months)</Label>
+                  <span className="text-2xl font-bold">{calculateRunway()}</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {monthlyExpenses > 0
+                    ? `At your current burn rate, your capital will last approximately ${calculateRunway()} months.`
+                    : 'Enter your monthly expenses to calculate runway.'}
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <ImportExport
+                  calculatorType="burnRate"
+                  currentData={calculatorData}
+                  onImport={handleImport}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </CardContent>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Burn Rate & Runway Feedback</DrawerTitle>
+              <DrawerDescription>
+                Contextual insights for your burn rate.
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="p-4">
+              <p>Detailed feedback based on your capital and expenses will appear here.</p>
+              {/* Placeholder for actual feedback content */}
+            </div>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button variant="outline">Close</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Card>
+      </div>
     </Drawer>
   );
 }

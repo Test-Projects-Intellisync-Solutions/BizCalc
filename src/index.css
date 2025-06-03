@@ -2,6 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme CSS Variables */
+@layer base {
+  :root {
+    /* Solid Colors from Screenshot Palette */
+    --app-name-color: 224 30% 20%; /* Dark Gray for App Name */
+    --service-title-blue: 210 100% 50%; /* Bright Blue for 'Our Services' */
+
+    /* Base UI Colors (can be adjusted) */
+    --background: 0 0% 100%; /* White for page background */
+    --foreground: 224 30% 20%; /* Default text */
+    --card: 0 0% 100%; /* Card background */
+    --card-foreground: 224 30% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 30% 20%;
+    --primary: 221 83% 53%; /* Default primary if not using gradients */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 262 83% 58%; /* Default secondary if not using gradients */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --border: 214 32% 91%; /* Default border */
+    --input: 214 32% 91%;
+    --ring: 210 100% 50%; /* Using service blue for focus rings */
+
+    /* Gradient Start/End Points */
+    --gradient-primary-start: 270 80% 60%; /* Purple */
+    --gradient-primary-end: 220 90% 65%;   /* Blue */
+    --gradient-heading-start: 300 90% 70%; /* Pink */
+    --gradient-heading-end: 200 90% 70%;   /* Light Blue */
+
+    /* Service Card Gradients - Light Mode */
+    --gradient-card-blue: linear-gradient(to bottom right, hsl(205, 90%, 60%), hsl(225, 95%, 75%));
+    --gradient-card-orange: linear-gradient(to bottom right, hsl(30, 100%, 60%), hsl(50, 100%, 70%));
+    --gradient-card-pink: linear-gradient(to bottom right, hsl(300, 90%, 70%), hsl(270, 85%, 75%));
+    --gradient-card-green: linear-gradient(135deg, hsl(140, 90%, 25%), hsl(160, 95%, 35%));
+
+    /* Semantic Colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 224 30% 20%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --app-name-color: 0 0% 95%;
+    --service-title-blue: 210 100% 60%;
+
+    --background: 220 15% 10%; /* Darker page background */
+    --foreground: 0 0% 95%;
+    --card: 220 15% 15%; /* Darker card background */
+    --card-foreground: 0 0% 95%;
+    --popover: 220 15% 10%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 262 89% 65%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 10% 25%;
+    --muted-foreground: 215 20.2% 75.1%;
+    --accent: 220 10% 25%;
+    --accent-foreground: 0 0% 98%;
+    --border: 215 20% 30%;
+    --input: 215 20% 30%;
+    --ring: 210 100% 60%;
+
+    /* Gradient Start/End Points */
+    --gradient-primary-start: 270 80% 65%;
+    --gradient-primary-end: 220 90% 70%;
+    --gradient-heading-start: 300 90% 75%;
+    --gradient-heading-end: 200 90% 75%;
+
+    /* Service Card Gradients - Dark Mode */
+    --gradient-card-blue: linear-gradient(to bottom right, hsl(205, 90%, 65%), hsl(225, 95%, 80%));
+    --gradient-card-orange: linear-gradient(to bottom right, hsl(30, 100%, 65%), hsl(50, 100%, 75%));
+    --gradient-card-pink: linear-gradient(to bottom right, hsl(300, 90%, 75%), hsl(270, 85%, 80%));
+    --gradient-card-green: linear-gradient(135deg, hsl(140, 95%, 15%), hsl(140, 95%, 10%));
+
+    /* Semantic Colors */
+    --destructive: 0 74% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 60%;
+    --warning-foreground: 224 30% 20%;
+  }
+}
+
 @layer base {
   h1 {
     @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
@@ -28,6 +121,38 @@
   
   .stat-highlight {
     @apply font-semibold text-primary;
+  }
+
+  /* Vibrant Documentation Page Cards */
+  .docs-gradient-card {
+    @apply rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 w-full !important;
+    background-image: var(--gradient) !important;
+    color: white !important;
+    border: none !important;
+  }
+  .docs-gradient-card-header {
+    @apply pb-3 !important;
+  }
+  .docs-gradient-card-icon-wrapper {
+    @apply p-3 bg-white/20 rounded-full;
+  }
+  .docs-gradient-card-icon {
+    @apply h-6 w-6 text-white;
+  }
+  .docs-gradient-card-title {
+    @apply text-lg font-bold text-white !important;
+  }
+  .docs-gradient-card .docs-gradient-card-header .docs-gradient-card-description {
+    @apply text-sm text-white opacity-90 !important;
+  }
+  .docs-gradient-card-content {
+    @apply p-4; /* Default padding for content area */
+  }
+  .docs-gradient-card-item-button {
+    @apply w-full text-left p-2 rounded-md hover:bg-white/10 transition-colors;
+  }
+  .docs-gradient-card-item-text {
+    @apply text-sm text-white group-hover:text-gray-50 group-hover:underline;
   }
 }
 

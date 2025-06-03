@@ -12,8 +12,7 @@ import { generateFeedback } from '../../../utils/feedbackUtils';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FinancialData } from './types';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+// import { Progress } from '@/components/ui/progress'; // Commented out during development
 import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer'; // New FeedbackDrawer import
 
 // Helper to determine border class based on feedback
@@ -79,41 +78,6 @@ export default function RatiosTab() {
   const [isFeedbackDrawerOpen, setIsFeedbackDrawerOpen] = useState(false);
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
 
-  const handleGetFeedback = () => {
-    const selectedBizTypeData = businessTypes.find(bt => bt.value === selectedBusinessType);
-
-    const calculatorData: Record<string, number | string | undefined> = {
-      currentRatio: allCalculatedRatios.currentRatio,
-      quickRatio: allCalculatedRatios.quickRatio,
-      cashRatio: allCalculatedRatios.cashRatio,
-      grossMargin: allCalculatedRatios.grossMargin,
-      operatingMargin: allCalculatedRatios.operatingMargin,
-      netMargin: allCalculatedRatios.netMargin,
-      roa: allCalculatedRatios.roa,
-      roe: allCalculatedRatios.roe,
-      debtToEquity: allCalculatedRatios.debtToEquity,
-      debtRatio: allCalculatedRatios.debtRatio,
-      interestCoverage: allCalculatedRatios.interestCoverage,
-      revenueGrowth: allCalculatedRatios.revenueGrowth,
-      netIncomeGrowth: allCalculatedRatios.netIncomeGrowth,
-    };
-
-    const filteredCalculatorData = Object.entries(calculatorData)
-      .filter(([_, value]) => value !== undefined && !isNaN(Number(value))) // Ensure value is defined and a number
-      .reduce((obj, [key, value]) => {
-        obj[key] = Number(value); // Store as number
-        return obj;
-      }, {} as Record<string, number | string>)
-
-    const generatedItems = generateFeedback(
-      filteredCalculatorData,
-      selectedBizTypeData, // generateFeedback handles if this is undefined
-      'ratios' as CalculatorType,
-      allFeedbackRules
-    );
-    setFeedbackItems(generatedItems);
-    setIsFeedbackDrawerOpen(true);
-  };
 
   // Interface for the results of calculateRatios
   interface RatioCalculationResults {
@@ -266,10 +230,10 @@ export default function RatiosTab() {
       <div className="space-y-6 p-4 md:p-6 pb-24">
         <ImportExport 
           calculatorType="ratios"
-          currentData={{ ...financialData, selectedBusinessType } as Record<string, unknown>} // Corrected currentData and cast
+          currentData={{ ...financialData, selectedBusinessType } as Record<string, unknown>} 
           currentFeedbackItems={feedbackItems}
           onImport={(data, importedFeedbackItems?: FeedbackItem[]) => {
-            setFinancialData(data as unknown as FinancialData); // Corrected cast
+            setFinancialData(data as unknown as FinancialData); 
             if (importedFeedbackItems) {
               setFeedbackItems(importedFeedbackItems);
               if (importedFeedbackItems.length > 0) {
@@ -279,11 +243,7 @@ export default function RatiosTab() {
           }} 
         />
         
-        <div className="my-4 flex justify-center">
-          <Button onClick={handleGetFeedback} disabled={completionPercentage < 100}>
-            <MessageSquareText className="mr-2 h-4 w-4" /> Get Feedback & Insights
-          </Button>
-        </div>
+       
 
         {/* Progress indicator section commented out during development
         <div className="space-y-2 p-4 border rounded-lg shadow">
@@ -300,9 +260,7 @@ export default function RatiosTab() {
         </div>
         */}
 
-          <Button onClick={() => setIsFeedbackDrawerOpen(true)} variant="outline" className="w-full md:w-auto">
-            <MessageSquareText className="mr-2 h-4 w-4" /> View Feedback & Insights
-          </Button>
+         
 
           <GuideCard 
             title="Understanding Financial Ratios"

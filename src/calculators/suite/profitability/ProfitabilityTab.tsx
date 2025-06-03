@@ -87,40 +87,6 @@ export default function ProfitabilityTab() {
     (item) => item.uiTarget?.scope === 'chart'
   );
 
-  const handleGetFeedback = () => {
-    const selectedBizTypeData = businessTypes.find(bt => bt.value === selectedBusinessType);
-    const calculated = calculateMetrics(); 
-
-    const calculatorData: Record<string, number | string | undefined> = {
-      grossMargin: calculated.grossMargin,
-      netMargin: calculated.netMargin,
-      contributionMarginRatio: calculated.contributionMarginRatio,
-      breakEvenUnits: calculated.breakEvenUnits,
-      breakEvenRevenue: calculated.breakEvenRevenue,
-      revenue: metrics.revenue,
-      cogs: metrics.cogs,
-      operatingExpenses: metrics.operatingExpenses,
-      fixedCosts: metrics.fixedCosts,
-      pricePerUnit: metrics.pricePerUnit,
-      variableCostPerUnit: metrics.variableCostPerUnit,
-    };
-
-    const filteredCalculatorData = Object.entries(calculatorData)
-      .filter(([_, value]) => value !== undefined && !isNaN(Number(value)))
-      .reduce((obj, [key, value]) => {
-        obj[key] = Number(value);
-        return obj;
-      }, {} as Record<string, number | string>);
-
-    const generatedItems = generateFeedback(
-      filteredCalculatorData,
-      selectedBizTypeData,
-      'profitability' as CalculatorType,
-      allFeedbackRules
-    );
-    setFeedbackItems(generatedItems);
-    setIsFeedbackDrawerOpen(true);
-  };
 
   useEffect(() => {
     const coreProfitabilityComplete = metrics.revenue > 0 && metrics.cogs >= 0 && metrics.operatingExpenses > 0;

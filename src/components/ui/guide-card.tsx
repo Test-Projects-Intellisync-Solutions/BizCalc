@@ -15,7 +15,7 @@ interface GuideCardProps {
 
 export default function GuideCard({ title, steps, interpretations }: GuideCardProps) {
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 bg-blue-50/50 shadow-sm dark:bg-blue-900/20">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CircleHelp className="h-5 w-5" />

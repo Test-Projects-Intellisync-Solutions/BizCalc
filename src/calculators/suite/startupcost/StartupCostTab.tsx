@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button'; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Trash2, PlusCircle, Info, MessageSquareText } from 'lucide-react';
+import { Trash2, PlusCircle, Info } from 'lucide-react';
 import { 
   BarChart, 
   Bar,
@@ -18,8 +18,9 @@ import {
 } from 'recharts';
 
 import { ImportExport } from '@/components/ui/UIComponents/ImportExport';
+import GuideCard from '@/components/ui/guide-card';
 import { businessTypes, type BusinessType } from '@/data/businessTypes';
-import { Progress } from '@/components/ui/progress';
+// import { Progress } from '@/components/ui/progress'; For future use
 import { allFeedbackRules, type FeedbackItem, type CalculatorType } from '../../../data/feedbackRules';
 import { generateFeedback } from '../../../utils/feedbackUtils';
 import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer';
@@ -50,43 +51,6 @@ export default function StartupCostTab() {
     { id: 'startup10', name: 'Employee Salaries', amount: 0, category: 'Staffing', isOneTime: false },
   ]);
 
-  const handleGetFeedback = () => {
-    const selectedBizTypeData = businessTypes.find(bt => bt.value === businessType);
-    
-    const oneTime = items.filter(item => item.isOneTime).reduce((sum, item) => sum + item.amount, 0);
-    const monthly = items.filter(item => !item.isOneTime).reduce((sum, item) => sum + item.amount, 0);
-    const sixMonthOp = oneTime + (monthly * 6);
-
-    const costsByCategory: Record<string, number> = items.reduce((acc, item) => {
-      acc[item.category] = (acc[item.category] || 0) + item.amount;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const calculatorData: Record<string, any> = {
-      totalOneTimeCosts: oneTime,
-      totalMonthlyCosts: monthly,
-      sixMonthOperating: sixMonthOp,
-      totalStartupCosts: sixMonthOp, // Using sixMonthOp as the main "total startup cost"
-      numberOfCostItems: items.length,
-      costsByCategory: costsByCategory,
-    };
-
-    const filteredCalculatorData = Object.entries(calculatorData)
-      .filter(([_, value]) => value !== undefined && !isNaN(Number(value)))
-      .reduce((obj, [key, value]) => {
-        obj[key] = Number(value);
-        return obj;
-      }, {} as Record<string, number | string>);
-
-    const generatedItems = generateFeedback(
-      filteredCalculatorData,
-      selectedBizTypeData,
-      'startupCosts' as CalculatorType,
-      allFeedbackRules
-    );
-    setFeedbackItems(generatedItems);
-    setIsFeedbackDrawerOpen(true);
-  };
 
   const getSummaryCardClassName = (metricName: string, defaultClasses: string): string => {
     const relevantFeedback = feedbackItems.find(
@@ -310,6 +274,24 @@ export default function StartupCostTab() {
             currentData={{ items, businessType }}
             currentFeedbackItems={feedbackItems}
             onImport={handleImportData}
+          />
+        </div>
+        <div className="mb-6">
+          <GuideCard
+            title="Understanding Your Startup Costs"
+            steps={[
+              { title: "Select Template or Start Fresh:", description: "Choose a business type template to pre-fill common startup expenses, or begin by adding items manually." },
+              { title: "Input Cost Items:", description: "Add, edit, or remove expenses. For each, specify the name, amount, category (e.g., Legal, Equipment, Marketing), and whether it's a one-time or recurring monthly cost." },
+              { title: "Review Summaries & Charts:", description: "Observe the calculated totals and visualizations to understand your financial outlay." },
+              { title: "Check Feedback (If Available):", description: "If feedback features are enabled, review insights based on your entries and business type." }
+            ]}
+            interpretations={[
+              { title: "Total One-Time Costs:", description: "The sum of all initial, non-recurring expenses required to launch (e.g., equipment purchase, deposits)." },
+              { title: "Total Monthly Operating Costs:", description: "The sum of all recurring expenses you'll incur each month to keep the business running (e.g., rent, salaries, utilities)." },
+              { title: "Estimated Initial Funding (First 3 Months):", description: "Calculated as: Total One-Time Costs + (Total Monthly Operating Costs x 3). This provides a baseline for your immediate funding needs, covering initial setup and the first few months of operation." },
+              { title: "Cost Breakdown & Distribution:", description: "These charts visualize where your money is allocated across different categories. Use this to identify major expense areas and potential opportunities for optimization." },
+              { title: "General Tip:", description: "Be thorough and realistic with your estimates. It's often wise to slightly overestimate to create a financial buffer for unforeseen expenses." }
+            ]}
           />
         </div>
         <Card>

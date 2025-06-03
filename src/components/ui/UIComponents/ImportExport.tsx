@@ -43,6 +43,7 @@ interface ImportExportProps {
   currentData: Record<string, unknown>;
   currentFeedbackItems?: FeedbackItem[]; // Added currentFeedbackItems
   onImport?: (data: Record<string, unknown>, feedbackItems?: FeedbackItem[]) => void; // Modified onImport signature
+
   className?: string;
 }
 
@@ -55,7 +56,7 @@ export const ImportExport: React.FC<ImportExportProps> = ({
   currentData,
   currentFeedbackItems, // Added currentFeedbackItems
   onImport,
-  className = '',
+  className = 'mb-4',
 }) => {
   const handleExport = () => {
     const exportData: ExportData = {

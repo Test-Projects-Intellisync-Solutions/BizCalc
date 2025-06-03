@@ -109,40 +109,6 @@ export default function ProjectionsTab() {
 
   const { totalRevenue, totalExpenses, netCashFlow } = calculateTotals();
 
-  const handleGetFeedback = () => {
-    const selectedBizTypeData = businessTypes.find(bt => bt.value === selectedBusinessType);
-    const calculated = calculateTotals(); 
-
-    const calculatorData: Record<string, number | string | undefined> = {
-      totalRevenue: calculated.totalRevenue,
-      totalExpenses: calculated.totalExpenses,
-      netCashFlow: calculated.netCashFlow,
-      projectionMonths,
-      numberOfRevenueStreams: revenueStreams.length,
-      numberOfExpenseCategories: expenses.length,
-      expenseToRevenueRatio: calculated.totalRevenue > 0 ? (calculated.totalExpenses / calculated.totalRevenue) * 100 : undefined, // as percentage
-      // Potentially add average revenue per stream, average expense amount etc.
-      // Example: averageRevenuePerStream: revenueStreams.length > 0 ? calculated.totalRevenue / revenueStreams.length : 0,
-    };
-
-    const filteredCalculatorData = Object.entries(calculatorData)
-      .filter(([_, value]) => value !== undefined && !isNaN(Number(value)))
-      .reduce((obj, [key, value]) => {
-        obj[key] = Number(value);
-        return obj;
-      }, {} as Record<string, number | string>);
-
-    const generatedItems = generateFeedback(
-      filteredCalculatorData,
-      selectedBizTypeData,
-      'projections' as CalculatorType,
-      allFeedbackRules
-    );
-    setFeedbackItems(generatedItems);
-    if (generatedItems.length > 0) {
-      setIsFeedbackDrawerOpen(true);
-    }
-  };
 
   useEffect(() => {
     const newHighlightPoints: HighlightPoint[] = [];
