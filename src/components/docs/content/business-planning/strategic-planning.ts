@@ -1,8 +1,7 @@
 export const strategicPlanning = {
   id: "strategic-planning",
   label: "Strategic Planning",
-  content: `
-# Strategic Planning Guide
+  content: `# Strategic Planning Guide
 
 A comprehensive guide to developing and implementing a strategic plan for your business. This guide is designed to help Canadian entrepreneurs—especially those in Chatham-Kent, Ontario—set and achieve long-term goals with clarity and purpose.
 

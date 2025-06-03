@@ -67,18 +67,48 @@ const CalculatorsPage = () => {
 
   return (
     <div className="container mx-auto py-6 px-4">
-      <h1 className="text-3xl font-bold mb-6">Business Calculators</h1>
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-[hsl(var(--gradient-heading-start))] to-[hsl(var(--gradient-heading-end))] bg-clip-text text-transparent">
+          Business Calculators
+        </h1>
+        <p className="text-muted-foreground mt-2">Powerful tools to analyze and optimize your business finances</p>
+      </div>
       <Tabs 
         value={activeTab}
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6">
-          <TabsTrigger value="startup">Start-up & Costs</TabsTrigger>
-          <TabsTrigger value="projections">Revenue & Expenses</TabsTrigger>
-          <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
-          <TabsTrigger value="profitability">Profitability</TabsTrigger>
-          <TabsTrigger value="ratios">Financial Ratios</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6 gap-2 p-1 bg-muted/20 rounded-lg">
+          <TabsTrigger 
+            value="startup"
+            className="font-semibold data-[state=active]:bg-background data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--gradient-heading-start))] data-[state=active]:to-[hsl(var(--gradient-heading-end))] data-[state=active]:bg-clip-text data-[state=active]:text-transparent data-[state=active]:shadow-sm transition-all hover:bg-muted/50"
+          >
+            Start-up & Costs
+          </TabsTrigger>
+          <TabsTrigger 
+            value="projections"
+            className="font-semibold data-[state=active]:bg-background data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--gradient-heading-start))] data-[state=active]:to-[hsl(var(--gradient-heading-end))] data-[state=active]:bg-clip-text data-[state=active]:text-transparent data-[state=active]:shadow-sm transition-all hover:bg-muted/50"
+          >
+            Revenue & Expenses
+          </TabsTrigger>
+          <TabsTrigger 
+            value="cashflow"
+            className="font-semibold data-[state=active]:bg-background data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--gradient-heading-start))] data-[state=active]:to-[hsl(var(--gradient-heading-end))] data-[state=active]:bg-clip-text data-[state=active]:text-transparent data-[state=active]:shadow-sm transition-all hover:bg-muted/50"
+          >
+            Cash Flow
+          </TabsTrigger>
+          <TabsTrigger 
+            value="profitability"
+            className="font-semibold data-[state=active]:bg-background data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--gradient-heading-start))] data-[state=active]:to-[hsl(var(--gradient-heading-end))] data-[state=active]:bg-clip-text data-[state=active]:text-transparent data-[state=active]:shadow-sm transition-all hover:bg-muted/50"
+          >
+            Profitability
+          </TabsTrigger>
+          <TabsTrigger 
+            value="ratios"
+            className="font-semibold data-[state=active]:bg-background data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(var(--gradient-heading-start))] data-[state=active]:to-[hsl(var(--gradient-heading-end))] data-[state=active]:bg-clip-text data-[state=active]:text-transparent data-[state=active]:shadow-sm transition-all hover:bg-muted/50"
+          >
+            Financial Ratios
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="startup" className="space-y-6">

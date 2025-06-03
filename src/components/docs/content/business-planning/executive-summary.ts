@@ -1,7 +1,7 @@
 export const executiveSummaryTemplate = {
   id: "executive-summary",
   label: "Executive Summary",
-  content: `# Executive Summary 
+  content: ` # Executive Summary
 
 A step-by-step guide to crafting an engaging and persuasive executive summary that grabs investors' attention and clearly communicates your business opportunity. This template is designed for Canadian entrepreneurs with examples rooted in Chatham-Kent, Ontario.
 

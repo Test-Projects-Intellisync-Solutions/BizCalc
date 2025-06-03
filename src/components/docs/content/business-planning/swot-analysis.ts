@@ -1,8 +1,7 @@
 export const swotAnalysis = {
   id: "swot-analysis",
   label: "SWOT Analysis",
-  content: `
-# SWOT Analysis Guide
+  content: `# SWOT Analysis Guide
 
 A comprehensive guide to analyzing your business's Strengths, Weaknesses, Opportunities, and Threats. Use this template to gain a clear picture of your competitive position and to guide your strategic decisions with actionable insights.
 

@@ -1,4 +1,5 @@
-import { Calculator } from 'lucide-react';
+import { Calculator, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -8,7 +9,7 @@ export default function Footer() {
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               <Calculator className="h-6 w-6 text-primary" />
-              <h3 className="text-lg font-semibold">BusinessOne</h3>
+              <h3 className="text-lg font-semibold">IntelliSync Solutions</h3>
             </div>
             <p className="text-sm text-muted-foreground">
               Professional financial planning and analysis tools for modern enterprises.
@@ -55,7 +56,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="space-y-3">
+          {/* Resources section - Commented out for future use */}
+          {/* <div className="space-y-3">
             <h4 className="font-semibold">Resources</h4>
             <ul className="space-y-2">
               <li>
@@ -71,35 +73,44 @@ export default function Footer() {
                 <a href="/support" className="text-sm text-muted-foreground hover:text-primary">Support</a>
               </li>
             </ul>
-          </div>
-
+          </div> */}
+          
           <div className="space-y-3">
-            <h4 className="font-semibold">Company</h4>
+            <h4 className="font-semibold">Legal</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/about" className="text-sm text-muted-foreground hover:text-primary">About</a>
+                <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary">
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <a href="/careers" className="text-sm text-muted-foreground hover:text-primary">Careers</a>
+                <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary">
+                  Terms of Service
+                </Link>
               </li>
               <li>
-                <a href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact</a>
-              </li>
-              <li>
-                <a href="mailto:chris.june@intellisync.ca" className="text-sm text-muted-foreground hover:text-primary">Email Us</a>
+                <Link to="/cookies" className="text-sm text-muted-foreground hover:text-primary">
+                  Cookie Policy
+                </Link>
               </li>
             </ul>
+            <div className="pt-4 mt-4 border-t border-gray-200">
+              <div className="flex items-center space-x-2 text-sm text-green-600">
+                <Shield className="h-4 w-4" />
+                <span>Privacy Protected</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="border-t py-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <div className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} IntelliSync Solutions. All rights reserved.
+            {new Date().getFullYear()} IntelliSync Solutions. All rights reserved.
           </div>
           <div className="flex space-x-4 text-sm text-muted-foreground">
-            <a href="/privacy" className="hover:text-primary">Privacy Policy</a>
-            <a href="/terms" className="hover:text-primary">Terms of Service</a>
-            <a href="/cookies" className="hover:text-primary">Cookie Policy</a>
+            <Link to="/privacy-policy" className="hover:text-primary">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-primary">Terms of Service</Link>
+            <Link to="/cookies" className="hover:text-primary">Cookie Policy</Link>
           </div>
         </div>
       </div>

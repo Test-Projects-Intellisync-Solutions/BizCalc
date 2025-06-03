@@ -1,8 +1,7 @@
 export const operationalPlan = {
   id: "operational-plan",
   label: "Operational Plan",
-  content: `
-# Operational Plan Guide
+  content: `# Operational Plan Guide
 
 A comprehensive guide to planning and managing your business operations. Designed with Canadian entrepreneurs in mind, this guide offers practical examples from Chatham-Kent, Ontario, to help you run your business efficiently, control costs, and maintain quality while scaling up.
 

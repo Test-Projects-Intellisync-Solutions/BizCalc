@@ -1,8 +1,7 @@
 export const marketingPlan = {
   id: "marketing-plan",
   label: "Marketing Plan Template",
-  content: `
-# Marketing Plan Guide
+  content: `# Marketing Plan Guide
 
 A comprehensive guide to creating and implementing an effective marketing strategy. This plan is tailored for Canadian businesses and includes practical examples from Chatham-Kent, Ontario. Whether you’re launching a new artisanal bakery or expanding a local service, this guide will help you attract and retain customers.
 

@@ -1,8 +1,7 @@
 export const fundingStrategy = {
   id: "funding-strategy",
   label: "Funding & Investment Strategy",
-  content: `
-# Funding & Investment Strategy Guide
+  content: `# Funding & Investment Strategy Guide
 
 A comprehensive guide to understanding and securing funding for your business. This guide breaks down funding options, timelines, and best practices while using plain language and real-world examples from Chatham-Kent, Ontario. Whether you're just getting started or looking to scale, this guide has you covered—no magic money tree required.
 

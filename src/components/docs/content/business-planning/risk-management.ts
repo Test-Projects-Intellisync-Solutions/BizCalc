@@ -1,8 +1,7 @@
 export const riskManagementPlan = {
   id: "risk-management",
   label: "Risk Management Plan",
-  content: `
-# Risk Management Plan Guide
+  content: `# Risk Management Plan Guide
 
 A practical guide to identifying, assessing, and managing business risks. This plan is tailored for Canadian businesses, with examples drawn from the Chatham-Kent, Ontario market. It’s designed to help you protect your business, prevent problems before they occur, and minimize the impact of potential issues.
 

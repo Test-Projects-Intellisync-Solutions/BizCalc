@@ -73,7 +73,8 @@ export default function Hero() {
       >
         Leverage powerful financial tools and insights to drive your business growth.
       </motion.p>
-      <motion.div
+      
+      {/* <motion.div
         className="mt-8 flex gap-4 justify-center"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -82,29 +83,29 @@ export default function Hero() {
         <Button
           size="lg"
           className="relative text-lg font-semibold px-8 py-4 rounded-full shadow-xl bg-gradient-to-br from-fuchsia-500 via-blue-500 to-cyan-400 text-white overflow-hidden hover:scale-105 hover:shadow-2xl transition-all duration-300 group"
-        >
-          <motion.span
+        > */}
+          {/* <motion.span
             className="absolute left-0 top-0 w-full h-full pointer-events-none"
             initial={{ opacity: 0 }}
             whileHover={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
             {/* Glow effect */}
-            <span className="absolute inset-0 bg-purple-400/30 blur-2xl rounded-full animate-pulse" />
-          </motion.span>
-          <span className="relative z-10 flex items-center gap-2">
+            {/* <span className="absolute inset-0 bg-purple-400/30 blur-2xl rounded-full animate-pulse" />
+          </motion.span> */} 
+          {/* <span className="relative z-10 flex items-center gap-2">
             <Sparkles className="h-6 w-6 animate-spin-slow text-purple-200 drop-shadow" />
             Get Started
-          </span>
-        </Button>
-        <Button
+          </span> */}
+        {/* </Button> */}
+        {/* <Button
           size="lg"
           variant="outline"
           className="relative text-lg font-semibold px-8 py-4 rounded-full shadow-lg group"
         >
           Learn More
-        </Button>
-      </motion.div>
+        </Button> */}
+      {/* </motion.div> */}
     </section>
   );
 }

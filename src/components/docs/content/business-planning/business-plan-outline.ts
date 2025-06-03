@@ -1,8 +1,7 @@
 export const businessPlanOutline = {
   id: "business-plan-outline",
   label: "Business Plan Outline",
-  content: `
-# Business Plan Outline
+  content: ` # Business Plan Outline
 
 A comprehensive guide to crafting a detailed business plan that not only meets professional standards but also tells your unique story. This guide is designed with Canadian entrepreneurs in mind, using real-life examples from Chatham-Kent, Ontario to illustrate best practices and local context.
 

@@ -1,8 +1,7 @@
 export const financialProjections = {
   id: "financial-projections",
   label: "Financial Projections",
-  content: `
-# Financial Projections Guide
+  content: `# Financial Projections Guide
 
 A comprehensive guide to developing realistic financial projections that help you plan for growth, secure funding, and steer your business toward success. This guide is tailored for Canadian entrepreneurs, featuring examples based on the Chatham-Kent, Ontario market.
 

@@ -1,8 +1,7 @@
 export const competitiveAnalysis = {
   id: "competitive-analysis",
   label: "Competitive Analysis",
-  content: `
-# Competitive Analysis Guide
+  content: ` # Competitive Analysis Guide
 
 A comprehensive and practical guide to understanding and analyzing your competition. Designed with Canadian entrepreneurs in mind, this guide uses real-world examples from Chatham-Kent, Ontario to help you identify opportunities, manage threats, and position your business for success.
 

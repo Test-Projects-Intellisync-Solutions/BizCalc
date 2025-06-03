@@ -139,11 +139,12 @@ export default function BurnRate() {
             ]}
           />
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end mb-6">
           <ImportExport
             calculatorType="burnRate"
             currentData={calculatorData}
             onImport={handleImport}
+            className="w-full"
           />
         </div>
         <Card>
@@ -228,14 +229,7 @@ export default function BurnRate() {
                 </p>
               </div>
 
-              <div className="mt-4">
-                <ImportExport
-                  calculatorType="burnRate"
-                  currentData={calculatorData}
-                  onImport={handleImport}
-                  className="w-full"
-                />
-              </div>
+
             </div>
           </CardContent>
           <DrawerContent>

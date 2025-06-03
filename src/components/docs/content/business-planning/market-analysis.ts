@@ -1,8 +1,7 @@
 export const marketAnalysisReport = {
   id: "market-analysis",
   label: "Market Analysis Report",
-  content: `
-# Market Analysis Guide
+  content: `# Market Analysis Guide
 
 A comprehensive guide to analyzing your market opportunity and understanding your customers. This guide is designed for Canadian entrepreneurs and includes practical examples from Chatham-Kent, Ontario. By diving deep into market size, trends, customer demographics, and competitive dynamics, you’ll be well-equipped to make informed business decisions.
 
