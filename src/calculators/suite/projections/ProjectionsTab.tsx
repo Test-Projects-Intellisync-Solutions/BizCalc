@@ -12,28 +12,14 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { allFeedbackRules, type FeedbackItem, type CalculatorType } from '../../../data/feedbackRules'; 
 import { generateFeedback } from '../../../utils/feedbackUtils'; 
-import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer'; 
+import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer';
 import { MessageSquareText } from 'lucide-react';
+import { getSummaryCardClasses } from '@/utils/ui/getSummaryCardClasses';
 
-const getSummaryCardClassNameForProjections = (metricName: string, currentFeedbackItems: FeedbackItem[]): string => {
-  const relevantFeedback = currentFeedbackItems.find(
-    (item) => item.uiTarget?.scope === 'summaryMetric' && item.uiTarget?.identifier === metricName
-  );
-
-  if (relevantFeedback) {
-    switch (relevantFeedback.severity) {
-      case 'critical':
-        return 'border-l-4 border-red-500';
-      case 'warning':
-        return 'border-l-4 border-yellow-500';
-      case 'good':
-        return 'border-l-4 border-green-500';
-      default:
-        return '';
-    }
-  }
-  return '';
-};
+const getSummaryCardClassNameForProjections = (
+  metricName: string,
+  currentFeedbackItems: FeedbackItem[]
+): string => getSummaryCardClasses(metricName, currentFeedbackItems);
 
 export default function ProjectionsTab() {
   const [completionPercentage, setCompletionPercentage] = useState(0);
