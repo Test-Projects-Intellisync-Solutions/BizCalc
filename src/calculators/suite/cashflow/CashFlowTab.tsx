@@ -13,6 +13,7 @@ import { allFeedbackRules, type FeedbackItem, type CalculatorType } from '../../
 import { FeedbackDrawer } from '../../../components/feedback/FeedbackDrawer'; 
 import CashFlowChart from './CashFlowChart';
 // import { Progress } from '@/components/ui/progress'; For future use
+import { getSummaryCardClasses } from '@/utils/ui/getSummaryCardClasses';
 
 export default function CashFlowTab() {
   const [items, setItems] = useState<CashFlowItem[]>([]);
@@ -83,39 +84,10 @@ export default function CashFlowTab() {
 
 
 
-  const getSummaryCardClassNameForCashFlow = (identifier: string, currentFeedbackItems: FeedbackItem[]): string => {
-    const relevantFeedback = currentFeedbackItems.filter(
-      (item) =>
-        item.uiTarget?.scope === 'summaryMetric' &&
-        item.uiTarget?.identifier === identifier
-    );
-
-    if (relevantFeedback.length === 0) {
-      return '';
-    }
-
-    let highestSeverity: FeedbackItem['severity'] = 'info';
-    if (relevantFeedback.some((item) => item.severity === 'critical')) {
-      highestSeverity = 'critical';
-    } else if (relevantFeedback.some((item) => item.severity === 'warning')) {
-      highestSeverity = 'warning';
-    } else if (relevantFeedback.some((item) => item.severity === 'good')) {
-      highestSeverity = 'good';
-    }
-
-    switch (highestSeverity) {
-      case 'critical':
-        return 'border-l-4 border-red-500';
-      case 'warning':
-        return 'border-l-4 border-yellow-500';
-      case 'good':
-        return 'border-l-4 border-green-500';
-      case 'info':
-        return 'border-l-4 border-blue-500';
-      default:
-        return '';
-    }
-  };
+  const getSummaryCardClassNameForCashFlow = (
+    identifier: string,
+    currentFeedbackItems: FeedbackItem[]
+  ): string => getSummaryCardClasses(identifier, currentFeedbackItems);
 
   useEffect(() => {
     const hasOpeningBalance = openingBalance > 0;

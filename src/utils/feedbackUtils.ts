@@ -1,5 +1,7 @@
 import { FeedbackItem, FeedbackRule, FeedbackCondition, CalculatorType } from '../data/feedbackRules';
 import { BusinessType, Benchmarks } from '../data/businessTypes';
+import { evaluateCondition } from './feedback/evaluateCondition';
+import { getFlattenedBenchmarks } from './feedback/getFlattenedBenchmarks';
 
 /**
  * Safely retrieves a nested value from an object using a dot-separated path.
@@ -117,64 +119,6 @@ interface MatchedRuleData {
   businessTypeValue: string; 
 }
 
-/**
- * Helper to get all benchmark values for interpolation, flattening nested structures.
- */
-function getFlattenedBenchmarks(businessTypeData?: BusinessType): Record<string, any> {
-  if (!businessTypeData?.benchmarks) return {};
-  const flattened: Record<string, any> = {};
-  Object.entries(businessTypeData.benchmarks).forEach(([key, value]) => {
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      Object.entries(value).forEach(([subKey, subValue]) => {
-        flattened[`${key}.${subKey}`] = subValue;
-      });
-    } else {
-      flattened[key] = value;
-    }
-  });
-  return flattened;
-}
-
-/**
- * Evaluates a single feedback condition.
- */
-function evaluateCondition(
-  condition: FeedbackCondition,
-  metricValue: any,
-  comparisonValue: any
-): boolean {
-  // Handle 'exists' and 'notExists' first as they don't need comparisonValue or numeric conversion
-  if (condition.operator === 'exists') {
-    return metricValue !== undefined && metricValue !== null;
-  }
-  if (condition.operator === 'notExists') {
-    return metricValue === undefined || metricValue === null;
-  }
-
-  const numMetricValue = Number(metricValue);
-  const numComparisonValue = Number(comparisonValue);
-
-  // For other operators, if either value is not a number (and it's not an existence check),
-  // or if comparisonValue is undefined (which can happen if a comparisonMetric path is bad),
-  // then the condition typically can't be meaningfully evaluated for numeric comparisons.
-  if (comparisonValue === undefined || isNaN(numMetricValue) || isNaN(numComparisonValue)) {
-    // Allow string comparison for '==' and '!=' as a fallback if values are not numbers
-    if (condition.operator === '==') return String(metricValue) === String(comparisonValue);
-    if (condition.operator === '!=') return String(metricValue) !== String(comparisonValue);
-    // For other operators (>, <, >=, <=), non-numeric or missing comparisonValue means condition fails
-    return false; 
-  }
-
-  switch (condition.operator) {
-    case '>':  return numMetricValue > numComparisonValue;
-    case '<':  return numMetricValue < numComparisonValue;
-    case '>=': return numMetricValue >= numComparisonValue;
-    case '<=': return numMetricValue <= numComparisonValue;
-    case '==': return numMetricValue === numComparisonValue; // Numeric comparison
-    case '!=': return numMetricValue !== numComparisonValue; // Numeric comparison
-    default:   return false;
-  }
-}
 
 export function generateFeedback(
   calculatorData: Record<string, any>, // Allow any data type for flexibility
