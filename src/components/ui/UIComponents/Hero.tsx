@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import { Calculator, Home, Sparkles } from "lucide-react";
+import { Calculator, Divide, Plus, Pi, Percent} from "lucide-react";
 import { useEffect } from "react";
 
 export default function Hero() {
@@ -24,35 +23,6 @@ export default function Hero() {
           backgroundSize: "200% 200%",
         }}
       />
-      {/* Sparkles */}
-      <AnimatePresence>
-        {[...Array(7)].map((_, i) => (
-          <motion.span
-            key={i}
-            className="absolute"
-            initial={{
-              opacity: 0,
-              scale: 0.8,
-              x: Math.random() * 700 - 350,
-              y: Math.random() * 120 - 60,
-            }}
-            animate={{
-              opacity: [0, 1, 0],
-              scale: [0.8, 1.3, 0.8],
-              rotate: [0, 360],
-            }}
-            transition={{
-              duration: Math.random() * 2 + 2,
-              delay: Math.random() * 3,
-              repeat: Infinity,
-              repeatType: "loop",
-            }}
-            style={{ left: "50%", top: "50%" }}
-          >
-            <Sparkles className="h-8 w-8 text-purple-400 drop-shadow-lg" />
-          </motion.span>
-        ))}
-      </AnimatePresence>
       <span className="relative inline-block mb-6">
         <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl transform -rotate-6"></div>
         <Calculator className="h-20 w-20 text-primary relative animate-bounce" />
@@ -73,6 +43,45 @@ export default function Hero() {
       >
         Leverage powerful financial tools and insights to drive your business growth.
       </motion.p>
+      
+      {/* Animated Math Icons */}
+      <div className="relative h-40 w-full mt-8">
+        <AnimatePresence>
+          {[...Array(7)].map((_, i) => {
+            const icons = [Divide, Plus, Pi, Percent];
+            const Icon = icons[Math.floor(Math.random() * icons.length)];
+            const colors = ['text-purple-400', 'text-blue-400', 'text-pink-400', 'text-cyan-400'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            return (
+              <motion.span
+                key={i}
+                className="absolute"
+                initial={{
+                  opacity: 0,
+                  scale: 0.8,
+                  x: Math.random() * 800 - 400,
+                  y: Math.random() * 80 - 40,
+                }}
+                animate={{
+                  opacity: [0, 1, 0],
+                  scale: [0.8, 1.3, 0.8],
+                  y: [0, -40, 0],
+                }}
+                transition={{
+                  duration: Math.random() * 2 + 2,
+                  delay: Math.random() * 3,
+                  repeat: Infinity,
+                  repeatType: "loop",
+                }}
+                style={{ left: "50%", top: "50%" }}
+              >
+                <Icon className={`h-8 w-8 ${color} drop-shadow-lg`} />
+              </motion.span>
+            );
+          })}
+        </AnimatePresence>
+      </div>
       
       {/* <motion.div
         className="mt-8 flex gap-4 justify-center"

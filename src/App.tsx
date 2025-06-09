@@ -1,6 +1,6 @@
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Calculator, Wrench, FileText, LayoutDashboard } from 'lucide-react';
 
 // Layout
 import AppLayout from './AppLayout'; 
@@ -45,12 +45,20 @@ function MainApp({ currentTab, onTabChange }: MainAppProps) {
       >
         {/* Home Tab */}
         <TabsContent value="home" className="space-y-12">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <LayoutDashboard className="h-5 w-5 text-primary" />
+            Home
+          </div>
           <Hero />
           <Services />
         </TabsContent>
 
         {/* Calculators Tab */}
         <TabsContent value="calculators">
+          <div className="flex items-center gap-2 text-lg font-semibold mb-4">
+            <Calculator className="h-5 w-5 text-primary" />
+            Calculators
+          </div>
           <Suspense fallback={<PageLoading />}>
             <CalculatorsPage />
           </Suspense>
@@ -58,6 +66,10 @@ function MainApp({ currentTab, onTabChange }: MainAppProps) {
 
         {/* Tools Tab */}
         <TabsContent value="tools">
+          <div className="flex items-center gap-2 text-lg font-semibold mb-4">
+            <Wrench className="h-5 w-5 text-primary" />
+            Tools
+          </div>
           <Suspense fallback={<PageLoading />}>
             <ToolsPage />
           </Suspense>
@@ -65,6 +77,10 @@ function MainApp({ currentTab, onTabChange }: MainAppProps) {
 
         {/* Docs Tab */}
         <TabsContent value="docs">
+          <div className="flex items-center gap-2 text-lg font-semibold mb-4">
+            <FileText className="h-5 w-5 text-primary" />
+            Docs
+          </div>
           <Suspense fallback={<PageLoading />}>
             <DocsPage />
           </Suspense>
