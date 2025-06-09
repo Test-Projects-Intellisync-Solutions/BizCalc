@@ -179,7 +179,7 @@ function InfiniteScroller({ cards }: { cards: typeof services }) {
       transition: {
         repeat: Infinity,
         repeatType: "loop",
-        duration: 130, // Scroll speed (lower = faster)
+        duration: 90, // Scroll speed (lower = faster)
         ease: "linear"
       }
     });
@@ -231,7 +231,7 @@ function InfiniteScroller({ cards }: { cards: typeof services }) {
 
 export default function Services() {
   return (
-    <section className="py-20">
+    <section className="py-8">
       <div className="max-w-6xl mx-auto px-4">
         <motion.h2
           className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-fuchsia-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent"

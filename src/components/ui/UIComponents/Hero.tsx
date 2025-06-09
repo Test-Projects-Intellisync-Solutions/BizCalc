@@ -1,5 +1,31 @@
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import { Calculator, Divide, Plus, Pi, Percent} from "lucide-react";
+import { 
+  Calculator, 
+  Divide, 
+  Plus, 
+  Minus, 
+  X, 
+  Pi, 
+  Percent, 
+  Equal, 
+  EqualNotIcon, 
+  Infinity as InfinityIcon,
+  BarChart2, 
+  PieChart, 
+  LineChart, 
+  BarChart3, 
+  PieChart as PieChartIcon,
+  LineChart as LineChartIcon,
+
+  Sigma,
+ 
+  Parentheses,
+  Braces,
+  Brackets,
+  DollarSign,
+  Hash,
+  Asterisk
+} from "lucide-react";
 import { useEffect } from "react";
 
 export default function Hero() {
@@ -12,7 +38,7 @@ export default function Hero() {
   }, [controls]);
 
   return (
-    <section className="relative flex flex-col items-center justify-center py-20 px-4 overflow-hidden text-center">
+    <section className="relative flex flex-col items-center justify-center py-8 md:py-16 px-4 overflow-hidden text-center">
       {/* Animated background */}
       <motion.div
         className="absolute inset-0 -z-10 blur-2xl opacity-70"
@@ -45,10 +71,19 @@ export default function Hero() {
       </motion.p>
       
       {/* Animated Math Icons */}
-      <div className="relative h-40 w-full mt-8">
+      {/* <div className="relative h-40 w-full mt-8">
         <AnimatePresence>
-          {[...Array(7)].map((_, i) => {
-            const icons = [Divide, Plus, Pi, Percent];
+          {[...Array(16)].map((_, i) => {
+            const icons = [
+              // Math operators
+              Plus, Minus, X, Divide, Equal, EqualNotIcon,
+              // Symbols
+              Percent, Pi, InfinityIcon, Sigma,
+              // Charts
+              BarChart2, BarChart3, PieChart, PieChartIcon, LineChart, LineChartIcon,
+              // Other math symbols
+              Parentheses, Braces, Brackets, DollarSign, Hash, Asterisk
+            ];
             const Icon = icons[Math.floor(Math.random() * icons.length)];
             const colors = ['text-purple-400', 'text-blue-400', 'text-pink-400', 'text-cyan-400'];
             const color = colors[Math.floor(Math.random() * colors.length)];
@@ -60,17 +95,17 @@ export default function Hero() {
                 initial={{
                   opacity: 0,
                   scale: 0.8,
-                  x: Math.random() * 800 - 400,
-                  y: Math.random() * 80 - 40,
+                  x: (Math.random() > 0.5 ? 1 : -1) * (100 + Math.random() * 400), // Wider horizontal spread
+                  y: Math.random() * 80 - 70,//Vertical
                 }}
                 animate={{
                   opacity: [0, 1, 0],
                   scale: [0.8, 1.3, 0.8],
-                  y: [0, -40, 0],
+                  y: [0, -70, 0],//Bounce Height
                 }}
                 transition={{
-                  duration: Math.random() * 2 + 2,
-                  delay: Math.random() * 3,
+                  duration: Math.random() * 2 + 2,//Animation Duration
+                  delay: Math.random() * 3,//Animation Delay
                   repeat: Infinity,
                   repeatType: "loop",
                 }}
@@ -81,7 +116,7 @@ export default function Hero() {
             );
           })}
         </AnimatePresence>
-      </div>
+      </div> */}
       
       {/* <motion.div
         className="mt-8 flex gap-4 justify-center"

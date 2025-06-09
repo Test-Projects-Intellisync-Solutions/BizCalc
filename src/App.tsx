@@ -44,7 +44,7 @@ function MainApp({ currentTab, onTabChange }: MainAppProps) {
         className="space-y-8"
       >
         {/* Home Tab */}
-        <TabsContent value="home" className="space-y-12">
+        <TabsContent value="home" className="space-y-6">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <LayoutDashboard className="h-5 w-5 text-primary" />
             Home
