@@ -1,0 +1,40 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[dev]
+  command = "npm run dev"
+  targetPort = 5173
+  publish = "dist"
+
+[dev.environment]
+  NODE_VERSION = "18"
+
+# Disable Git submodule initialization
+[build.processing]
+  skip_processing = false
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.images]
+  compress = true
+
+# Ignore Git submodules
+[build.environment]
+  NETLIFY_USE_YARN = "true"
+  NPM_FLAGS = "--no-optional"
+
+[functions]
+  node_bundler = "esbuild"
