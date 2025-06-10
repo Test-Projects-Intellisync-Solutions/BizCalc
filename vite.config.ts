@@ -15,7 +15,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
+        /*manualChunks: (id) => {
           // Group vendor dependencies into separate chunks
           if (id.includes('node_modules')) {
             // Group React and React DOM together
@@ -49,14 +49,14 @@ export default defineConfig({
             }
             return 'calculators_other';
           }
-        },
-        chunkFileNames: (chunkInfo) => {
+        },*/
+        /*chunkFileNames: (chunkInfo) => {
           // Customize chunk file names for better caching
           if (chunkInfo.name === 'index') {
             return 'assets/[name]-[hash].js';
           }
           return 'assets/[name]-[hash].js';
-        },
+        },*/
       },
     },
     chunkSizeWarningLimit: 1000, // Increase chunk size warning limit to 1000KB
