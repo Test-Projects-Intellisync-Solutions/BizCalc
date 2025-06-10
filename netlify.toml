@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  NETLIFY_USE_YARN = "true"
+  NPM_FLAGS = "--no-optional"
 
 [dev]
   command = "npm run dev"
@@ -30,11 +32,6 @@
 
 [build.processing.images]
   compress = true
-
-# Ignore Git submodules
-[build.environment]
-  NETLIFY_USE_YARN = "true"
-  NPM_FLAGS = "--no-optional"
 
 [functions]
   node_bundler = "esbuild"
